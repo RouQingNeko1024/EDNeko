@@ -1,0 +1,64 @@
+# Gradle
+.gradle/
+build/
+.kotlin/
+
+# IDE
+.idea/*
+!.idea/copyright/
+!.idea/codeInsightSettings.xml
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.code-workspace
+
+# Eclipse
+.settings/
+.classpath
+.project
+claude/
+
+# Minecraft run directory
+run/
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Compiled files
+*.class
+*.jar
+*.war
+*.ear
+
+# But keep Gradle wrapper
+!gradle/wrapper/gradle-wrapper.jar
+
+# Package files
+*.nar
+
+# Virtual machine crash logs
+hs_err_pid*
+
+# Local configuration
+local.properties
+
+# Build artifacts
+liquidbounce.mixins.refmap.json
+
+# Test files
+Test.java
+
+# Build scripts
+build.bat
+build_with_output.bat
+
+bin/
+promo-video/

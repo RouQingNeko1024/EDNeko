@@ -1,0 +1,12 @@
+gradle.projectsEvaluated {
+    def t = gradle.rootProject.tasks.findByName('runClient')
+    if (t != null) {
+        println "runClient task class: ${t.class.name}"
+        if (t.hasProperty('classpath')) {
+            println '--- runClient classpath ---'
+            t.classpath.files.each { println it }
+        }
+        println '--- dependsOn ---'
+        t.dependsOn.each { println it }
+    }
+}

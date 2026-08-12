@@ -1,0 +1,16 @@
+[
+  {
+    "modid": "EDNEKO",
+    "name": "EDNEKO",
+    "description": "EDNEKO",
+    "version": "${version}",
+    "mcversion": "1.8.9",
+    "url": "https://liquidbounce.net",
+    "updateUrl": "",
+    "authorList": ["CCBlueX","LMX","NekoBanka","NekoParua"],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]

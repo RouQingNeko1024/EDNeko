@@ -12,6 +12,7 @@ import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.aac.
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.aac.AACHop4
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.aac.AACHop5
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.aac.AACPortFDP
+import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.grim.Grim
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.hypixel.HypixelHop
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.hypixel.HypixelLowHop
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.intave.IntaveHop
@@ -76,6 +77,9 @@ object Speed : Module("Speed", Category.MOVEMENT, Keyboard.KEY_X) {
         VulcanHop,
         VulcanLowHop,
         VulcanGround288,
+
+        // Grim
+        Grim,
 
         // Matrix
         OldMatrixHop,
@@ -191,6 +195,14 @@ object Speed : Module("Speed", Category.MOVEMENT, Keyboard.KEY_X) {
     val bmcDamageBoost by boolean("DamageBoost", true) { mode.get() == "BlocksMCHop" }
     val damageLowHop by boolean("DamageLowHop", false) { mode.get() == "BlocksMCHop" }
     val safeY by boolean("SafeY", true) { mode.get() == "BlocksMCHop" }
+
+    // Grim Speed
+    val grimAirTimer by float("GrimAirTimer", 1.08f, 1f..2f) { mode.get() == "Grim" }
+    val grimTimerBoost by boolean("GrimTimerBoost", true) { mode.get() == "Grim" }
+    val grimSpoofGround by boolean("GrimSpoofGround", true) { mode.get() == "Grim" }
+    val grimPullDown by boolean("GrimPullDown", true) { mode.get() == "Grim" }
+    val grimPullDownTicks by float("GrimPullDownTicks", 8f, 1f..20f)
+    { grimPullDown && mode.get() == "Grim" }
 
     val onUpdate = handler<UpdateEvent> {
         val thePlayer = mc.thePlayer ?: return@handler

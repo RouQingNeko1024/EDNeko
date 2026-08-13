@@ -13,6 +13,11 @@ AirClient 是一个免费开源的 Minecraft 作弊客户端，基于 LiquidBoun
 
 - **我不知道喵** - 我不知道有什么特色功能
 
+### 构建
+
+.\gradlew.bat shadowJar --no-daemon
+
+
 这是SKID表
 1. 3arthH4ck
 2. ACID7

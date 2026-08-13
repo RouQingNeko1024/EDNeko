@@ -14,6 +14,7 @@ import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.a
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.aac.AACv2
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.aac.AACv3
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.ncp.NCP
+import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.other.Boat
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.other.Buzz
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.other.Hycraft
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.other.Redesky
@@ -32,7 +33,7 @@ object LongJump : Module("LongJump", Category.MOVEMENT) {
         AACv1, AACv2, AACv3,
 
         // Other
-        Redesky, Hycraft, Buzz, VerusDamage
+        Redesky, Hycraft, Buzz, VerusDamage, Boat
     )
 
     private val modes = longJumpModes.map { it.modeName }.toTypedArray()
@@ -44,14 +45,22 @@ object LongJump : Module("LongJump", Category.MOVEMENT) {
 
     val autoDisable by boolean("AutoDisable", true) { mode == "VerusDamage" }
 
+    val boatMode by choices("BoatMode", arrayOf("PacketAttack"), "PacketAttack") { mode == "Boat" }
+    val boatBoost by float("BoatBoost", 1.5f, 0.1f..10f) { mode == "Boat" }
+
     var jumped = false
     var canBoost = false
     var teleported = false
 
     val onUpdate = handler<UpdateEvent> {
-        if (jumped) {
-            val mode = mode
+        val mode = mode
 
+        if (mode == "Boat") {
+            modeModule.onUpdate()
+            return@handler
+        }
+
+        if (jumped) {
             if (mc.thePlayer.onGround || mc.thePlayer.capabilities.isFlying) {
                 jumped = false
 

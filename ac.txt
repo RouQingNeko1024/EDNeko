@@ -1,0 +1,731 @@
+================================================================================
+          Grim 2.0 反作弊移动类检测 严格分析报告
+================================================================================
+分析目标: Grim-2.0 (common 模块移动检测体系)
+分析范围: predictionengine / checks/impl/movement / checks/impl/prediction
+          checks/impl/flight / checks/impl/groundspoof / checks/impl/timer
+          checks/impl/velocity / checks/impl/elytra / manager/SetbackTeleportUtil
+分析日期: 2026-08-13
+================================================================================
+
+目录
+--------------------------------------------------------------------------------
+0. 移动检测架构总览
+1. [严重] 0.03 移动阈值版本欺骗绕过 (PointThreeEstimator / getMovementThreshold)
+2. [严重] GhostBlock 触发 blockOffsets 完全禁用 Simulation 检测
+3. [严重] FlightA 检测形同虚设 - 仅检测飞行包包序
+4. [高危] UncertaintyHandler.reduceOffset 偏移消减滥用
+5. [高危] GroundSpoof / exemptOnGround 大面积豁免链
+6. [高危] 击退/爆炸 0.03 内忽略 (KnockbackHandler / PointThreeEstimator)
+7. [中危] 鞘翅 isExemptElytra 完全预测豁免
+8. [中危] Timer clockDrift 平衡值累积绕过
+9. [中危] 载具切换不确定性 (lastVehicleSwitch) 位置裁剪滥用
+10. [中危] 潜行边缘隐藏速度累积 (SneakingEstimator)
+11. [中危] Phase 1.8 故障方块豁免
+12. [中危] 活塞不确定性 + 地面伪装豁免
+13. [中危] Riptide 触发 couldSkipTick 0.03 绕过
+14. [低危] NoSlow 双 tick 标记 + 1.8 槽位切换豁免
+15. [低危] Setback 速度复用与 futureKb 逻辑
+16. 综合绕过策略与组合利用
+17. 修复建议
+
+================================================================================
+0. 移动检测架构总览
+================================================================================
+
+Grim 2.0 的核心移动检测基于"预测引擎 (Prediction Engine)":
+
+  实际移动 (actualMovement) = 当前位置 - 上一帧位置
+  预测速度 (predictedVelocity) = 基于输入/摩擦/重力/碰撞模拟出的速度
+  偏移 (offset) = |predictedVelocity - actualMovement|
+
+关键文件链路:
+  PredictionRunner.onPositionUpdate()
+    -> MovementCheckRunner.processAndCheckMovementPacket()
+       -> check() 进行完整物理模拟
+       -> offset = predictedVelocity.distance(actualMovement)
+       -> offset = uncertaintyHandler.reduceOffset(offset)  [偏移消减]
+       -> checkManager.onPredictionFinish(PredictionComplete(offset,...))
+          -> OffsetHandler (Simulation)     偏移阈值判定
+          -> GroundSpoof                    地面状态伪装
+          -> Phase                          穿墙
+          -> GhostBlockDetector             幽灵方块 -> 可能置零偏移
+          -> NoSlow / KnockbackHandler / ExplosionHandler
+
+核心阈值 (OffsetHandler / Simulation):
+  threshold                  = 0.001      (触发标记的偏移阈值)
+  immediate-setback-threshold= 0.1        (立即回退)
+  max-advantage              = 1          (累积优势上限触发回退)
+  max-ceiling                = 4          (优势累积封顶)
+  setback-violation-threshold= 1          (违规次数门槛)
+  setback-decay-multiplier   = 0.999
+
+关键阈值 (GrimPlayer):
+  getMovementThreshold() = isPointThree() ? 0.03 : 0.0002
+    isPointThree() = 客户端版本 < 1.18.2
+  canSkipTicks() = 客户端 >= 1.9 且不支持 endTick (1.9~1.18.1)
+
+这意味着:
+  - 1.18.2+ 客户端: 阈值 0.0002, 几乎无法跳过 tick
+  - 1.9 ~ 1.18.1 客户端: 阈值 0.03, 拥有 150 倍的宽松度, 且可跳过 tick
+
+================================================================================
+1. [严重] 0.03 移动阈值版本欺骗绕过
+================================================================================
+
+漏洞位置:
+  GrimPlayer.getMovementThreshold()  [GrimPlayer.java:655]
+  GrimPlayer.isPointThree()          [GrimPlayer.java:651]
+  PointThreeEstimator.determineCanSkipTick()
+
+代码:
+  public boolean isPointThree() {
+      return getClientVersion().isOlderThan(ClientVersion.V_1_18_2);
+  }
+  public double getMovementThreshold() {
+      return isPointThree() ? 0.03 : 0.0002;
+  }
+
+漏洞分析:
+  移动阈值直接由"客户端自报版本"决定。Grim 通过 ViaVersion/PacketEvents 获取客户端
+  协议版本, 但该版本可被客户端伪造。1.18.2 以下客户端获得 0.03 的阈值, 而 1.18.2+
+  只有 0.0002。两者相差 150 倍。
+
+  0.03 阈值会触发 determineCanSkipTick(), 允许"跳过 tick"——即玩家可以发送一个
+  低于 0.03 的移动而不被检测。PredictionEngine.addZeroPointThreeToPossibilities()
+  会把一个 (0,0,0) 的 ZeroPointZeroThree 向量加入候选, 任何实际移动只要落在
+  0.03 球体内都会被判定为"跳过 tick"而豁免。
+
+  UncertaintyHandler.getOffsetHorizontal() 在 0.03 状态下给出:
+    pointThree = 0.91 * 0.6 * (0.03 * 2) + 0.03 ≈ 0.0627
+  即水平方向有约 0.06 的免费偏移。
+
+绕过方法:
+  1. 使用 ViaVersion 将客户端协议伪装为 1.18.1 / 1.17 / 1.16 等, 使 Grim 认为
+     你是 isPointThree()=true, 获得 0.03 阈值。
+  2. 在 0.03 球体内做微移动 (micro-move): 每帧位移控制在 < 0.03 内, Grim 会将
+     其归入 ZeroPointZeroThree 候选, offset 被消减为 0。
+  3. 配合"跳过 tick": 每隔一帧发送一个纯 look 包 (不含位置), 下一帧再发送累积位移。
+     由于 0.03 的存在, 累积位移只要不超过 0.03*2 的球体, 就不会被标记。
+  4. 垂直方向: wasZeroPointThreeVertically 会给垂直 0.06 的免费偏移, 可用于
+     微小悬浮/下落调整。
+
+================================================================================
+2. [严重] GhostBlock 触发 blockOffsets 完全禁用 Simulation 检测
+================================================================================
+
+漏洞位置:
+  MovementCheckRunner.check()  [MovementCheckRunner.java:~566]
+  GhostBlockDetector.onPredictionComplete()
+  SetbackTeleportUtil.blockMovementsUntilResync()
+
+代码:
+  // MovementCheckRunner
+  if (player.getSetbackTeleportUtil().blockOffsets) offset = 0;
+
+  // GhostBlockDetector
+  if (shouldResync) {
+      predictionComplete.setOffset(0);
+      player.getSetbackTeleportUtil().executeForceResync();  // isResync=true
+  }
+
+  // SetbackTeleportUtil.blockMovementsUntilResync
+  if (isResync) {
+      blockOffsets = true;   // 此后所有 offset 被强制置 0
+  }
+
+漏洞分析:
+  当 GhostBlockDetector 检测到"幽灵方块"条件时, 会:
+    (a) 将本次 offset 置 0
+    (b) 调用 executeForceResync() -> blockOffsets = true
+  此后, 在玩家"接受传送"之前, MovementCheckRunner 中:
+    if (blockOffsets) offset = 0;
+  所有偏移被强制清零, Simulation/GroundSpoof/Phase 全部失效。
+
+  GhostBlockDetector.isGhostBlock() 触发条件极宽:
+    - isOrWasNearGlitchyBlock (1.8 客户端靠近铁砧/箱子)
+    - 1.8 客户端 12 格内有船 (boat)
+
+绕过方法:
+  1. [1.8 客户端] 在铁砧/箱子/陷阱箱附近移动, 触发 isOrWasNearGlitchyBlock,
+     使 isGhostBlock 返回 true -> blockOffsets=true -> 后续所有移动检测失效。
+     在 blockOffsets 期间可自由飞行/穿墙, 直到玩家接受回退传送。
+  2. [1.8 客户端] 放置船在身边 (12 格内), 触发船检测, 同样效果。
+  3. 配合"延迟接受传送": 回退传送需要玩家发送匹配位置才被 poll 出 pendingTeleports。
+     若玩家持续发送略微偏移的位置 (在 threshold 内), checkTeleportQueue 会一直
+     无法匹配, blockOffsets 保持 true。注意: 若 lastTransactionReceived 超过
+     teleportPos.transaction, 会触发 BadPacketsN 并重新发送 setback, 但仍会
+     保持 blockOffsets 状态一段时间。
+
+================================================================================
+3. [严重] FlightA 检测形同虚设
+================================================================================
+
+漏洞位置:
+  FlightA.java
+
+代码:
+  public void onPacketReceive(PacketReceiveEvent event) {
+      if (WrapperPlayClientPlayerFlying.isFlying(event.getPacketType()) && !player.isFlying) {
+          flag();
+      }
+  }
+
+漏洞分析:
+  注释自称 "This check catches 100% of cheaters", 实际上这是反讽。
+  该检测 ONLY 检查: 玩家发送了 flying 包但 isFlying 标志为 false。
+  这只能捕获最原始的"飞行模式包序错误", 完全无法检测:
+    - 空中悬浮 (hovering)
+    - 无视重力的垂直爬升
+    - 滑翔状态下的非法爬升
+    - 利用 0.03 的微飞行
+
+  真正的飞行检测完全依赖预测引擎的 offset, 而 offset 可被上述 0.03 / blockOffsets
+  / reduceOffset 等机制绕过。
+
+绕过方法:
+  1. 任何不修改 isFlying 标志的飞行 hack 都不会被 FlightA 检测。
+  2. 只要保持预测引擎 offset 低于 0.001 (借助 0.03 阈值或 blockOffsets),
+     即可自由飞行。
+  3. 滑翔 (elytra) 状态下, isExemptElytra 或 fireworks 不确定性可掩盖爬升。
+
+================================================================================
+4. [高危] UncertaintyHandler.reduceOffset 偏移消减滥用
+================================================================================
+
+漏洞位置:
+  UncertaintyHandler.reduceOffset()  [UncertaintyHandler.java:~324]
+
+代码:
+  public double reduceOffset(double offset) {
+      if (player.uncertaintyHandler.lastHardCollidingLerpingEntity.hasOccurredSince(3)) {
+          offset -= 1.2;     // 硬碰撞实体: 消减 1.2 !!!
+      }
+      if (player.uncertaintyHandler.isOrWasNearGlitchyBlock) {
+          offset -= 0.25;    // 故障方块: 消减 0.25
+      }
+      if (player.uncertaintyHandler.influencedByBouncyBlock() && (!player.isPointThree() || player.inVehicle())) {
+          offset -= 0.03;    // 弹性方块: 消减 0.03
+      }
+      if (player.compensatedEntities.self.getRiding() instanceof PacketEntityRideable vehicle) {
+          if (vehicle.currentBoostTime < vehicle.boostTimeMax + 20)
+              offset -= 0.01; // 可骑乘实体加速: 消减 0.01
+      }
+      return Math.max(0, offset);
+  }
+
+漏洞分析:
+  lastHardCollidingLerpingEntity 在 checkForHardCollision() 中被 reset, 条件是
+  附近有船 / 潜影盒 / 快乐恶灵 (happy ghast)。一旦触发, 之后 3 tick 内所有 offset
+  消减 1.2——这远超 immediate-setback-threshold (0.1) 和 max-advantage (1)。
+  意味着玩家可以做出高达 1.2 的偏移而完全不被标记。
+
+  hasHardCollision() 的检测范围是 boundingBox.expand(1), 即玩家 1 格内有这些
+  实体就触发。
+
+绕过方法:
+  1. 在船 / 潜影盒 / 快乐恶灵 1 格范围内移动, 触发 lastHardCollidingLerpingEntity,
+     获得 1.2 的免费偏移。可在此期间做高速位移/瞬移 (offset < 1.2 均被清零)。
+  2. 在弹性方块 (史莱姆/蜂蜜/床) 附近, 若非 0.03 状态, 额外获得 0.03 偏移消减。
+  3. 骑乘可加速实体 (猪/赤兽) 时, boost 期间获得 0.01 消减。
+  4. 组合: 船 + 弹性方块 + 1.8 客户端 (故障方块) = 1.2 + 0.25 + 0.03 = 1.48 偏移
+     全部免费。
+
+================================================================================
+5. [高危] GroundSpoof / exemptOnGround 大面积豁免链
+================================================================================
+
+漏洞位置:
+  GroundSpoof.java
+  GrimPlayer.exemptOnGround()  [GrimPlayer.java:748]
+
+代码:
+  public boolean exemptOnGround() {
+      return inVehicle()
+          || Collections.max(uncertaintyHandler.pistonX) != 0
+          || Collections.max(uncertaintyHandler.pistonY) != 0
+          || Collections.max(uncertaintyHandler.pistonZ) != 0
+          || uncertaintyHandler.isStepMovement
+          || isFlying || compensatedEntities.self.isDead
+          || isInBed || lastInBed
+          || uncertaintyHandler.lastFlyingStatusChange.hasOccurredSince(30)   // 30 tick!
+          || uncertaintyHandler.lastHardCollidingLerpingEntity.hasOccurredSince(3)
+          || uncertaintyHandler.isOrWasNearGlitchyBlock;
+  }
+
+  // GroundSpoof
+  if (player.exemptOnGround() || !predictionComplete.isChecked()) return;
+  if (player.getSetbackTeleportUtil().blockOffsets) return;
+
+漏洞分析:
+  exemptOnGround() 返回 true 时, GroundSpoof 完全不检测。其中:
+    - lastFlyingStatusChange.hasOccurredSince(30): 飞行状态改变后 30 tick (1.5 秒)
+      内全部豁免地面伪装检测。
+    - lastHardCollidingLerpingEntity.hasOccurredSince(3): 硬碰撞实体 3 tick 豁免。
+    - 活塞 (pistonX/Y/Z 非零): 活塞推动期间豁免。
+    - isStepMovement: 步阶移动豁免。
+
+绕过方法:
+  1. [飞行状态切换] 切换飞行模式 (creative fly 开关) 后 1.5 秒内, 可任意伪造
+     onGround 状态而不被 GroundSpoof 标记。配合 NoFall 可实现长时间无伤坠落。
+  2. [硬碰撞实体] 在船/潜影盒附近伪造地面, 用于 NoFall 或跳跃重置。
+  3. [活塞] 触发活塞推动, 在活塞运动期间伪造地面。
+  4. [步阶] 利用 isStepMovement (上台阶/半砖) 时伪造地面。
+  5. [blockOffsets] 触发幽灵方块条件后, GroundSpoof 也被 blockOffsets 豁免。
+
+================================================================================
+6. [高危] 击退/爆炸 0.03 内忽略
+================================================================================
+
+漏洞位置:
+  PointThreeEstimator.handleChangeBlock()  [PointThreeEstimator.java:~117]
+  KnockbackHandler.forceExempt()
+
+代码:
+  // PointThreeEstimator.handleChangeBlock
+  // This can allow a player to ignore knockback and explosions within 0.03
+  // But I'm not sure there's a way to fix that without falses
+  final VelocityData oldFirstBreadKB = player.firstBreadKB;
+  ...
+  player.firstBreadKB = player.checkManager.getKnockbackHandler().calculateFirstBreadKnockback(...);
+  player.likelyKB = player.checkManager.getKnockbackHandler().calculateRequiredKB(...);
+  ...
+  player.updateVelocityMovementSkipping();
+  if (player.couldSkipTick) {
+      player.uncertaintyHandler.lastPointThree.reset();
+  } else {
+      // 还原旧值
+      player.firstBreadKB = oldFirstBreadKB;
+      ...
+  }
+
+  // KnockbackHandler.onPredictionComplete
+  if (!predictionComplete.isChecked() || predictionComplete.getData().isTeleport()) {
+      forceExempt();   // KB offset 置 0
+      return;
+  }
+
+漏洞分析:
+  开发者注释明确承认: "This can allow a player to ignore knockback and explosions
+  within 0.03"。当方块变化触发 couldSkipTick 时, 击退/爆炸的 firstBread/likely
+  数据会被重新计算, 若玩家处于 0.03 状态, 击退可被忽略。
+
+  此外, 当 predictionComplete 未被 checked (载具/未检测状态) 或为传送时,
+  forceExempt() 直接将 KB offset 置 0。
+
+绕过方法:
+  1. 在被击退的瞬间, 在身边放置/破坏方块 (如世界保护区内放水/梯子), 触发
+     handleChangeBlock -> couldSkipTick, 使击退数据被重算/忽略。
+  2. 利用 0.03 状态: 站立不动时 (lastPointThree 活跃), 接受击退但实际不移动,
+     KnockbackHandler 因 wasZero/knockbackPointThree 而不标记。
+  3. 进入/离开载具: 未 checked 状态下 forceExempt, 击退完全豁免。
+
+================================================================================
+7. [中危] 鞘翅 isExemptElytra 完全预测豁免
+================================================================================
+
+漏洞位置:
+  MovementCheckRunner.check()  [MovementCheckRunner.java:483]
+
+代码:
+  } else if (player.disableGrim || (...SPECTATOR...) || player.isFlying
+             || (player.isExemptElytra() && player.isGliding)) {
+      player.predictedVelocity = new VectorData(player.actualMovement, VectorType.Spectator);
+      player.clientVelocity = player.actualMovement.clone();   // 直接信任实际移动!
+      player.gravity = 0;
+      ...
+  }
+
+漏洞分析:
+  当 isExemptElytra() 返回 true 且玩家在滑翔时, 整个预测引擎被跳过——
+  predictedVelocity 直接等于 actualMovement, offset 恒为 0。
+  isExemptElytra 由配置 "exempt-elytra" 控制 (默认 false), 但若管理员开启
+  (用于兼容某些客户端), 则完全绕过。
+
+  即使未开启, 鞘翅正常状态下 fireworksBox 给予大量不确定性:
+    UncertaintyHandler.tickFireworksBox() 计算烟花推力盒, 最大 1.7 格/tick。
+    getOffsetHorizontal / getVerticalOffset 在滑翔时给 0.99*(0.03*2)+0.03 的偏移。
+
+绕过方法:
+  1. 若服务器开启 exempt-elytra: 滑翔期间可任意移动, offset 恒 0。
+  2. 正常鞘翅: 利用烟花不确定性, 在滑翔时做超出预测的位移, offset 被
+     fireworksBox 消减。配合 look 向量变化 (currentLook/lastLook) 扩大不确定性盒。
+  3. 快速切换滑翔/不滑翔 (0.03 内), PointThreeEstimator.isGliding 触发
+     controlsVerticalMovement, 获得垂直 0.06 免费偏移。
+
+================================================================================
+8. [中危] Timer clockDrift 平衡值累积绕过
+================================================================================
+
+漏洞位置:
+  Timer.java / TimerLimit.java
+
+代码:
+  // Timer
+  protected void limitFallBehind() {
+      timerBalanceRealTime = Math.max(timerBalanceRealTime, lastMovementPlayerClock - clockDrift);
+  }
+  // clockDrift 默认 120ms
+
+  // TimerLimit.limitFallBehind
+  long playerClock = lastMovementPlayerClock;
+  if (limitAbuseOverPing != -1 && System.nanoTime() - playerClock > limitAbuseOverPing) {
+      playerClock = System.nanoTime() - limitAbuseOverPing;   // 限制 ping 滥用
+  }
+
+漏洞分析:
+  Timer 检查允许玩家"落后" clockDrift (120ms) 而不标记。这意味着玩家可以累积
+  120ms 的"时间信用", 然后在关键时刻一次性消耗 (加速)。
+  timerBalanceRealTime 每包 +50e6 ns (50ms), 当 > System.nanoTime() 时标记。
+  但 limitFallBehind 保证余额不会低于 lastMovementPlayerClock - clockDrift。
+
+  TimerLimit 针对 >1000ms ping 限制滥用, 但默认仍允许 120ms drift。
+
+绕过方法:
+  1. [脉冲 Timer] 站立不动累积 timerBalance (每包 +50ms), 然后在战斗/移动时
+     以 1.01~1.02 倍速消耗, 因 clockDrift 缓冲不会立即标记。
+  2. [ping 滥用] 若 ping < 1000ms, TimerLimit 不生效, 可利用 120ms drift
+     做间歇性加速。
+  3. [NegativeTimer] 反向: 慢发包 (0.98x) 累积负余额, 再正常发包"偿还"。
+     NegativeTimer 在 lastPointThree (0.03) 2 tick 内重置余额, 可利用 0.03 状态
+     重置 NegativeTimer 检测。
+
+================================================================================
+9. [中危] 载具切换不确定性 位置裁剪滥用
+================================================================================
+
+漏洞位置:
+  MovementCheckRunner.check()  [wasVehicleSwitch / lastDummy 处理]
+
+代码:
+  if (player.vehicleData.wasVehicleSwitch || player.vehicleData.lastDummy) {
+      player.uncertaintyHandler.lastVehicleSwitch.reset();
+  }
+  ...
+  if (riding != null) {
+      SimpleCollisionBox interTruePositions = riding.getPossibleCollisionBoxes();
+      ...  // 缩小盒子
+      Vector3dm cutTo = VectorUtils.cutBoxToVector(player.x, player.y, player.z, interTruePositions);
+      player.lastX = cutTo.getX();   // 裁剪到载具碰撞盒内
+      ...
+  } else {
+      // 弹出载具: 若距离 > 3 才强制同步
+      if (distance > 3) {
+          player.getSetbackTeleportUtil().executeForceResync();
+      }
+      handleTeleport(update);
+      ...
+      return;
+  }
+
+漏洞分析:
+  切换载具时, lastVehicleSwitch 重置, 给予后续不确定性。
+  弹出载具时, 若玩家位置距 last 位置 <= 3 格, 不会强制同步——玩家可在 3 格内
+  自由设置弹出位置。
+  cutBoxToVector 将玩家位置裁剪到载具可能碰撞盒内, 但该盒子基于
+  getPossibleCollisionBoxes() (插值范围), 可能较大。
+
+  开发者注释: "Value patching this is not allowed. NoCheatPlus suffers from this
+  type of exploit" ——承认此为已知攻击面。
+
+绕过方法:
+  1. [弹出载具 3 格内位移] 骑载具到目标点附近, 弹出时设置位置在 3 格内的任意
+     高度/位置, 不会被强制同步。可用于小幅穿墙/越界。
+  2. [快速切换载具] 反复上下载具, 每次触发 lastVehicleSwitch, 获得不确定性
+     消减 (虽 reduceOffset 未直接列出, 但 lastVehicleSwitch 影响 0.03 判定)。
+  3. [载具插值盒] 利用载具插值阶段 getPossibleCollisionBoxes 较大, cutBoxToVector
+     给予更大合法位置范围。
+
+================================================================================
+10. [中危] 潜行边缘隐藏速度累积 (SneakingEstimator)
+================================================================================
+
+漏洞位置:
+  SneakingEstimator.java
+
+代码:
+  sneakingPotentialHiddenVelocity.minX = Math.min(-0.15, ...);
+  sneakingPotentialHiddenVelocity.maxX = Math.max(0.15, ...);
+  // Z 轴同理
+
+漏洞分析:
+  当玩家潜行卡在边缘 (stuckOnEdge) 时, SneakingEstimator 允许 ±0.15 的隐藏
+  水平速度。该速度被乘以 trueFriction 后保留, 用于后续 tick 的预测容差。
+  这意味着玩家在边缘潜行时可累积最高 0.15 的"隐藏"速度, 用于突然加速。
+
+绕过方法:
+  1. 在方块边缘潜行 (stuckOnEdge 触发), 累积隐藏速度。
+  2. 离开边缘瞬间释放隐藏速度, 做一次 0.15 的加速位移, 预测引擎因
+     sneakingPotentialHiddenVelocity 容差而不标记。
+  3. 配合 1.14 客户端 (潜行延迟 2 tick) 进一步扩大不确定性。
+
+================================================================================
+11. [中危] Phase 1.8 故障方块豁免
+================================================================================
+
+漏洞位置:
+  Phase.java
+
+代码:
+  if (player.getClientVersion().isOlderThanOrEquals(ClientVersion.V_1_8)) {
+      WrappedBlockState state = player.compensatedWorld.getBlock(...);
+      if (BlockTags.ANVIL.contains(state.getType())
+          || state.getType() == StateTypes.CHEST
+          || state.getType() == StateTypes.TRAPPED_CHEST) {
+          continue;   // 1.8 故障方块, 忽略穿墙
+      }
+  }
+
+漏洞分析:
+  Phase 检测对 1.8 客户端跳过铁砧/箱子/陷阱箱的穿墙判定。这是为了兼容 1.8
+  原版的碰撞箱 bug, 但可被利用。
+
+绕过方法:
+  1. 使用 1.8 客户端 (或 ViaVersion 伪装 1.8), 在铁砧/箱子处穿墙。
+  2. 配合 blockOffsets (1.8 故障方块触发 isOrWasNearGlitchyBlock -> GhostBlock
+     -> blockOffsets=true), Phase 也因 blockOffsets 而豁免:
+       if (!player.getSetbackTeleportUtil().blockOffsets && ...) // Phase 主体
+  3. 双重豁免: 1.8 + 故障方块 = Phase 完全不检测这些方块。
+
+================================================================================
+12. [中危] 活塞不确定性 + 地面伪装豁免
+================================================================================
+
+漏洞位置:
+  UncertaintyHandler.pistonX/Y/Z
+  GrimPlayer.exemptOnGround()
+
+代码:
+  // exemptOnGround
+  || Collections.max(uncertaintyHandler.pistonX) != 0
+  || Collections.max(uncertaintyHandler.pistonY) != 0
+  || Collections.max(uncertaintyHandler.pistonZ) != 0
+
+  // handleStartingVelocityUncertainty
+  double pistonX = Collections.max(player.uncertaintyHandler.pistonX);
+  double pistonY = Collections.max(player.uncertaintyHandler.pistonY);
+  double pistonZ = Collections.max(player.uncertaintyHandler.pistonZ);
+  // 加入不确定性盒
+
+漏洞分析:
+  活塞推动时, pistonX/Y/Z 队列 (EvictingQueue(5)) 记录推力。任何非零值都会:
+    (a) 触发 exemptOnGround -> GroundSpoof 豁免
+    (b) 在 handleStartingVelocityUncertainty 中扩大不确定性盒
+  队列保留 5 个 tick, 即一次活塞推动给予 5 tick 的地面伪装豁免 + 位移容差。
+
+绕过方法:
+  1. 触发活塞推动 (站在活塞路径上), 获得 5 tick 的:
+     - 地面伪装豁免 (NoFall)
+     - 水平/垂直位移容差 (活塞推力大小)
+  2. 在活塞推动期间伪造 onGround, 实现 NoFall 或跳跃重置。
+  3. 利用活塞推力方向的不确定性, 做额外位移。
+
+================================================================================
+13. [中危] Riptide 触发 couldSkipTick 0.03 绕过
+================================================================================
+
+漏洞位置:
+  MovementCheckRunner.check()  [likelyGroundRiptide 处理]
+
+代码:
+  if (player.lastOnGround && player.packetStateData.tryingToRiptide && !player.inVehicle()) {
+      Vector3dm pushingMovement = Collisions.collide(player, 0, 1.1999999F, 0);
+      ...
+      if (likelyGroundRiptide(pushingMovement)) {
+          player.uncertaintyHandler.thisTickSlimeBlockUncertainty = Math.abs(Riptide.getRiptideVelocity(player).getY()) + ...;
+          player.uncertaintyHandler.nextTickSlimeBlockUncertainty = ...;
+          player.lastOnGround = false;
+          player.lastY += pushingMovement.getY();
+          ...
+          player.couldSkipTick = true;   // 启用 0.03 跳过!
+      }
+  }
+
+漏洞分析:
+  地面激流 (riptide) 会强制设置 couldSkipTick = true, 启用 0.03 跳过 tick 逻辑。
+  同时设置 thisTickSlimeBlockUncertainty / nextTickSlimeBlockUncertainty 为
+  激流 Y 速度, 给予垂直方向大量不确定性。
+
+  likelyGroundRiptide 通过比较 actualMovement.Y 与激流速度的差异猜测玩家是否
+  在地面激流, 该猜测基于绝对差值比较, 可被操控。
+
+绕过方法:
+  1. 在水中 (isInWaterOrRain) 使用三叉戟激流, 同时控制 Y 位移使
+     riptideDiffToGround < riptideDiffToBase, 触发 likelyGroundRiptide=true。
+  2. 一旦 couldSkipTick=true, 后续预测加入 ZeroPointZeroThree 候选, 获得
+     0.03 球体免费位移。
+  3. 激流 Y 速度 (通常 ~1.2) 被加入 slimeBlockUncertainty, 垂直方向可做
+     大幅位移而不被标记。
+
+================================================================================
+14. [低危] NoSlow 双 tick 标记 + 1.8 槽位切换豁免
+================================================================================
+
+漏洞位置:
+  NoSlow.java
+
+代码:
+  if (player.packetStateData.isSlowedByUsingItem()) {
+      if (player.getClientVersion().isOlderThanOrEquals(ClientVersion.V_1_8) && didSlotChangeLastTick) {
+          didSlotChangeLastTick = false;
+          flaggedLastTick = false;   // 1.8 槽位切换: 豁免
+      }
+      if (bestOffset > offsetToFlag) {
+          if (flaggedLastTick) {
+              flagWithSetback();     // 需要连续 2 tick
+          }
+          flaggedLastTick = true;
+      } else {
+          reward();
+          flaggedLastTick = false;
+      }
+  }
+
+漏洞分析:
+  NoSlow 需要"连续 2 tick"偏移超标才标记 (flaggedLastTick 机制)。
+  1.8 客户端在槽位切换时 (didSlotChangeLastTick) 直接豁免。
+  offsetToFlag 默认 0.001。
+
+绕过方法:
+  1. [1.8 客户端] 每隔一 tick 切换手持物品 (在可使用物品间切换), 触发
+     didSlotChangeLastTick, 持续豁免 NoSlow。可满速使用物品移动。
+  2. [所有版本] 交替"使用物品满速"与"正常减速" tick, 使 flaggedLastTick 无法
+     连续 2 tick 为 true, 避免标记。即每秒做若干次减速"复位"。
+  3. 配合 0.03: bestOffset 被 reduceOffset 消减后 < 0.001, 直接 reward。
+
+================================================================================
+15. [低危] Setback 速度复用与 futureKb 逻辑
+================================================================================
+
+漏洞位置:
+  SetbackTeleportUtil.blockMovementsUntilResync()
+
+代码:
+  Pair<VelocityData, Vector3dm> futureKb = player.checkManager.getKnockbackHandler().getFutureKnockback();
+  VelocityData futureExplosion = player.checkManager.getExplosionHandler().getFutureExplosion();
+
+  if (futureKb.first() != null && !futureKb.first().isSetback) {
+      clientVel = futureKb.second();   // 应用未来击退
+  }
+  if (futureExplosion != null && (...)) {
+      clientVel.add(futureExplosion.vector);
+  }
+
+漏洞分析:
+  回退时, 若有"未来击退" (未确认的 firstBread KB), 会将其应用到回退速度。
+  但 isSetback 的 KB 被排除。这意味着玩家若能操控 firstBread KB 的时机,
+  可影响回退后的速度。
+
+  另外, simulateFriction 在回退时模拟摩擦, 但若 wasTouchingWater/Lava/Gliding
+  状态被操控, 可影响回退速度计算。
+
+绕过方法:
+  1. 在被回退前接受一个 firstBread 击退, 回退速度会包含该击退, 可能将玩家
+     "弹"向期望方向。
+  2. 操控 wasTouchingWater (0.03 内进水) 使 simulateFriction 使用水中摩擦
+     (0.8), 减少回退后的减速, 保留更多速度。
+  3. 回退后 clientVel 若 lengthSquared > 0 会发送 EntityVelocity, 玩家可利用
+     该速度做二次加速。
+
+================================================================================
+16. 综合绕过策略与组合利用
+================================================================================
+
+以下为高威胁组合绕过方案:
+
+【方案 A: 1.8 客户端全绕过链】
+  1. 使用 1.8 客户端 (或 ViaVersion 伪装 1.8)
+     -> isPointThree()=true, 阈值 0.03
+     -> canSkipTicks()=false (1.8 不跳 tick), 但 getMovementThreshold=0.03
+  2. 在铁砧/箱子附近活动
+     -> isOrWasNearGlitchyBlock=true
+     -> GhostBlockDetector.isGhostBlock=true
+     -> blockOffsets=true
+     -> offset 恒为 0, Simulation/GroundSpoof/Phase 全失效
+  3. 在船 1 格内
+     -> lastHardCollidingLerpingEntity reset
+     -> reduceOffset 消减 1.2
+     -> exemptOnGround=true (GroundSpoof 豁免)
+  4. 结果: 可自由飞行/穿墙/NoFall, 仅受 SetbackBlocker 的 shouldBlockMovement 限制
+
+【方案 B: 1.18.1 伪装 + 0.03 微移动】
+  1. ViaVersion 伪装 1.18.1
+     -> isPointThree()=true, 阈值 0.03
+     -> canSkipTicks()=true (1.9~1.18.1)
+  2. 每帧位移 < 0.03, 每隔一帧发纯 look 包
+     -> determineCanSkipTick=true
+     -> addZeroPointThreeToPossibilities 加入 (0,0,0) 候选
+     -> skippedTickInActualMovement=true
+     -> offset 被 0.03 球体覆盖
+  3. 垂直方向: wasZeroPointThreeVertically 给 0.06 免费偏移
+     -> 可做微小悬浮/爬升
+  4. 配合 NoSlow 交替减速, 满速使用物品
+
+【方案 C: 活塞 + 地面伪装 NoFall】
+  1. 触发活塞推动 (5 tick pistonX/Y/Z 非零)
+     -> exemptOnGround=true
+  2. 在活塞期间伪造 onGround=true (实际在空中)
+     -> GroundSpoof 豁免
+     -> NoFall 重置坠落伤害
+  3. 活塞不确定性盒给予位移容差, 掩盖位置差异
+
+【方案 D: 鞘翅烟花不确定性爬升】
+  1. 滑翔 + 使用烟花
+     -> fireworksBox 计算, 最大 1.7 格/tick 不确定性
+  2. 快速变化 look 向量 (yaw/pitch)
+     -> currentLook/lastLook 差异扩大 fireworksBox
+  3. 在烟花不确定性盒内做向上位移 (爬升), offset 被消减
+  4. 若服务器开启 exempt-elytra, 直接完全豁免
+
+【方案 E: 载具 3 格内弹出位移】
+  1. 骑船/猪到目标附近
+  2. 弹出载具, 设置位置在 3 格内的穿墙位置
+     -> distance <= 3, 不触发 executeForceResync
+  3. handleTeleport 重置速度, 但位置已被设置
+  4. 可用于小幅穿墙/越界
+
+================================================================================
+17. 修复建议
+================================================================================
+
+1. [blockOffsets] 不应将 offset 直接置 0, 应改为"延迟检测"或"使用更宽松阈值",
+   而非完全禁用。增加 blockOffsets 持续时间上限与审计日志。
+
+2. [getMovementThreshold] 0.03 阈值应结合服务器实际版本与反 ViaVersion 伪造,
+   不应完全信任客户端自报版本。可对 0.03 状态下的移动做额外统计检测
+   (如长期 0.03 占比过高则标记)。
+
+3. [reduceOffset] 1.2 的硬碰撞消减过大, 应限制为实际碰撞位移量, 而非固定值。
+   或对消减后的 offset 仍累计 advantageGained。
+
+4. [exemptOnGround] lastFlyingStatusChange 30 tick 豁免过长, 应缩短至 5 tick
+   或改为"仅在飞行切换瞬间"豁免。
+
+5. [FlightA] 应增加实际飞行检测: 空中悬停时间、垂直速度异常、无支撑飞行等,
+   而非仅检测包序。
+
+6. [GhostBlockDetector] isGhostBlock 条件过宽 (1.8 船 12 格), 应缩小范围并
+   增加 buffer, 避免单次触发即 blockOffsets。
+
+7. [Phase 1.8] 故障方块豁免应改为"仅在该方块碰撞箱确实异常时"豁免, 而非
+   全部 1.8 客户端全部铁砧/箱子。
+
+8. [Knockback 0.03] handleChangeBlock 中重算 KB 的逻辑应保留原始 offset 记录,
+   不应因 couldSkipTick 而完全重置。
+
+9. [NoSlow] 1.8 槽位切换豁免应限制频率, 双 tick 机制应改为"滑动窗口"统计。
+
+10. [Timer] clockDrift 120ms 偏大, 可降至 60ms; 对脉冲式加速做滑动窗口检测。
+
+11. [Riptide] likelyGroundRiptide 的猜测逻辑应增加置信度阈值, 不应单次猜测即
+    设置 couldSkipTick=true。
+
+12. [Setback futureKb] 回退速度不应包含未确认的 firstBread KB, 应使用最后确认
+    的安全速度。
+
+================================================================================
+报告结束
+================================================================================
+
+免责声明: 本报告仅用于安全研究与防御加固目的。绕过方法描述旨在帮助开发者
+理解攻击面并修复漏洞, 不应被用于实际作弊。

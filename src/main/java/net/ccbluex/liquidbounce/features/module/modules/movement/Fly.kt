@@ -72,7 +72,7 @@ object Fly : Module("Fly", Category.MOVEMENT, Keyboard.KEY_P) {
         MineSecure, HawkEye, HAC, WatchCat,
 
         // Other
-        Jetpack, KeepAlive, Collide, Jump, Flag, Fireball
+        Jetpack, KeepAlive, Collide, Jump, Flag, Fireball, Intave1493Lag
     )
 
     /**
@@ -131,6 +131,10 @@ object Fly : Module("Fly", Category.MOVEMENT, Keyboard.KEY_P) {
 
     // Other
     val neruxVaceTicks by int("NeruxVace-Ticks", 6, 2..20) { mode == "NeruxVace" }
+
+    // Intave14.9.3lag
+    val intaveLagCount by int("LagCount", 20, 1..100) { mode == "Intave14.9.3lag" }
+    val intaveAutoWalk by boolean("AutoWalk", true) { mode == "Intave14.9.3lag" }
 
     // Verus
     val damage by boolean("Damage", false) { mode == "Verus" }

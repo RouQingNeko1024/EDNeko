@@ -74,12 +74,12 @@ public class AimAssistRotationUtil {
             float randomizeStrength
     ) {
         Vec3 point = pointToFace;
-        if(Math.random()<=0.08){
+        if(Math.random()<=0.08){ //别转了。
             yawSpeed*=0.04F;pitchSpeed*= 0.03F;
         }
         float calcYaw,calcPitch;
         float[] current = new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch};
-        Rotation origin = RotationUtils.INSTANCE.toRotation(new Vec3(point.xCoord, point.yCoord, point.zCoord), false, mc.thePlayer);
+        Rotation origin = RotationUtils.INSTANCE.getRotations(point.xCoord, point.yCoord, point.zCoord);
         float[] target = new float[]{origin.getYaw(), origin.getPitch()};
         float[] finalR = smoothRotation(target, current, yawSpeed, pitchSpeed, point);
         calcYaw=finalR[0];
@@ -118,13 +118,13 @@ public class AimAssistRotationUtil {
             float entropyFactor,
             float randomizeStrength
     ) {
-        if(shortStop&&(Math.random()<=0.08)){
+        if(shortStop&&(Math.random()<=0.08)){ //别转了。
             yawSpeed*=0.04F;pitchSpeed*= 0.03F;
         }
         float calcYaw,calcPitch;
         Vec3 targetPos = getNearestHitVec(entity, heuristics);
         float[] current = new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch};
-        Rotation origin = RotationUtils.INSTANCE.toRotation(new Vec3(targetPos.xCoord, targetPos.yCoord, targetPos.zCoord), false, mc.thePlayer);
+        Rotation origin = RotationUtils.INSTANCE.getRotations(targetPos.xCoord, targetPos.yCoord, targetPos.zCoord);
         float[] target = new float[]{origin.getYaw(), origin.getPitch()};
         float[] finalR = smoothRotation(target, current, yawSpeed, pitchSpeed, entity, P1Max, P1Min, entropyFactor);
         calcYaw=finalR[0];

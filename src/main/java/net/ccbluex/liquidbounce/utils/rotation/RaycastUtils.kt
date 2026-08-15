@@ -1,19 +1,20 @@
 /*
- * Air Client
+ * FireBounce Hacked Client
  * A free open source mixin-based injection hacked client for Minecraft using Minecraft Forge.
+ * https://github.com/CCBlueX/LiquidBounce/
  */
 package net.ccbluex.liquidbounce.utils.rotation
 
 import net.ccbluex.liquidbounce.features.module.modules.combat.Backtrack
 import net.ccbluex.liquidbounce.features.module.modules.combat.Backtrack.loopThroughBacktrackData
 import net.ccbluex.liquidbounce.utils.client.MinecraftInstance
-import net.ccbluex.liquidbounce.utils.rotation.RotationUtils.getVectorForRotation
-import net.ccbluex.liquidbounce.utils.rotation.RotationUtils.isVisible
-import net.ccbluex.liquidbounce.utils.rotation.RotationUtils.serverRotation
 import net.ccbluex.liquidbounce.utils.extensions.eyes
 import net.ccbluex.liquidbounce.utils.extensions.hitBox
 import net.ccbluex.liquidbounce.utils.extensions.plus
 import net.ccbluex.liquidbounce.utils.extensions.times
+import net.ccbluex.liquidbounce.utils.rotation.RotationUtils.getVectorForRotation
+import net.ccbluex.liquidbounce.utils.rotation.RotationUtils.isVisible
+import net.ccbluex.liquidbounce.utils.rotation.RotationUtils.serverRotation
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityItemFrame

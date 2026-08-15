@@ -14,7 +14,7 @@ import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.aac.L
 import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.other.*
 import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.other.Blink
 import net.ccbluex.liquidbounce.utils.block.BlockUtils.collideBlock
-import net.ccbluex.liquidbounce.utils.rotation.AlwaysRotationSettings
+import net.ccbluex.liquidbounce.utils.rotation.RotationSettings
 import net.minecraft.block.BlockLiquid
 import net.minecraft.util.AxisAlignedBB.fromBounds
 import net.minecraft.util.BlockPos
@@ -73,7 +73,7 @@ object NoFall : Module("NoFall", Category.PLAYER) {
     val autoMLG by choices("AutoMLG", arrayOf("Off", "Pick", "Spoof"), "Spoof") { mode == "MLG" }
     val swing by boolean("Swing", true) { mode == "MLG" }
 
-    val options = AlwaysRotationSettings(this) { mode == "MLG" }
+    val options = RotationSettings(this) { mode == "MLG" }
 
     // Using too many times of simulatePlayer could result timer flag. Hence, why this is disabled by default.
     val checkFallDist by boolean("CheckFallDistance", false) { mode == "Blink" }.subjective()

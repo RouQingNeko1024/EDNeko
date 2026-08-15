@@ -24,7 +24,7 @@ import net.ccbluex.liquidbounce.utils.movement.MovementUtils
 import net.ccbluex.liquidbounce.utils.render.RenderUtils
 import net.ccbluex.liquidbounce.utils.rotation.PlaceRotation
 import net.ccbluex.liquidbounce.utils.rotation.Rotation
-import net.ccbluex.liquidbounce.utils.rotation.RotationSettingsWithRotationModes
+import net.ccbluex.liquidbounce.utils.rotation.RotationSettings
 import net.ccbluex.liquidbounce.utils.rotation.RotationUtils
 import net.ccbluex.liquidbounce.utils.rotation.RotationUtils.canUpdateRotation
 import net.ccbluex.liquidbounce.utils.rotation.RotationUtils.getFixedAngleDelta
@@ -161,7 +161,7 @@ object Scaffold : Module("Scaffold", Category.WORLD, Keyboard.KEY_I) {
     private val modeList =
         choices("Rotations", arrayOf("Off", "Normal", "Stabilized", "ReverseYaw", "GodBridge"), "Normal")
 
-    private val options = RotationSettingsWithRotationModes(this, modeList).apply {
+    private val options = RotationSettings(this).apply {
         strictValue.excludeWithState()
         resetTicksValue.setSupport { it && scaffoldMode != "Telly" }
     }

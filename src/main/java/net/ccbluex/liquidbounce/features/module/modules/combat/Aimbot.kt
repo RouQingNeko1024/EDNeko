@@ -204,6 +204,7 @@ object Aimbot : Module("Aimbot", Category.COMBAT) {
             destinationRotation,
             realisticTurnSpeed.toFloat(),
             legitimize = legitimize,
+            legitimizeFactor = 0.9f..1.1f,
             minRotationDiff = minRotationDifference,
             minRotationDiffResetTiming = minRotationDifferenceResetTiming,
         )

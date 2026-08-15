@@ -1,6 +1,7 @@
 /*
- * Air Client
+ * FireBounce Hacked Client
  * A free open source mixin-based injection hacked client for Minecraft using Minecraft Forge.
+ * https://github.com/CCBlueX/LiquidBounce/
  */
 package net.ccbluex.liquidbounce.utils.rotation
 
@@ -153,3 +154,4 @@ data class VecRotation(val vec: Vec3, val rotation: Rotation)
  * Rotation with place info
  */
 data class PlaceRotation(val placeInfo: PlaceInfo, val rotation: Rotation)
+

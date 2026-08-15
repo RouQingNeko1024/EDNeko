@@ -7,7 +7,7 @@ package net.ccbluex.liquidbounce.features.module.modules.misc
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.utils.extensions.rotation
-import net.ccbluex.liquidbounce.utils.rotation.AlwaysRotationSettings
+import net.ccbluex.liquidbounce.utils.rotation.RotationSettings
 import net.ccbluex.liquidbounce.utils.rotation.Rotation
 import net.ccbluex.liquidbounce.utils.rotation.RotationUtils.currentRotation
 import net.ccbluex.liquidbounce.utils.rotation.RotationUtils.setTargetRotation
@@ -22,7 +22,7 @@ object NoRotateSet : Module("NoRotateSet", Category.MISC, gameDetecting = false)
 
     private val ticksUntilStart = intRange("TicksUntilStart", 0..0, 0..20) { affectRotation }
 
-    private val options = AlwaysRotationSettings(this) { affectRotation }.apply {
+    private val options = RotationSettings(this) { affectRotation }.apply {
         withoutKeepRotation()
         applyServerSideValue.hideWithState(true)
         resetTicksValue.excludeWithState(1)

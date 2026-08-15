@@ -1,9 +1,3 @@
-/*
- * edneko Hacked Client
- *  A free open source mixin-based injection hacked client built on Liquidbounce legacy codebase.
- * https://github.com/lmx0721/edneko
- */
-
 package net.ccbluex.liquidbounce.features.module.modules.combat
 
 import net.ccbluex.liquidbounce.event.AttackEvent

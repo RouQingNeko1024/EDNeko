@@ -17,6 +17,7 @@ import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.n
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.other.Boat
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.other.Buzz
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.other.Hycraft
+import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.other.KkcraftBW
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.other.Redesky
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.other.VerusDamage
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.other.VerusDamage.damaged
@@ -33,7 +34,7 @@ object LongJump : Module("LongJump", Category.MOVEMENT) {
         AACv1, AACv2, AACv3,
 
         // Other
-        Redesky, Hycraft, Buzz, VerusDamage, Boat
+        Redesky, Hycraft, Buzz, VerusDamage, Boat, KkcraftBW
     )
 
     private val modes = longJumpModes.map { it.modeName }.toTypedArray()
@@ -47,6 +48,12 @@ object LongJump : Module("LongJump", Category.MOVEMENT) {
 
     val boatMode by choices("BoatMode", arrayOf("PacketAttack"), "PacketAttack") { mode == "Boat" }
     val boatBoost by float("BoatBoost", 1.5f, 0.1f..10f) { mode == "Boat" }
+
+    // KkcraftBW
+    val kkcraftBWSpeed by float("KkcraftBW-Speed", 0.4f, 0.1f..2f) { mode == "KkcraftBW" }
+    val kkcraftBWJump by boolean("KkcraftBW-Jump", true) { mode == "KkcraftBW" }
+    val kkcraftBWBoost by boolean("KkcraftBW-Boost", true) { mode == "KkcraftBW" }
+    val kkcraftBWBoostMultiplier by float("KkcraftBW-BoostMultiplier", 1.5f, 1.0f..5.0f) { kkcraftBWBoost && mode == "KkcraftBW" }
 
     var jumped = false
     var canBoost = false

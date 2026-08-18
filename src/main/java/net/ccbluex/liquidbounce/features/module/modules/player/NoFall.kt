@@ -11,6 +11,9 @@ import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.aac.A
 import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.aac.AAC3311
 import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.aac.AAC3315
 import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.aac.LAAC
+import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.matrix.Matrix
+import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.matrix.MatrixNew
+import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.matrix.MatrixSpoof
 import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.other.*
 import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.other.Blink
 import net.ccbluex.liquidbounce.utils.block.BlockUtils.collideBlock
@@ -31,6 +34,7 @@ object NoFall : Module("NoFall", Category.PLAYER) {
         Cancel,
         MLG,
         Blink,
+        GrimAC19,
 
         // AAC
         AAC,
@@ -45,6 +49,11 @@ object NoFall : Module("NoFall", Category.PLAYER) {
         // Vulcan
         VulcanFast288,
 
+        // Matrix
+        Matrix,
+        MatrixNew,
+        MatrixSpoof,
+
         // Other Server
         Spartan,
         CubeCraft,
@@ -53,6 +62,10 @@ object NoFall : Module("NoFall", Category.PLAYER) {
     private val modes = noFallModes.map { it.modeName }.toTypedArray()
 
     val mode by choices("Mode", modes, "MLG")
+
+    val matrixMinFallDistance by float("MatrixMinFallDistance", 3f, 0f..50f) { mode == "MatrixSpoof" }
+    val matrixNoVoid by boolean("MatrixNoVoid", true) { mode == "MatrixSpoof" }
+    val matrixLegitTimer by boolean("MatrixLegitTimer", true) { mode == "MatrixSpoof" }
 
     val minFallDistance by float("MinMLGHeight", 5f, 2f..50f) { mode == "MLG" }.subjective()
 
@@ -174,6 +187,10 @@ object NoFall : Module("NoFall", Category.PLAYER) {
 
     val onRotationUpdate = handler<RotationUpdateEvent> {
         modeModule.onRotationUpdate()
+    }
+
+    val onMovementInput = handler<MovementInputEvent> {
+        modeModule.onMovementInput(it)
     }
 
     override val tag

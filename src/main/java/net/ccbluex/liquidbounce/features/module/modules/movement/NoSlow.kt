@@ -15,10 +15,12 @@ import net.ccbluex.liquidbounce.utils.client.PacketUtils.sendPacket
 import net.ccbluex.liquidbounce.utils.extensions.isMoving
 import net.ccbluex.liquidbounce.utils.inventory.InventoryUtils
 import net.ccbluex.liquidbounce.utils.inventory.SilentHotbar
+import net.ccbluex.liquidbounce.utils.kotlin.RandomUtils.nextInt
 import net.ccbluex.liquidbounce.utils.movement.MovementUtils.hasMotion
 import net.ccbluex.liquidbounce.utils.timing.MSTimer
 import net.ccbluex.liquidbounce.utils.timing.TickTimer
 import net.minecraft.block.*
+import net.minecraft.init.Blocks
 import net.minecraft.item.*
 import net.minecraft.network.Packet
 import net.minecraft.network.PacketBuffer
@@ -26,9 +28,11 @@ import net.minecraft.network.handshake.client.C00Handshake
 import net.minecraft.network.play.client.*
 import net.minecraft.network.play.client.C07PacketPlayerDigging.Action.DROP_ITEM
 import net.minecraft.network.play.client.C07PacketPlayerDigging.Action.RELEASE_USE_ITEM
+import net.minecraft.network.play.server.S09PacketHeldItemChange
 import net.minecraft.network.play.server.S12PacketEntityVelocity
 import net.minecraft.network.play.server.S27PacketExplosion
 import net.minecraft.network.play.server.S2FPacketSetSlot
+import net.minecraft.network.play.server.S30PacketWindowItems
 import net.minecraft.network.status.client.C00PacketServerQuery
 import net.minecraft.network.status.client.C01PacketPing
 import net.minecraft.network.status.server.S01PacketPong
@@ -40,7 +44,7 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
 
     private val swordMode by choices(
         "SwordMode",
-        arrayOf("None", "NCP", "UpdatedNCP", "AAC5", "SwitchItem", "InvalidC08", "Blink", "postplace", "Matrix", "PredictionSemi", "Prediction", "GrimAC"),
+        arrayOf("None", "NCP", "UpdatedNCP", "AAC5", "SwitchItem", "InvalidC08", "Blink", "postplace", "Matrix", "PredictionSemi", "Prediction", "GrimAC", "GrimAC1.9+", "aug"),
         "None"
     )
 
@@ -50,6 +54,49 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
     private val predictionSwapDelay by int("PredictionSwapDelay", 0, 0..3) { swordMode == "Prediction" }
     private val predictionBlink by boolean("PredictionBlink", false) { swordMode == "Prediction" }
     private val predictionC17 by boolean("PredictionC17", false) { swordMode == "Prediction" }
+
+    private val grim19KeepSprinting by boolean("Grim19KeepSprinting", true) { swordMode == "GrimAC1.9+" }
+    private val grim19NoC0F by boolean("Grim19NoC0F", true) { swordMode == "GrimAC1.9+" }
+
+    // aug模式 - Blocking子选项
+    private val augBlockingSwitch by boolean("AugBlockingSwitch", false) { swordMode == "aug" }
+    private val augBlockingExtra by boolean("AugBlockingExtra", false) { swordMode == "aug" }
+    private val augBlockingAAC5 by boolean("AugBlockingAAC5", false) { swordMode == "aug" }
+    private val augBlockingNoGround by boolean("AugBlockingNoGround", false) { swordMode == "aug" }
+    private val augBlockingJump by boolean("AugBlockingJump", false) { swordMode == "aug" }
+    private val augBlockingHandPacket by boolean("AugBlockingHandPacket", false) { swordMode == "aug" }
+    private val augBlockingMainHand by boolean("AugBlockingMainHand", false) { swordMode == "aug" }
+    private val augBlockingOffHandPlace by boolean("AugBlockingOffHandPlace", false) { swordMode == "aug" }
+    private val augBlockingOldGrim by boolean("AugBlockingOldGrim", false) { swordMode == "aug" }
+    private val augBlockingPost by boolean("AugBlockingPost", false) { swordMode == "aug" }
+
+    // aug模式 - Food子选项
+    private val augFoodSwitch by boolean("AugFoodSwitch", false) { swordMode == "aug" }
+    private val augFoodExtra by boolean("AugFoodExtra", false) { swordMode == "aug" }
+    private val augFoodJump by boolean("AugFoodJump", false) { swordMode == "aug" }
+    private val augFoodNoGround by boolean("AugFoodNoGround", false) { swordMode == "aug" }
+    private val augFoodClip by boolean("AugFoodClip", false) { swordMode == "aug" }
+    private val augFoodHandPacket by boolean("AugFoodHandPacket", false) { swordMode == "aug" }
+    private val augFoodOldGrim by boolean("AugFoodOldGrim", false) { swordMode == "aug" }
+    private val augFoodMainHand by boolean("AugFoodMainHand", false) { swordMode == "aug" }
+
+    // aug模式 - Bow子选项
+    private val augBowSwitch by boolean("AugBowSwitch", false) { swordMode == "aug" }
+    private val augBowExtra by boolean("AugBowExtra", false) { swordMode == "aug" }
+    private val augBowHandPacket by boolean("AugBowHandPacket", false) { swordMode == "aug" }
+    private val augBowOldGrim by boolean("AugBowOldGrim", false) { swordMode == "aug" }
+    private val augBowMainHand by boolean("AugBowMainHand", false) { swordMode == "aug" }
+
+    // aug模式 - 速度倍率
+    private val augBlockingForward by float("AugBlockingForward", 0.2f, 0.0f..1.0f) { swordMode == "aug" }
+    private val augBlockingStrafe by float("AugBlockingStrafe", 0.2f, 0.0f..1.0f) { swordMode == "aug" }
+    private val augFoodForward by float("AugFoodForward", 0.2f, 0.0f..1.0f) { swordMode == "aug" }
+    private val augFoodStrafe by float("AugFoodStrafe", 0.2f, 0.0f..1.0f) { swordMode == "aug" }
+    private val augBowForward by float("AugBowForward", 0.2f, 0.0f..1.0f) { swordMode == "aug" }
+    private val augBowStrafe by float("AugBowStrafe", 0.2f, 0.0f..1.0f) { swordMode == "aug" }
+
+    // aug模式 - 其他选项
+    private val augIgnoreServerItemChange by boolean("AugIgnoreServerItemChange", false) { swordMode == "aug" }
 
     private val blockForwardMultiplier by float("BlockForwardMultiplier", 1f, 0.2F..1f)
     private val blockStrafeMultiplier by float("BlockStrafeMultiplier", 1f, 0.2F..1f)
@@ -92,6 +139,7 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
     private var grimEating = true
     private var grimLastFoodAmount = 0
     private var grimFoodSpeed = 0.2f
+    private var grim19Blocking = false
     private var predictionDelay = 0
     private var predictionPost = false
     private var predictionBlockTick = 0
@@ -103,7 +151,26 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
     private val packetBuf = mutableListOf<Packet<*>>()
     private val msTimer = MSTimer()
 
+    // aug模式相关变量
+    private var augBlocking = false
+
     private val BlinkTimer = TickTimer()
+
+    override val tag: String?
+        get() = if (swordMode == "aug") {
+            val tags = mutableListOf<String>()
+            if (augBlockingSwitch) tags.add("Switch")
+            if (augBlockingExtra) tags.add("Extra")
+            if (augBlockingAAC5) tags.add("AAC5")
+            if (augBlockingNoGround) tags.add("NoGround")
+            if (augBlockingJump) tags.add("Jump")
+            if (augBlockingHandPacket) tags.add("HandPacket")
+            if (augBlockingMainHand) tags.add("MainHand")
+            if (augBlockingOffHandPlace) tags.add("OffHandPlace")
+            if (augBlockingOldGrim) tags.add("OldGrim")
+            if (augBlockingPost) tags.add("Post")
+            if (tags.isNotEmpty()) "aug | ${tags.joinToString(",")}" else "aug"
+        } else null
 
     override fun onDisable() {
         shouldSwap = false
@@ -114,6 +181,7 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
         grimEating = true
         grimLastFoodAmount = 0
         grimFoodSpeed = 0.2f
+        grim19Blocking = false
         predictionDelay = 0
         predictionPost = false
         predictionBlockTick = 0
@@ -124,6 +192,9 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
         waitC03 = false
         packetBuf.clear()
         msTimer.reset()
+
+        // 重置aug模式相关变量
+        augBlocking = false
     }
 
     val onMotion = handler<MotionEvent> { event ->
@@ -133,6 +204,22 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
 
         if (!hasMotion && !shouldSwap)
             return@handler
+
+        // GrimAC1.9+ 模式: 不在使用物品时重置状态
+        if (swordMode == "GrimAC1.9+" && !isUsingItem) {
+            grim19Blocking = false
+        }
+
+        // aug模式: 不在使用物品时重置状态
+        if (swordMode == "aug" && !isUsingItem) {
+            augBlocking = false
+        }
+
+        // aug模式处理
+        if (swordMode == "aug" && isUsingItem) {
+            handleAugMotion(event, player, heldItem)
+            return@handler
+        }
 
         // Matrix模式处理
         if (swordMode == "Matrix" && (lastBlockingStat || isUsingItem)) {
@@ -323,6 +410,15 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
                         predictionPost = false
                     }
                 }
+
+                "grimac1.9+" -> {
+                    if (event.eventState == EventState.PRE) {
+                        grim19Blocking = true
+                        if (grim19NoC0F) {
+                            sendPacket(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, heldItem, 0f, 0f, 0f))
+                        }
+                    }
+                }
             }
         }
     }
@@ -336,6 +432,21 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
 
         if (consumeMode == "GrimAC") {
             handleGrimConsumePacket(event, packet, player)
+            if (event.isCancelled)
+                return@handler
+        }
+
+        // GrimAC1.9+ 模式: 取消原始的C08包(使用物品触发的), 我们在onMotion中发送了伪造的C08
+        if (swordMode == "GrimAC1.9+" && grim19Blocking && grim19NoC0F) {
+            if (packet is C08PacketPlayerBlockPlacement && packet.placedBlockDirection == 255 && player.heldItem?.item is ItemSword) {
+                event.cancelEvent()
+                return@handler
+            }
+        }
+
+        // aug模式包处理
+        if (swordMode == "aug") {
+            handleAugPacket(event, packet, player)
             if (event.isCancelled)
                 return@handler
         }
@@ -467,6 +578,34 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
 
         if (heldItem is ItemSword && swordMode == "PredictionSemi" && predictionBlockTick != predictionCancelTick && predictionBlockTick != predictionCancelTick2)
             return@handler
+
+        if (heldItem is ItemSword && swordMode == "GrimAC1.9+" && grim19Blocking) {
+            event.forward = 1f
+            event.strafe = 1f
+            if (grim19KeepSprinting) {
+                mc.thePlayer?.setSprinting(true)
+            }
+            return@handler
+        }
+
+        // aug模式减速处理
+        if (swordMode == "aug") {
+            when (heldItem) {
+                is ItemSword -> {
+                    event.forward = augBlockingForward
+                    event.strafe = augBlockingStrafe
+                }
+                is ItemFood, is ItemPotion, is ItemBucketMilk -> {
+                    event.forward = augFoodForward
+                    event.strafe = augFoodStrafe
+                }
+                is ItemBow -> {
+                    event.forward = augBowForward
+                    event.strafe = augBowStrafe
+                }
+            }
+            return@handler
+        }
 
         event.forward = getMultiplier(heldItem, true)
         event.strafe = getMultiplier(heldItem, false)
@@ -617,5 +756,150 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
         SilentHotbar.selectSlotSilently(this, (SilentHotbar.currentSlot + 1) % 9, immediate = true)
         SilentHotbar.resetSlot(this, true)
     }
-}
 
+    private fun handleAugMotion(event: MotionEvent, player: net.minecraft.client.entity.EntityPlayerSP, heldItem: net.minecraft.item.ItemStack) {
+        val isPre = event.eventState == EventState.PRE
+        val currentItem = heldItem.item
+
+        if (currentItem is ItemSword) {
+            if (augBlockingSwitch && isPre) {
+                sendPacket(C09PacketHeldItemChange(player.inventory.currentItem % 8 + 1))
+                sendPacket(C09PacketHeldItemChange(player.inventory.currentItem))
+            }
+            if (augBlockingNoGround) {
+                event.onGround = false
+            }
+            if (augBlockingJump && player.onGround && !isPre) {
+                player.jump()
+            }
+            if (augBlockingAAC5 && !isPre) {
+                sendPacket(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, heldItem, 0f, 0f, 0f))
+            }
+            if (augBlockingExtra && isPre) {
+                sendPacket(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, heldItem, 0f, 0f, 0f))
+            }
+            if (augBlockingHandPacket && isPre) {
+                sendPacket(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, null, 0f, 0f, 0f))
+            }
+            if (augBlockingPost) {
+                if (isPre) {
+                    sendPacket(C07PacketPlayerDigging(RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN))
+                } else {
+                    sendPacket(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, heldItem, 0f, 0f, 0f))
+                }
+            }
+            if (augBlockingOffHandPlace && isPre) {
+                sendPacket(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, null, 0f, 0f, 0f))
+            }
+            if (augBlockingOldGrim) {
+                if (isPre) {
+                    if (augBlocking) {
+                        sendPacket(C07PacketPlayerDigging(RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN))
+                        augBlocking = false
+                    }
+                } else {
+                    sendPacket(C0FPacketConfirmTransaction(1, nextInt(-999999, 999999).toShort(), true), false)
+                    sendPacket(C08PacketPlayerBlockPlacement(heldItem))
+                    augBlocking = true
+                }
+            }
+            if (augBlockingMainHand && isPre) {
+                sendPacket(C08PacketPlayerBlockPlacement(heldItem))
+            }
+        }
+
+        if (currentItem is ItemFood || currentItem is ItemPotion || currentItem is ItemBucketMilk) {
+            if (augFoodSwitch && isPre) {
+                sendPacket(C09PacketHeldItemChange(player.inventory.currentItem % 8 + 1))
+                sendPacket(C09PacketHeldItemChange(player.inventory.currentItem))
+            }
+            if (augFoodNoGround) {
+                event.onGround = false
+            }
+            if (augFoodJump && player.onGround && !isPre) {
+                player.jump()
+            }
+            if (augFoodExtra && isPre) {
+                sendPacket(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, heldItem, 0f, 0f, 0f))
+            }
+            if (augFoodClip) {
+                event.y += 1e-14
+            }
+            if (augFoodHandPacket && isPre) {
+                sendPacket(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, null, 0f, 0f, 0f))
+            }
+            if (augFoodOldGrim) {
+                if (isPre) {
+                    sendPacket(C0EPacketClickWindow(0, 36, 0, 2, ItemStack(Blocks.barrier), 0.toShort()), false)
+                }
+                sendPacket(C09PacketHeldItemChange(player.inventory.currentItem % 8 + 1))
+                sendPacket(C09PacketHeldItemChange(player.inventory.currentItem % 7 + 2))
+                sendPacket(C09PacketHeldItemChange(player.inventory.currentItem))
+            }
+            if (augFoodMainHand && isPre) {
+                sendPacket(C08PacketPlayerBlockPlacement(heldItem))
+            }
+        }
+
+        if (currentItem is ItemBow) {
+            if (augBowSwitch && isPre) {
+                sendPacket(C09PacketHeldItemChange(player.inventory.currentItem % 8 + 1))
+                sendPacket(C09PacketHeldItemChange(player.inventory.currentItem))
+            }
+            if (augBowExtra && isPre) {
+                sendPacket(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, heldItem, 0f, 0f, 0f))
+            }
+            if (augBowHandPacket && isPre) {
+                sendPacket(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, null, 0f, 0f, 0f))
+            }
+            if (augBowOldGrim) {
+                sendPacket(C09PacketHeldItemChange(player.inventory.currentItem % 8 + 1))
+                sendPacket(C09PacketHeldItemChange(player.inventory.currentItem % 7 + 2))
+                sendPacket(C09PacketHeldItemChange(player.inventory.currentItem))
+            }
+            if (augBowMainHand && isPre) {
+                sendPacket(C08PacketPlayerBlockPlacement(heldItem))
+            }
+        }
+    }
+
+    private fun handleAugPacket(event: PacketEvent, packet: Packet<*>, player: net.minecraft.client.entity.EntityPlayerSP) {
+        val heldItem = player.heldItem?.item ?: return
+
+        // OldGrim food/bow: 发送使用物品包时清零移动
+        if ((augFoodOldGrim && (heldItem is ItemFood || heldItem is ItemBucketMilk || heldItem is ItemPotion)) ||
+            (augBowOldGrim && heldItem is ItemBow)
+        ) {
+            if (event.eventType == EventState.SEND) {
+                if (packet is C08PacketPlayerBlockPlacement && packet.placedBlockDirection == 255) {
+                    player.motionX = 0.0
+                    player.motionZ = 0.0
+                }
+                if (packet is C07PacketPlayerDigging && packet.status == RELEASE_USE_ITEM) {
+                    player.motionX = 0.0
+                    player.motionZ = 0.0
+                }
+            }
+        }
+
+        // OldGrim food/bow: 取消S30PacketWindowItems
+        if (event.eventType == EventState.RECEIVE) {
+            if ((augFoodOldGrim && (heldItem is ItemFood || heldItem is ItemBucketMilk || heldItem is ItemPotion)) ||
+                (augBowOldGrim && heldItem is ItemBow)
+            ) {
+                if (packet is S30PacketWindowItems) {
+                    event.cancelEvent()
+                    return
+                }
+            }
+        }
+
+        // IgnoreServerItemChange: 取消S09PacketHeldItemChange
+        if (augIgnoreServerItemChange && event.eventType == EventState.RECEIVE) {
+            if (packet is S09PacketHeldItemChange) {
+                event.cancelEvent()
+                return
+            }
+        }
+    }
+}

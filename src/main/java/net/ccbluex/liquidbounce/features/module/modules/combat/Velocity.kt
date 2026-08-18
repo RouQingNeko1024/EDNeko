@@ -39,6 +39,7 @@ import net.minecraft.network.play.client.C0BPacketEntityAction.Action.*
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S12PacketEntityVelocity
 import net.minecraft.network.play.server.S19PacketEntityStatus
+import net.minecraft.network.play.server.S23PacketBlockChange
 import net.minecraft.network.play.server.S27PacketExplosion
 import net.minecraft.network.play.server.S32PacketConfirmTransaction
 import net.minecraft.util.AxisAlignedBB
@@ -77,7 +78,7 @@ object Velocity : Module("Velocity", Category.COMBAT) {
             "AAC4Reduce", "AAC5Reduce", "AAC5.2.0", "AAC5.2.0Combat",
             "Grim", "Grim1.17", "GrimC07", "GrimDamage", "MatrixReverse",
             "MatrixSimple", "HypixelBoost", "Minemen", "Phase", "SideStrafe",
-            "Spoof", "Tick"
+            "Spoof", "Tick", "Rise"
         ), "Simple"
     )
 
@@ -248,6 +249,97 @@ object Velocity : Module("Velocity", Category.COMBAT) {
     private val sideStrafeFace by boolean("SideStrafeFace", true) { mode == "SideStrafe" }
     private val sideStrafeRotationSettings = RotationSettings(this) { mode == "SideStrafe" && sideStrafeFace }.withoutKeepRotation()
 
+    private val riseGrimRotationSettings = RotationSettings(this) { mode == "Rise" && riseMode == "Grim" && riseGrimRotations }.withoutKeepRotation()
+
+    // Rise Mode
+    private val riseMode by choices(
+        "RiseMode", arrayOf(
+            "AAC", "Bounce", "BufferAbuse", "Delay", "Grim2", "GrimReduce",
+            "GrimTest", "Grim", "Ground", "Intave", "Karhu", "Legit",
+            "Matrix", "MMC", "Standard", "Tick", "Universocraft", "Vulcan",
+            "WatchdogDamageBoost", "WatchdogPrediction", "WatchdogReduce", "Watchdog"
+        ), "Standard"
+    ) { mode == "Rise" }
+
+    // Rise-Bounce
+    private val riseBounceTick by int("RiseBounceTick", 0, 0..6) { mode == "Rise" && riseMode == "Bounce" }
+    private val riseBounceVertical by boolean("RiseBounceVertical", false) { mode == "Rise" && riseMode == "Bounce" }
+    private val riseBounceHorizontal by boolean("RiseBounceHorizontal", false) { mode == "Rise" && riseMode == "Bounce" }
+
+    // Rise-BufferAbuse
+    private val riseBufferHorizontal by int("RiseBufferHorizontal", 100, 0..100) { mode == "Rise" && riseMode == "BufferAbuse" }
+    private val riseBufferVertical by int("RiseBufferVertical", 100, 0..100) { mode == "Rise" && riseMode == "BufferAbuse" }
+    private val riseBufferBuffer by int("RiseBufferBuffer", 1, 1..3) { mode == "Rise" && riseMode == "BufferAbuse" }
+
+    // Rise-Delay
+    private val riseDelayTicks by int("RiseDelayTicks", 5, 0..40) { mode == "Rise" && riseMode == "Delay" }
+    private val riseDelayExplosions by boolean("RiseDelayExplosions", true) { mode == "Rise" && riseMode == "Delay" }
+
+    // Rise-Grim2
+    private val riseGrim2FullRotationFix by boolean("RiseGrim2FullRotationFix", true) { mode == "Rise" && riseMode == "Grim2" }
+    private val riseGrim2FakeS08 by boolean("RiseGrim2FakeS08", true) { mode == "Rise" && riseMode == "Grim2" }
+    private val riseGrim2CancelVelocity by boolean("RiseGrim2CancelVelocity", true) { mode == "Rise" && riseMode == "Grim2" }
+    private val riseGrim2RotationNoise by float("RiseGrim2RotationNoise", 0.001f, 0f..0.1f) { mode == "Rise" && riseMode == "Grim2" }
+
+    // Rise-GrimReduce
+    private val riseGrimReduceReduceTicks by int("RiseGrimReduceReduceTicks", 7, 1..10) { mode == "Rise" && riseMode == "GrimReduce" }
+    private val riseGrimReduceRotations by boolean("RiseGrimReduceRotations", true) { mode == "Rise" && riseMode == "GrimReduce" }
+    private val riseGrimReduceExtraHit by boolean("RiseGrimReduceExtraHit", false) { mode == "Rise" && riseMode == "GrimReduce" }
+    private val riseGrimReduceJumpReset by boolean("RiseGrimReduceJumpReset", true) { mode == "Rise" && riseMode == "GrimReduce" }
+    private val riseGrimReduceDelayPlus by boolean("RiseGrimReduceDelayPlus", false) { mode == "Rise" && riseMode == "GrimReduce" }
+    private val riseGrimReduceDelayTillGround by boolean("RiseGrimReduceDelayTillGround", true) { mode == "Rise" && riseMode == "GrimReduce" }
+    private val riseGrimReduceTeleportDisableTicks by int("RiseGrimReduceTeleportDisableTicks", 0, 0..20) { mode == "Rise" && riseMode == "GrimReduce" }
+
+    // Rise-GrimTest
+    private val riseGrimTestMode by choices("RiseGrimTestMode", arrayOf("GrimFull", "Reduce", "JumpReset"), "Reduce") { mode == "Rise" && riseMode == "GrimTest" }
+    private val riseGrimTestMinAttacks by int("RiseGrimTestMinAttacks", 1, 1..5) { mode == "Rise" && riseMode == "GrimTest" }
+    private val riseGrimTestMaxAttacks by int("RiseGrimTestMaxAttacks", 3, 1..5) { mode == "Rise" && riseMode == "GrimTest" }
+    private val riseGrimTestDelayRelease by boolean("RiseGrimTestDelayRelease", true) { mode == "Rise" && riseMode == "GrimTest" }
+    private val riseGrimTestDelaySpeedThreshold by float("RiseGrimTestDelaySpeedThreshold", 0.4f, 0f..2f) { mode == "Rise" && riseMode == "GrimTest" }
+    private val riseGrimTestDelayTimeout by int("RiseGrimTestDelayTimeout", 5000, 1000..10000) { mode == "Rise" && riseMode == "GrimTest" }
+    private val riseGrimTestJumpResetTick by int("RiseGrimTestJumpResetTick", 2, 1..5) { mode == "Rise" && riseMode == "GrimTest" }
+    private val riseGrimTestRotationFix by boolean("RiseGrimTestRotationFix", true) { mode == "Rise" && riseMode == "GrimTest" }
+
+    // Rise-Grim
+    private val riseGrimRotations by boolean("RiseGrimRotations", true) { mode == "Rise" && riseMode == "Grim" }
+
+    // Rise-Ground
+    private val riseGroundDelay by int("RiseGroundDelay", 1, 0..20) { mode == "Rise" && riseMode == "Ground" }
+
+    // Rise-Legit
+    private val riseLegitChance by int("RiseLegitChance", 100, 0..100) { mode == "Rise" && riseMode == "Legit" }
+    private val riseLegitTiming by boolean("RiseLegitTiming", false) { mode == "Rise" && riseMode == "Legit" }
+
+    // Rise-Standard
+    private val riseStandardHorizontal by int("RiseStandardHorizontal", 0, 0..100) { mode == "Rise" && riseMode == "Standard" }
+    private val riseStandardVertical by int("RiseStandardVertical", 0, 0..100) { mode == "Rise" && riseMode == "Standard" }
+    private val riseStandardExplosionIgnore by boolean("RiseStandardExplosionIgnore", false) { mode == "Rise" && riseMode == "Standard" }
+
+    // Rise-Tick
+    private val riseTickVelocity by int("RiseTickVelocity", 1, 1..6) { mode == "Rise" && riseMode == "Tick" }
+
+    // Rise-Vulcan
+    private val riseVulcanBacktrack by boolean("RiseVulcanBacktrack", false) { mode == "Rise" && riseMode == "Vulcan" }
+    private val riseVulcanAlwaysCancelVertical by boolean("RiseVulcanAlwaysCancelVertical", false) { mode == "Rise" && riseMode == "Vulcan" }
+
+    // Rise-WatchdogDamageBoost
+    private val riseWatchdogDamageBoostHorizontal by int("RiseWatchdogDamageBoostHorizontal", 0, 0..100) { mode == "Rise" && riseMode == "WatchdogDamageBoost" }
+    private val riseWatchdogDamageBoostVertical by int("RiseWatchdogDamageBoostVertical", 0, 0..100) { mode == "Rise" && riseMode == "WatchdogDamageBoost" }
+
+    // Rise-WatchdogPrediction
+    private val riseWatchdogPredictionVelocityToLetThrough by float("RiseWatchdogPredictionVelocityToLetThrough", 0.0f, 0f..1f) { mode == "Rise" && riseMode == "WatchdogPrediction" }
+    private val riseWatchdogPredictionPreventGhosting by boolean("RiseWatchdogPredictionPreventGhosting", true) { mode == "Rise" && riseMode == "WatchdogPrediction" }
+
+    // Rise-WatchdogReduce
+    private val riseWatchdogReduceCancelOnGround by boolean("RiseWatchdogReduceCancelOnGround", true) { mode == "Rise" && riseMode == "WatchdogReduce" }
+    private val riseWatchdogReduceCancelOnAttack by boolean("RiseWatchdogReduceCancelOnAttack", true) { mode == "Rise" && riseMode == "WatchdogReduce" }
+
+    // Rise-Watchdog
+    private val riseWatchdogAlwaysCancelVertical by boolean("RiseWatchdogAlwaysCancelVertical", false) { mode == "Rise" && riseMode == "Watchdog" }
+    private val riseWatchdogBacktrack by boolean("RiseWatchdogBacktrack", false) { mode == "Rise" && riseMode == "Watchdog" }
+    private val riseWatchdogPreventGhosting by boolean("RiseWatchdogPreventGhosting", true) { mode == "Rise" && riseMode == "Watchdog" }
+    private val riseWatchdogVelocityToLetThrough by float("RiseWatchdogVelocityToLetThrough", 0.0f, 0f..1f) { mode == "Rise" && riseMode == "Watchdog" }
+
     /**
      * VALUES
      */
@@ -327,6 +419,77 @@ object Velocity : Module("Velocity", Category.COMBAT) {
     // Buffer Mode
     private val bufferedPackets = mutableListOf<BufferedPacket>()
 
+    // Rise Mode State
+    private var riseBufferAbuseAmount = 0
+    private val riseDelayPackets = ArrayDeque<Packet<*>>()
+    private var riseDelayReleasing = false
+    private var riseGrim2Random = Random
+    private var riseGrimReduceBlinking = false
+    private var riseGrimReduceFlushing = false
+    private var riseGrimReducePendingJumpReset = false
+    private val riseGrimReduceDelayedPackets = mutableListOf<Packet<*>>()
+    private var riseGrimTestVelocityReceived = false
+    private var riseGrimTestHurtReceived = false
+    private var riseGrimTestDelaying = false
+    private var riseGrimTestPendingAttacks = 0
+    private var riseGrimTestWasNotSprinting = false
+    private var riseGrimTestKnockbackSpeed = 0.0
+    private var riseGrimTestTarget: Entity? = null
+    private var riseGrimTestSkipNextDelay = false
+    private var riseGrimTestJumpResetCountdown = 0
+    private var riseGrimTestAttackCount = 1
+    private var riseGrimTestEnableTime = 0L
+    private var riseGrimTestVelocityApplied = false
+    private var riseGrimTestDelayStart = 0L
+    private var riseGrimTestPendingVelocityX = 0.0
+    private var riseGrimTestPendingVelocityY = 0.0
+    private var riseGrimTestPendingVelocityZ = 0.0
+    private val riseGrimTestDelayedPackets = mutableListOf<Packet<*>>()
+    private var riseGrimTestFlushing = false
+    private var riseGrimBlinking = false
+    private var riseGrimFlushing = false
+    private var riseGrimMovementFrozen = false
+    private var riseGrimMotionSaved = false
+    private var riseGrimSavedMotionX = 0.0
+    private var riseGrimSavedMotionY = 0.0
+    private var riseGrimSavedMotionZ = 0.0
+    private val riseGrimHeldPackets = mutableListOf<Packet<*>>()
+    private val riseGrimPlacedBlocks = mutableListOf<BlockPos>()
+    private var riseLegitJump = false
+    private var riseIntaveAttacked = false
+    private var riseIntaveSlowedDown = false
+    private var riseWatchdogReduceHeldPackets = mutableListOf<Packet<*>>()
+    private var riseWatchdogReduceFlushing = false
+    private var riseWatchdogPredictionBlinking = false
+    private var riseWatchdogPredictionReleasing = false
+    private var riseWatchdogPredictionShouldJump = false
+    private var riseWatchdogPredictionVelocityYaw = 0f
+    private var riseWatchdogPredictionVelocityX = 0.0
+    private var riseWatchdogPredictionVelocityZ = 0.0
+    private var riseWatchdogPredictionJumpCount = 0
+    private val riseWatchdogPredictionHeldPackets = mutableListOf<Packet<*>>()
+    private var riseWatchdogBlinking = false
+    private var riseWatchdogReleasing = false
+    private var riseWatchdogVelocityYaw = 0f
+    private var riseWatchdogVelocityX = 0.0
+    private var riseWatchdogVelocityZ = 0.0
+    private var riseWatchdogJumpCount = 0
+    private var riseWatchdogBacktrackBlocked = false
+    private var riseWatchdogInBacktrackRange = false
+    private var riseWatchdogBacktrackStart = -1L
+    private val riseWatchdogHeldPackets = mutableListOf<Packet<*>>()
+    private var riseVulcanBlinking = false
+    private var riseVulcanReleasing = false
+    private var riseVulcanPendingVelocity = false
+    private var riseVulcanVelocityY = 0.0
+    private var riseVulcanBacktrackBlocked = false
+    private var riseVulcanInBacktrackRange = false
+    private var riseVulcanBacktrackStart = -1L
+    private var riseVulcanTarget: Entity? = null
+    private val riseVulcanTargetPosition = net.minecraft.util.Vec3(0.0, 0.0, 0.0)
+    private val riseVulcanHeldPackets = mutableListOf<Packet<*>>()
+    private var riseMMCReceivedVelocity = false
+
     // FDP modes
     private var aac520TemplateX = 0
     private var aac520TemplateY = 0
@@ -347,6 +510,8 @@ object Velocity : Module("Velocity", Category.COMBAT) {
             val verticalPercentage = (vertical * 100).toInt()
 
             "$horizontalPercentage% $verticalPercentage%"
+        } else if (mode == "Rise") {
+            "Rise-$riseMode"
         } else mode
 
     override fun onDisable() {
@@ -376,6 +541,7 @@ object Velocity : Module("Velocity", Category.COMBAT) {
             mc.gameSettings.keyBindSneak.pressed = net.minecraft.client.settings.GameSettings.isKeyDown(mc.gameSettings.keyBindSneak)
         }
         bufferedPackets.clear()
+        resetRiseState()
         reset()
     }
 
@@ -536,6 +702,10 @@ object Velocity : Module("Velocity", Category.COMBAT) {
                 }
             }
         }
+
+        if (mode == "Rise") {
+            handleRiseUpdate(thePlayer)
+        }
     }
 
     val onClick = handler<GameTickEvent> {
@@ -665,6 +835,10 @@ object Velocity : Module("Velocity", Category.COMBAT) {
                     }
                 }
             }
+        }
+
+        if (mode == "Rise" && riseMode == "Intave") {
+            riseIntaveAttacked = true
         }
     }
 
@@ -1060,6 +1234,8 @@ object Velocity : Module("Velocity", Category.COMBAT) {
                     event.cancelEvent()
                     bufferedPackets.add(BufferedPacket(packet, bufferDelay))
                 }
+
+                "rise" -> handleRisePacket(event, packet, thePlayer)
             }
         }
 
@@ -1171,11 +1347,55 @@ object Velocity : Module("Velocity", Category.COMBAT) {
         minemenCanCancel = false
         tickVelocityTicks = 0
         sideStrafePos = null
+        resetRiseState()
     }
 
     val onGameLoop = handler<GameLoopEvent> {
         if (mode == "Delay")
             sendPacketsByOrder(false)
+    }
+
+    val onPacketSend = handler<PacketEvent> { event ->
+        if (mode != "Rise") return@handler
+        val player = mc.thePlayer ?: return@handler
+        val packet = event.packet
+
+        if (riseMode == "WatchdogReduce" && riseWatchdogReduceCancelOnAttack) {
+            if (packet is C02PacketUseEntity && packet.action == C02PacketUseEntity.Action.ATTACK) {
+                if (riseWatchdogReduceHeldPackets.isNotEmpty()) {
+                    riseWatchdogReduceFlushing = true
+                    try {
+                        riseWatchdogReduceHeldPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+                    } finally {
+                        riseWatchdogReduceHeldPackets.clear()
+                        riseWatchdogReduceFlushing = false
+                    }
+                }
+            }
+        }
+
+        if (riseMode == "Grim2" && riseGrim2FullRotationFix) {
+            if (packet is C03PacketPlayer && packet.rotating) {
+                val yaw = packet.yaw
+                val pitch = packet.pitch
+                if (isFullRotation(yaw) || isFullRotation(pitch)) {
+                    val noise = riseGrim2RotationNoise
+                    val newYaw = yaw + (if (riseGrim2Random.nextBoolean()) 1 else -1) * noise
+                    val newPitch = pitch + (if (riseGrim2Random.nextBoolean()) 1 else -1) * noise
+                    if (packet.isMoving) {
+                        sendPacket(C03PacketPlayer.C06PacketPlayerPosLook(packet.x, packet.y, packet.z, newYaw, newPitch, packet.isOnGround))
+                    } else {
+                        sendPacket(C03PacketPlayer.C05PacketPlayerLook(newYaw, newPitch, packet.isOnGround))
+                    }
+                    event.cancelEvent()
+                }
+            }
+        }
+    }
+
+    private fun isFullRotation(value: Float): Boolean {
+        val f = abs(value % 90f)
+        return f < 0.01f || f > 89.99f
     }
 
     private fun sendPacketsByOrder(velocity: Boolean) {
@@ -1212,6 +1432,11 @@ object Velocity : Module("Velocity", Category.COMBAT) {
         if (thePlayer == null || thePlayer.isInLiquid || thePlayer.isInWeb)
             return@handler
 
+        if (mode == "Rise" && riseMode == "Ground" && thePlayer.hurtTime == riseGroundDelay + 1) {
+            event.cancelEvent()
+            return@handler
+        }
+
         when (mode.lowercase()) {
             "aacpush" -> {
                 jump = true
@@ -1244,6 +1469,26 @@ object Velocity : Module("Velocity", Category.COMBAT) {
 
     val onStrafe = handler<StrafeEvent> { event ->
         val player = mc.thePlayer ?: return@handler
+
+        if (mode == "Rise") {
+            if (riseMode == "Legit" && riseLegitJump && player.onGround) {
+                player.tryJump()
+                riseLegitJump = false
+            }
+            if (riseMode == "GrimReduce" && riseGrimReducePendingJumpReset && player.onGround) {
+                player.tryJump()
+                riseGrimReducePendingJumpReset = false
+            }
+            if (riseMode == "GrimTest" && riseGrimTestMode == "JumpReset" && riseGrimTestJumpResetCountdown == 1 && player.onGround) {
+                player.tryJump()
+                riseGrimTestJumpResetCountdown = 0
+                mc.gameSettings.keyBindForward.pressed = true
+            }
+            if (riseMode == "GrimTest" && riseGrimTestMode == "JumpReset" && riseGrimTestJumpResetCountdown > 0) {
+                riseGrimTestJumpResetCountdown--
+            }
+            return@handler
+        }
 
         if (mode == "Jump" && hasReceivedVelocity) {
             if (!player.isJumping && nextInt(endExclusive = 100) < chance && shouldJump() && player.isSprinting && player.onGround && player.hurtTime == 9) {
@@ -1299,6 +1544,15 @@ object Velocity : Module("Velocity", Category.COMBAT) {
                     }
                 } else if (player.hurtTime == 0) {
                     hasReceivedVelocity = false
+                }
+            }
+        }
+
+        if (mode == "Rise" && riseMode == "Karhu") {
+            if (event.block is BlockAir && player.hurtTime > 0 && player.hurtTime <= 9) {
+                if (event.y == kotlin.math.floor(player.posY).toInt() + 1) {
+                    event.boundingBox = AxisAlignedBB.fromBounds(0.0, 0.0, 0.0, 1.0, 0.0, 1.0)
+                        .offset(event.x.toDouble(), event.y.toDouble(), event.z.toDouble())
                 }
             }
         }
@@ -1890,4 +2144,806 @@ object Velocity : Module("Velocity", Category.COMBAT) {
     }
 
     data class BufferedPacket(val packet: Packet<*>, var remainingTicks: Int)
+
+    private fun resetRiseState() {
+        riseBufferAbuseAmount = 0
+        riseDelayPackets.clear()
+        riseDelayReleasing = false
+        riseGrimReduceBlinking = false
+        riseGrimReduceFlushing = false
+        riseGrimReducePendingJumpReset = false
+        riseGrimReduceDelayedPackets.clear()
+        riseGrimTestVelocityReceived = false
+        riseGrimTestHurtReceived = false
+        riseGrimTestDelaying = false
+        riseGrimTestPendingAttacks = 0
+        riseGrimTestWasNotSprinting = false
+        riseGrimTestKnockbackSpeed = 0.0
+        riseGrimTestTarget = null
+        riseGrimTestSkipNextDelay = false
+        riseGrimTestJumpResetCountdown = 0
+        riseGrimTestAttackCount = 1
+        riseGrimTestEnableTime = System.currentTimeMillis()
+        riseGrimTestVelocityApplied = false
+        riseGrimTestDelayStart = 0L
+        riseGrimTestPendingVelocityX = 0.0
+        riseGrimTestPendingVelocityY = 0.0
+        riseGrimTestPendingVelocityZ = 0.0
+        riseGrimTestDelayedPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+        riseGrimTestDelayedPackets.clear()
+        riseGrimTestFlushing = false
+        riseGrimBlinking = false
+        riseGrimFlushing = false
+        riseGrimMovementFrozen = false
+        riseGrimMotionSaved = false
+        riseGrimHeldPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+        riseGrimHeldPackets.clear()
+        riseGrimPlacedBlocks.clear()
+        riseLegitJump = false
+        riseIntaveAttacked = false
+        riseIntaveSlowedDown = false
+        riseWatchdogReduceHeldPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+        riseWatchdogReduceHeldPackets.clear()
+        riseWatchdogReduceFlushing = false
+        riseWatchdogPredictionBlinking = false
+        riseWatchdogPredictionReleasing = false
+        riseWatchdogPredictionShouldJump = false
+        riseWatchdogPredictionHeldPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+        riseWatchdogPredictionHeldPackets.clear()
+        riseWatchdogBlinking = false
+        riseWatchdogReleasing = false
+        riseWatchdogHeldPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+        riseWatchdogHeldPackets.clear()
+        riseVulcanBlinking = false
+        riseVulcanReleasing = false
+        riseVulcanPendingVelocity = false
+        riseVulcanHeldPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+        riseVulcanHeldPackets.clear()
+        riseMMCReceivedVelocity = false
+    }
+
+    private fun handleRiseUpdate(player: EntityPlayerSP) {
+        when (riseMode) {
+            "AAC" -> {
+                if (player.onGround && player.hurtTime > 0) {
+                    player.motionX *= 0.6
+                    player.motionZ *= 0.6
+                }
+            }
+
+            "Bounce" -> {
+                if (player.hurtTime == 9 - riseBounceTick) {
+                    if (riseBounceHorizontal) {
+                        if (player.isMoving) {
+                            MovementUtils.strafe()
+                        } else {
+                            player.motionZ *= -1.0
+                            player.motionX *= -1.0
+                        }
+                    }
+                    if (riseBounceVertical) {
+                        player.motionY *= -1.0
+                    }
+                }
+            }
+
+            "Ground" -> {
+                if (player.hurtTime == riseGroundDelay) {
+                    player.onGround = true
+                }
+            }
+
+            "Intave" -> {
+                if (riseIntaveAttacked && !riseIntaveSlowedDown && player.isSprinting) {
+                    player.motionX *= 0.6
+                    player.motionZ *= 0.6
+                    player.isSprinting = false
+                }
+                riseIntaveAttacked = false
+                riseIntaveSlowedDown = false
+            }
+
+            "Legit" -> {
+                riseLegitJump = false
+            }
+
+            "Matrix" -> {
+                if (!player.isMoving && player.hurtTime == 1) {
+                    player.motionX *= -0.1
+                    player.motionZ *= -0.1
+                } else if (player.hurtTime == 1) {
+                    MovementUtils.strafe()
+                }
+                if (player.hurtTime in 2..14) {
+                    player.motionY -= 0.00348
+                }
+            }
+
+            "MMC" -> {
+                if (player.hurtTime == 1) {
+                    player.motionX *= 0.0
+                    player.motionZ *= 0.0
+                }
+                if (player.hurtTime == 1 && player.isJumping) {
+                    player.motionY -= 9.0
+                }
+                if (player.hurtTime < 4 && MovementUtils.speed < 0.31) {
+                    val yaw = MovementUtils.direction
+                    player.motionX += -sin(yaw) * 0.05
+                    player.motionZ += cos(yaw) * 0.05
+                }
+            }
+
+            "Tick" -> {
+                if (player.hurtTime == 10 - riseTickVelocity) {
+                    player.stop()
+                }
+            }
+
+            "GrimReduce" -> {
+                riseGrimReducePendingJumpReset = false
+
+                if ((player.onGround || !riseGrimReduceDelayTillGround) && riseGrimReduceBlinking) {
+                    riseGrimReduceBlinking = false
+                    riseGrimReduceFlushing = true
+                    riseGrimReduceDelayedPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+                    riseGrimReduceDelayedPackets.clear()
+                    riseGrimReduceFlushing = false
+                }
+
+                if (player.hurtTime > 25 && riseGrimReduceBlinking) {
+                    riseGrimReduceBlinking = false
+                    riseGrimReduceFlushing = true
+                    riseGrimReduceDelayedPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+                    riseGrimReduceDelayedPackets.clear()
+                    riseGrimReduceFlushing = false
+                }
+            }
+
+            "GrimTest" -> {
+                if (riseGrimTestMode == "Reduce" && riseGrimTestDelaying) {
+                    if (player.onGround || !riseGrimReduceDelayTillGround) {
+                        val target = riseGrimTestTarget
+                        if (target != null && riseGrimTestPendingAttacks > 0) {
+                            val wasNotSprinting = riseGrimTestWasNotSprinting
+                            if (wasNotSprinting) {
+                                sendPacket(C0BPacketEntityAction(player, START_SPRINTING))
+                            }
+                            while (riseGrimTestPendingAttacks >= 1) {
+                                sendPacket(C02PacketUseEntity(target, C02PacketUseEntity.Action.ATTACK))
+                                player.swingItem()
+                                player.motionX *= 0.6
+                                player.motionZ *= 0.6
+                                player.onGround = false
+                                riseGrimTestPendingAttacks--
+                            }
+                            if (wasNotSprinting) {
+                                sendPacket(C0BPacketEntityAction(player, STOP_SPRINTING))
+                                riseGrimTestWasNotSprinting = false
+                            }
+                        }
+                    }
+
+                    if (riseGrimTestVelocityApplied || (riseGrimTestDelayStart > 0 && System.currentTimeMillis() - riseGrimTestDelayStart >= riseGrimTestDelayTimeout)) {
+                        riseGrimTestDelaying = false
+                        riseGrimTestFlushing = true
+                        riseGrimTestDelayedPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+                        riseGrimTestDelayedPackets.clear()
+                        riseGrimTestFlushing = false
+                        riseGrimTestVelocityApplied = false
+                        riseGrimTestDelayStart = 0L
+                    }
+                }
+
+                if (riseGrimTestSkipNextDelay && player.hurtTime == 0) {
+                    riseGrimTestSkipNextDelay = false
+                }
+            }
+
+            "Grim" -> {
+                if (player.hurtTime >= 7 && !player.isInWeb) {
+                    if (riseGrimMovementFrozen) {
+                        if (!riseGrimMotionSaved) {
+                            riseGrimSavedMotionX = player.motionX
+                            riseGrimSavedMotionY = player.motionY
+                            riseGrimSavedMotionZ = player.motionZ
+                            riseGrimMotionSaved = true
+                        }
+                    } else if (riseGrimMotionSaved) {
+                        player.motionX = riseGrimSavedMotionX
+                        player.motionY = riseGrimSavedMotionY
+                        player.motionZ = riseGrimSavedMotionZ
+                        riseGrimMotionSaved = false
+                    }
+                }
+
+                if (player.onGround && riseGrimBlinking) {
+                    riseGrimBlinking = false
+                    riseGrimFlushing = true
+                    riseGrimMovementFrozen = false
+                    riseGrimPlacedBlocks.clear()
+                    riseGrimMotionSaved = false
+                    riseGrimHeldPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+                    riseGrimHeldPackets.clear()
+                    riseGrimFlushing = false
+                }
+
+                if (player.hurtTime > 25 && riseGrimBlinking) {
+                    riseGrimBlinking = false
+                    riseGrimFlushing = true
+                    riseGrimHeldPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+                    riseGrimHeldPackets.clear()
+                    riseGrimFlushing = false
+                }
+
+                if (riseGrimMovementFrozen) {
+                    if (riseGrimRotations) {
+                        setTargetRotation(
+                            Rotation(player.rotationYaw, (90.0 - Math.random() * 0.1).toFloat()),
+                            riseGrimRotationSettings, 10
+                        )
+                    }
+                    val blockPos = BlockPos(player)
+                    val blockPosDown = blockPos.down()
+                    sendPacket(
+                        C08PacketPlayerBlockPlacement(
+                            blockPosDown,
+                            net.minecraft.util.EnumFacing.UP.index,
+                            player.currentEquippedItem,
+                            (player.posX - blockPos.x).toFloat(),
+                            1.0f,
+                            (player.posZ - blockPos.z).toFloat()
+                        )
+                    )
+                    riseGrimPlacedBlocks.add(blockPosDown)
+                }
+            }
+
+            "Vulcan" -> {
+                if (riseVulcanPendingVelocity && player.onGround) {
+                    riseVulcanPendingVelocity = false
+                    riseVulcanReleasing = true
+                    val savedX = player.motionX
+                    val savedZ = player.motionZ
+                    val savedY = player.motionY
+                    riseVulcanHeldPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+                    riseVulcanHeldPackets.clear()
+                    player.motionY = savedY
+                    player.motionX = savedX
+                    player.motionZ = savedZ
+                    riseVulcanReleasing = false
+                }
+
+                if (player.onGround && riseVulcanBlinking && !riseVulcanPendingVelocity) {
+                    riseVulcanBlinking = false
+                    riseVulcanReleasing = true
+                    riseVulcanBacktrackBlocked = false
+                    val savedX = player.motionX
+                    val savedZ = player.motionZ
+                    val savedY = player.motionY
+                    riseVulcanHeldPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+                    riseVulcanHeldPackets.clear()
+                    player.tryJump()
+                    player.motionX = savedX
+                    player.motionZ = savedZ
+                    riseVulcanReleasing = false
+                }
+
+                if (player.hurtTime > 12 && riseVulcanBlinking) {
+                    riseVulcanBlinking = false
+                    riseVulcanReleasing = true
+                    val savedX = player.motionX
+                    val savedZ = player.motionZ
+                    riseVulcanHeldPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+                    riseVulcanHeldPackets.clear()
+                    if (!player.isMoving) {
+                        player.motionX = savedX
+                        player.motionZ = savedZ
+                    }
+                    riseVulcanReleasing = false
+                }
+
+                if (riseVulcanAlwaysCancelVertical && player.hurtTime < 5 && player.onGround) {
+                    player.motionX *= -1.0
+                    player.motionZ *= -1.0
+                }
+            }
+
+            "WatchdogPrediction" -> {
+                if (riseWatchdogPredictionBlinking || player.hurtTime == 1) {
+                    val f = player.rotationYaw % 360f
+                    val normalizedYaw = when {
+                        f < -180f -> f + 360f
+                        f > 180f -> f - 360f
+                        else -> f
+                    }
+                    val f1 = abs(normalizedYaw - riseWatchdogPredictionVelocityYaw)
+                    val f2 = 15f
+
+                    if (!player.onGround) {
+                        if (f1 <= f2 || f1 >= 360f - f2) {
+                            riseWatchdogPredictionReleasing = true
+                            riseWatchdogPredictionBlinking = false
+                            riseWatchdogPredictionHeldPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+                            riseWatchdogPredictionHeldPackets.clear()
+                            riseWatchdogPredictionReleasing = false
+                        } else if (player.hurtTime > 13) {
+                            riseWatchdogPredictionReleasing = true
+                            riseWatchdogPredictionBlinking = false
+                            riseWatchdogPredictionHeldPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+                            riseWatchdogPredictionHeldPackets.clear()
+                            riseWatchdogPredictionReleasing = false
+                        }
+                    } else {
+                        riseWatchdogPredictionReleasing = true
+                        riseWatchdogPredictionBlinking = false
+                        riseWatchdogPredictionHeldPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+                        riseWatchdogPredictionHeldPackets.clear()
+                        riseWatchdogPredictionReleasing = false
+                    }
+                }
+            }
+
+            "WatchdogReduce" -> {
+                if (riseWatchdogReduceCancelOnGround && player.onGround && riseWatchdogReduceHeldPackets.isNotEmpty()) {
+                    riseWatchdogReduceFlushing = true
+                    try {
+                        riseWatchdogReduceHeldPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+                    } finally {
+                        riseWatchdogReduceHeldPackets.clear()
+                        riseWatchdogReduceFlushing = false
+                    }
+                }
+            }
+
+            "Watchdog" -> {
+                if (riseWatchdogAlwaysCancelVertical && player.hurtTime < 5 && player.onGround) {
+                    player.motionX *= -1.0
+                    player.motionZ *= -1.0
+                }
+
+                if (player.onGround && riseWatchdogBlinking) {
+                    riseWatchdogBlinking = false
+                    riseWatchdogReleasing = true
+                    riseWatchdogBacktrackBlocked = false
+                    val savedX = player.motionX
+                    val savedZ = player.motionZ
+                    val savedY = player.motionY
+                    riseWatchdogHeldPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+                    riseWatchdogHeldPackets.clear()
+                    player.tryJump()
+                    player.motionX = savedX
+                    player.motionZ = savedZ
+                    riseWatchdogReleasing = false
+                }
+
+                if (player.hurtTime > 12 && riseWatchdogBlinking) {
+                    riseWatchdogBlinking = false
+                    riseWatchdogReleasing = true
+                    val savedX = player.motionX
+                    val savedZ = player.motionZ
+                    riseWatchdogHeldPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+                    riseWatchdogHeldPackets.clear()
+                    player.motionX = savedX
+                    player.motionZ = savedZ
+                    riseWatchdogReleasing = false
+                }
+            }
+        }
+    }
+
+    private fun handleRisePacket(event: PacketEvent, packet: Packet<*>, player: EntityPlayerSP) {
+        when (riseMode) {
+            "AAC" -> {
+                hasReceivedVelocity = true
+            }
+
+            "Bounce" -> {
+                hasReceivedVelocity = true
+            }
+
+            "BufferAbuse" -> {
+                val h = riseBufferHorizontal.toDouble()
+                val v = riseBufferVertical.toDouble()
+                if (packet is S12PacketEntityVelocity && packet.entityID == player.entityId) {
+                    if (riseBufferAbuseAmount < riseBufferBuffer) {
+                        event.cancelEvent()
+                        riseBufferAbuseAmount++
+                        return
+                    }
+                    riseBufferAbuseAmount = 0
+                }
+                if (packet is S27PacketExplosion) {
+                    if (riseBufferAbuseAmount < riseBufferBuffer) {
+                        event.cancelEvent()
+                        riseBufferAbuseAmount++
+                        return
+                    }
+                    packet.field_149152_f *= (h / 100.0).toFloat()
+                    packet.field_149153_g *= (v / 100.0).toFloat()
+                    packet.field_149159_h *= (h / 100.0).toFloat()
+                    riseBufferAbuseAmount = 0
+                }
+            }
+
+            "Delay" -> {
+                if (riseDelayReleasing) return
+
+                if (packet is S12PacketEntityVelocity && packet.entityID == player.entityId) {
+                    event.cancelEvent()
+                    riseDelayPackets.addLast(packet)
+                    return
+                }
+                if (packet is S32PacketConfirmTransaction) {
+                    event.cancelEvent()
+                    riseDelayPackets.addLast(packet)
+                    return
+                }
+                if (riseDelayExplosions && packet is S27PacketExplosion) {
+                    event.cancelEvent()
+                    riseDelayPackets.addLast(packet)
+                    return
+                }
+
+                if (riseDelayPackets.isNotEmpty()) {
+                    val currentTick = player.ticksExisted
+                    while (riseDelayPackets.isNotEmpty()) {
+                        val queuedPacket = riseDelayPackets.removeFirst()
+                        riseDelayReleasing = true
+                        try {
+                            PacketUtils.schedulePacketProcess(queuedPacket)
+                        } finally {
+                            riseDelayReleasing = false
+                        }
+                    }
+                }
+            }
+
+            "Grim2" -> {
+                if (riseGrim2FakeS08 && packet is S08PacketPlayerPosLook) {
+                    player.setPosition(packet.x, packet.y, packet.z)
+                    player.motionX = 0.0
+                    player.motionY = 0.0
+                    player.motionZ = 0.0
+                    event.cancelEvent()
+                }
+
+                if (riseGrim2CancelVelocity && packet is S12PacketEntityVelocity && packet.entityID == player.entityId) {
+                    event.cancelEvent()
+                }
+            }
+
+            "GrimReduce" -> {
+                if (riseGrimReduceFlushing) return
+
+                if (packet is S12PacketEntityVelocity && packet.entityID == player.entityId) {
+                    event.cancelEvent()
+                    riseGrimReduceBlinking = true
+                    riseGrimReduceDelayedPackets.add(packet)
+                    return
+                }
+                if (riseGrimReduceBlinking) {
+                    if (packet is S32PacketConfirmTransaction) {
+                        event.cancelEvent()
+                        riseGrimReduceDelayedPackets.add(packet)
+                    }
+                }
+
+                if (riseGrimReduceJumpReset && player.hurtTime < 7 && riseGrimReduceBlinking) {
+                    riseGrimReducePendingJumpReset = true
+                }
+            }
+
+            "GrimTest" -> {
+                if (riseGrimTestFlushing) return
+
+                if (packet is S12PacketEntityVelocity && packet.entityID == player.entityId) {
+                    val motionX = packet.motionX / 8000.0
+                    val motionY = packet.motionY / 8000.0
+                    val motionZ = packet.motionZ / 8000.0
+                    val speed = sqrt(motionX * motionX + motionZ * motionZ)
+                    riseGrimTestKnockbackSpeed = speed
+
+                    when (riseGrimTestMode) {
+                        "GrimFull" -> {
+                            event.cancelEvent()
+                            return
+                        }
+                        "Reduce" -> {
+                            if (riseGrimTestDelayRelease && !riseGrimTestSkipNextDelay) {
+                                if (speed >= riseGrimTestDelaySpeedThreshold) {
+                                    event.cancelEvent()
+                                    riseGrimTestDelaying = true
+                                    riseGrimTestPendingVelocityX = motionX
+                                    riseGrimTestPendingVelocityY = motionY
+                                    riseGrimTestPendingVelocityZ = motionZ
+                                    riseGrimTestDelayStart = System.currentTimeMillis()
+                                    return
+                                }
+                            }
+
+                            riseGrimTestSkipNextDelay = false
+                            riseGrimTestAttackCount = nextInt(
+                                riseGrimTestMinAttacks,
+                                riseGrimTestMaxAttacks + 1
+                            )
+                            riseGrimTestWasNotSprinting = !player.isSprinting
+                            riseGrimTestPendingAttacks = riseGrimTestAttackCount
+
+                            val target = findRiseTarget(3.0)
+                            riseGrimTestTarget = target
+
+                            if (!player.isSprinting) {
+                                sendPacket(C0BPacketEntityAction(player, START_SPRINTING))
+                            }
+                            repeat(riseGrimTestAttackCount) {
+                                target?.let {
+                                    sendPacket(C02PacketUseEntity(it, C02PacketUseEntity.Action.ATTACK))
+                                    player.swingItem()
+                                }
+                            }
+                            if (!player.isSprinting) {
+                                sendPacket(C0BPacketEntityAction(player, STOP_SPRINTING))
+                            }
+                        }
+                        "JumpReset" -> {
+                            riseGrimTestJumpResetCountdown = riseGrimTestJumpResetTick
+                        }
+                    }
+                    return
+                }
+
+                if (riseGrimTestDelaying) {
+                    if (packet is S32PacketConfirmTransaction || packet is S19PacketEntityStatus) {
+                        event.cancelEvent()
+                        riseGrimTestDelayedPackets.add(packet)
+                    } else if (packet is S08PacketPlayerPosLook) {
+                        riseGrimTestSkipNextDelay = true
+                        riseGrimTestDelaying = false
+                        riseGrimTestDelayedPackets.forEach { PacketUtils.schedulePacketProcess(it) }
+                        riseGrimTestDelayedPackets.clear()
+                    }
+                }
+            }
+
+            "Grim" -> {
+                if (riseGrimFlushing) return
+
+                if (packet is S12PacketEntityVelocity && packet.entityID == player.entityId) {
+                    if (player.onGround) {
+                        riseGrimMovementFrozen = true
+                    } else {
+                        riseGrimHeldPackets.add(packet)
+                        riseGrimBlinking = true
+                    }
+                    event.cancelEvent()
+                    return
+                }
+
+                if (riseGrimBlinking) {
+                    if (packet is S32PacketConfirmTransaction || packet is S19PacketEntityStatus) {
+                        event.cancelEvent()
+                        riseGrimHeldPackets.add(packet)
+                    }
+                }
+
+                if (packet is S23PacketBlockChange) {
+                    val blockPos = packet.getBlockPosition()
+                    if (riseGrimPlacedBlocks.remove(blockPos) && riseGrimPlacedBlocks.isEmpty()) {
+                        riseGrimMovementFrozen = false
+                    }
+                }
+            }
+
+            "Ground" -> {
+                hasReceivedVelocity = true
+            }
+
+            "Intave" -> {
+                hasReceivedVelocity = true
+            }
+
+            "Karhu" -> {
+                hasReceivedVelocity = true
+            }
+
+            "Legit" -> {
+                if (player.onGround && packet is S12PacketEntityVelocity && packet.entityID == player.entityId && packet.motionY > 0) {
+                    if (!riseLegitTiming || player.hurtTime <= 14 || player.posY - player.lastTickPosY <= 0) {
+                        if (Math.random() * 100.0 < riseLegitChance) {
+                            riseLegitJump = true
+                        }
+                    }
+                }
+            }
+
+            "Matrix" -> {
+                if (packet is S12PacketEntityVelocity && packet.entityID == player.entityId) {
+                    player.motionY = packet.motionY / 8000.0
+                    if (player.isMoving) {
+                        event.cancelEvent()
+                    }
+                }
+            }
+
+            "MMC" -> {
+                if (packet is S12PacketEntityVelocity && packet.entityID == player.entityId) {
+                    riseMMCReceivedVelocity = true
+                }
+            }
+
+            "Standard" -> {
+                val h = riseStandardHorizontal.toDouble()
+                val v = riseStandardVertical.toDouble()
+                if (packet is S12PacketEntityVelocity && packet.entityID == player.entityId) {
+                    if (h == 0.0) {
+                        if (v != 0.0) {
+                            player.motionY = packet.motionY / 8000.0
+                        }
+                        event.cancelEvent()
+                        return
+                    }
+                    packet.motionX = (packet.motionX * (h / 100.0)).toInt()
+                    packet.motionY = (packet.motionY * (v / 100.0)).toInt()
+                    packet.motionZ = (packet.motionZ * (h / 100.0)).toInt()
+                } else if (packet is S27PacketExplosion) {
+                    if (riseStandardExplosionIgnore) {
+                        event.cancelEvent()
+                        return
+                    }
+                    packet.field_149152_f *= (h / 100.0).toFloat()
+                    packet.field_149153_g *= (v / 100.0).toFloat()
+                    packet.field_149159_h *= (h / 100.0).toFloat()
+                }
+            }
+
+            "Tick" -> {
+                hasReceivedVelocity = true
+            }
+
+            "Universocraft" -> {
+                if (packet is S12PacketEntityVelocity && packet.entityID == player.entityId) {
+                    event.cancelEvent()
+                    player.motionY += 0.1 - Math.random() / 100.0
+                }
+                if (packet is S27PacketExplosion) {
+                    event.cancelEvent()
+                    player.motionY += 0.1 - Math.random() / 100.0
+                }
+            }
+
+            "Vulcan" -> {
+                if (riseVulcanReleasing) return
+
+                if (packet is S12PacketEntityVelocity && packet.entityID == player.entityId) {
+                    val motionX = packet.motionX / 8000.0
+                    val motionZ = packet.motionZ / 8000.0
+                    val speed = sqrt(motionX * motionX + motionZ * motionZ)
+
+                    if (speed > 0.3 && !riseVulcanPendingVelocity) {
+                        riseVulcanBlinking = true
+                        riseVulcanPendingVelocity = true
+                        riseVulcanVelocityY = packet.motionY / 8000.0
+                        event.cancelEvent()
+                        riseVulcanHeldPackets.add(packet)
+                        return
+                    }
+
+                    if (player.hurtTime == 1 && !player.isMoving) {
+                        player.motionX *= -1.0
+                        player.motionZ *= -1.0
+                    }
+                    return
+                }
+
+                if (riseVulcanBlinking) {
+                    if (packet is S32PacketConfirmTransaction || packet is S19PacketEntityStatus) {
+                        event.cancelEvent()
+                        riseVulcanHeldPackets.add(packet)
+                    }
+                }
+            }
+
+            "WatchdogDamageBoost" -> {
+                val h = riseWatchdogDamageBoostHorizontal.toDouble()
+                val v = riseWatchdogDamageBoostVertical.toDouble()
+                if (packet is S12PacketEntityVelocity && packet.entityID == player.entityId) {
+                    if (!player.onGround) {
+                        event.cancelEvent()
+                    } else {
+                        player.motionY = packet.motionY / 8000.0
+                        event.cancelEvent()
+                    }
+                }
+                if (packet is S27PacketExplosion) {
+                    if (h == 0.0 && v == 0.0) {
+                        event.cancelEvent()
+                        return
+                    }
+                    packet.field_149152_f *= (h / 100.0).toFloat()
+                    packet.field_149153_g *= (v / 100.0).toFloat()
+                    packet.field_149159_h *= (h / 100.0).toFloat()
+                }
+            }
+
+            "WatchdogPrediction" -> {
+                if (riseWatchdogPredictionReleasing) return
+
+                if (packet is S12PacketEntityVelocity && packet.entityID == player.entityId) {
+                    val motionX = packet.motionX / 8000.0
+                    val motionZ = packet.motionZ / 8000.0
+
+                    riseWatchdogPredictionVelocityYaw = player.rotationYaw % 360f
+                    if (riseWatchdogPredictionVelocityYaw < -180f) riseWatchdogPredictionVelocityYaw += 360f
+                    if (riseWatchdogPredictionVelocityYaw > 180f) riseWatchdogPredictionVelocityYaw -= 360f
+
+                    riseWatchdogPredictionHeldPackets.add(packet)
+                    event.cancelEvent()
+                    riseWatchdogPredictionVelocityX = motionX
+                    riseWatchdogPredictionVelocityZ = motionZ
+                    riseWatchdogPredictionBlinking = true
+                    return
+                }
+
+                if (riseWatchdogPredictionBlinking) {
+                    if (packet is S32PacketConfirmTransaction) {
+                        event.cancelEvent()
+                        riseWatchdogPredictionHeldPackets.add(packet)
+                    }
+                }
+            }
+
+            "WatchdogReduce" -> {
+                if (riseWatchdogReduceFlushing) return
+
+                if (packet is S12PacketEntityVelocity && packet.entityID == player.entityId) {
+                    event.cancelEvent()
+                    synchronized(riseWatchdogReduceHeldPackets) {
+                        riseWatchdogReduceHeldPackets.add(packet)
+                    }
+                } else if (packet is S32PacketConfirmTransaction) {
+                    synchronized(riseWatchdogReduceHeldPackets) {
+                        if (riseWatchdogReduceHeldPackets.isNotEmpty()) {
+                            event.cancelEvent()
+                            riseWatchdogReduceHeldPackets.add(packet)
+                        }
+                    }
+                }
+            }
+
+            "Watchdog" -> {
+                if (riseWatchdogReleasing) return
+
+                if (packet is S12PacketEntityVelocity && packet.entityID == player.entityId) {
+                    val motionX = packet.motionX / 8000.0
+                    val motionZ = packet.motionZ / 8000.0
+
+                    riseWatchdogVelocityYaw = player.rotationYaw % 360f
+                    if (riseWatchdogVelocityYaw < -180f) riseWatchdogVelocityYaw += 360f
+                    if (riseWatchdogVelocityYaw > 180f) riseWatchdogVelocityYaw -= 360f
+
+                    riseWatchdogHeldPackets.add(packet)
+                    event.cancelEvent()
+                    riseWatchdogVelocityX = motionX
+                    riseWatchdogVelocityZ = motionZ
+                    riseWatchdogBlinking = true
+                    return
+                }
+
+                if (riseWatchdogBlinking) {
+                    if (packet is S32PacketConfirmTransaction) {
+                        event.cancelEvent()
+                        riseWatchdogHeldPackets.add(packet)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun findRiseTarget(range: Double): Entity? {
+        val player = mc.thePlayer ?: return null
+        return mc.theWorld.loadedEntityList
+            .filter { isSelected(it, true) && player.getDistanceToEntityBox(it) <= range }
+            .minByOrNull { player.getDistanceToEntityBox(it) }
+    }
 }

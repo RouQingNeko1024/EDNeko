@@ -1,7 +1,8 @@
 /*
- * Air Client
- * A free open source mixin-based injection hacked client for Minecraft using Forge.
+ * 猫娘伟大发明操船fly
  */
+//By NekoBanka,NekoParua,AiNeko
+//爱来自nyasoft,edneko使用此代码需要带上前面以及此行注释
 package net.ccbluex.liquidbounce.features.module.modules.movement.flymodes.other
 
 import net.ccbluex.liquidbounce.features.module.modules.movement.Fly

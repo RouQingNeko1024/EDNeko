@@ -22,6 +22,7 @@ import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.matr
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.matrix.MatrixSlowHop
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.matrix.OldMatrixHop
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.ncp.*
+import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.other.BalanceTimer
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.other.*
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.spartan.SpartanYPort
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.spectre.SpectreBHop
@@ -110,7 +111,8 @@ object Speed : Module("Speed", Category.MOVEMENT, Keyboard.KEY_X) {
         MoraLowHop,
         SlowHop,
         Legit,
-        CustomSpeed
+        CustomSpeed,
+        BalanceTimer
     )
 
     /**
@@ -148,6 +150,11 @@ object Speed : Module("Speed", Category.MOVEMENT, Keyboard.KEY_X) {
     val customGroundTimer by float("CustomGroundTimer", 1f, 0.1f..2f) { mode.get() == "Custom" }
     val customAirTimerTick by int("CustomAirTimerTick", 5, 1..20) { mode.get() == "Custom" }
     val customAirTimer by float("CustomAirTimer", 1f, 0.1f..2f) { mode.get() == "Custom" }
+
+    // VanillaHop Speed
+    val vanillaHopSpeed by float("VanillaHop-Speed", 0.4f, 0.1f..2f) { mode.get() == "VanillaHop" }
+    val vanillaHopJump by boolean("VanillaHop-Jump", true) { mode.get() == "VanillaHop" }
+    val vanillaHopFastStop by boolean("VanillaHop-FastStop", true) { mode.get() == "VanillaHop" }
 
     // Extra options
     val resetXZ by boolean("ResetXZ", false) { mode.get() == "Custom" }

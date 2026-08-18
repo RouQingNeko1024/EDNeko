@@ -4,20 +4,26 @@
  */
 package net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.other
 
-import net.ccbluex.liquidbounce.config.FloatValue
+import net.ccbluex.liquidbounce.features.module.modules.movement.Speed
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.SpeedMode
 import net.ccbluex.liquidbounce.utils.extensions.isMoving
+import net.ccbluex.liquidbounce.utils.extensions.stopXZ
 import net.ccbluex.liquidbounce.utils.movement.MovementUtils
 
 object VanillaHop : SpeedMode("VanillaHop") {
-    private val vanillaSpeed = FloatValue("VanillaHop-Speed", 1F, 0.1F..9.5F)
 
     override fun onUpdate() {
         val player = mc.thePlayer ?: return
-        if (player.onGround && player.isMoving) {
-            player.jump()
-            MovementUtils.strafe(vanillaSpeed.get())
+
+        if (!player.isMoving && Speed.vanillaHopFastStop) {
+            player.stopXZ()
+            return
         }
-        MovementUtils.strafe()
+
+        if (player.onGround && Speed.vanillaHopJump && player.isMoving) {
+            player.jump()
+        }
+
+        MovementUtils.strafe(Speed.vanillaHopSpeed)
     }
 }

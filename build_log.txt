@@ -1,0 +1,52 @@
+﻿To honour the JVM settings for this build a single-use Daemon process will be forked. See https://docs.gradle.org/6.9.4/userguide/gradle_daemon.html#sec:disabling_the_daemon.
+Daemon will be stopped at the end of the build 
+
+> Configure project :
+#################################################
+         ForgeGradle 2.1-a3d86a5        
+  https://github.com/MinecraftForge/ForgeGradle  
+#################################################
+               Powered by MCP unknown               
+             http://modcoderpack.com             
+         by: Searge, ProfMobius, Fesh0r,         
+         R4wk, ZeuX, IngisKahn, bspkrs           
+#################################################
+Found an AccessTransformer: liquidbounce_at.cfg
+Version string 'b6' does not match SemVer specification 
+You should try SemVer : http://semver.org/
+
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :deobfCompileDummyTask
+> Task :deobfProvidedDummyTask
+> Task :compileApiKotlin NO-SOURCE
+> Task :getVersionJson
+> Task :extractUserdev UP-TO-DATE
+> Task :downloadClient SKIPPED
+> Task :downloadServer SKIPPED
+> Task :splitServerJar SKIPPED
+> Task :mergeJars SKIPPED
+> Task :applyBinaryPatches SKIPPED
+> Task :extractDependencyATs SKIPPED
+> Task :extractMcpData SKIPPED
+> Task :extractMcpMappings
+> Task :genSrgs SKIPPED
+> Task :deobfMcMCP SKIPPED
+> Task :sourceApiJava UP-TO-DATE
+> Task :compileApiJava NO-SOURCE
+> Task :processApiResources NO-SOURCE
+> Task :apiClasses UP-TO-DATE
+> Task :sourceMainJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :compileKotlin
+> Task :compileJava UP-TO-DATE
+> Task :moveResources
+> Task :classes
+> Task :shadowJar
+> Task :reobfShadowJar
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 7.0.
+Use '--warning-mode all' to show the individual deprecation warnings.
+See https://docs.gradle.org/6.9.4/userguide/command_line_interface.html#sec:command_line_warnings
+
+BUILD SUCCESSFUL in 21s
+13 actionable tasks: 8 executed, 5 up-to-date

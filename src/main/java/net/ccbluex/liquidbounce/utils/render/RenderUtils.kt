@@ -2425,4 +2425,61 @@ object RenderUtils : MinecraftInstance {
     fun scaleEnd() {
         glPopMatrix()
     }
+
+    fun drawArc(cx: Float, cy: Float, radius: Float, startAngle: Float, endAngle: Float, lineWidth: Float, color: Int) {
+        glEnable(GL_BLEND)
+        glDisable(GL_TEXTURE_2D)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        glEnable(GL_LINE_SMOOTH)
+        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST)
+        glLineWidth(lineWidth)
+
+        val alpha = (color shr 24 and 0xFF) / 255.0f
+        val red = (color shr 16 and 0xFF) / 255.0f
+        val green = (color shr 8 and 0xFF) / 255.0f
+        val blue = (color and 0xFF) / 255.0f
+
+        glColor4f(red, green, blue, alpha)
+
+        glBegin(GL_LINE_STRIP)
+        val degree = Math.PI / 180.0
+        var angle = startAngle.toDouble()
+        while (angle <= endAngle.toDouble()) {
+            glVertex2d(cx + cos(angle * degree) * radius, cy + sin(angle * degree) * radius)
+            angle += 1.0
+        }
+        glEnd()
+
+        glDisable(GL_LINE_SMOOTH)
+        glEnable(GL_TEXTURE_2D)
+        glDisable(GL_BLEND)
+        glColor4f(1f, 1f, 1f, 1f)
+    }
+
+    fun drawFilledArc(cx: Float, cy: Float, radius: Float, startAngle: Float, endAngle: Float, color: Int) {
+        glEnable(GL_BLEND)
+        glDisable(GL_TEXTURE_2D)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
+        val alpha = (color shr 24 and 0xFF) / 255.0f
+        val red = (color shr 16 and 0xFF) / 255.0f
+        val green = (color shr 8 and 0xFF) / 255.0f
+        val blue = (color and 0xFF) / 255.0f
+
+        glColor4f(red, green, blue, alpha)
+
+        glBegin(GL_TRIANGLE_FAN)
+        glVertex2d(cx.toDouble(), cy.toDouble())
+        val degree = Math.PI / 180.0
+        var angle = startAngle.toDouble()
+        while (angle <= endAngle.toDouble()) {
+            glVertex2d(cx + cos(angle * degree) * radius, cy + sin(angle * degree) * radius)
+            angle += 1.0
+        }
+        glEnd()
+
+        glEnable(GL_TEXTURE_2D)
+        glDisable(GL_BLEND)
+        glColor4f(1f, 1f, 1f, 1f)
+    }
 }

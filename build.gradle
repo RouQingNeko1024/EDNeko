@@ -1,9 +1,25 @@
 buildscript {
     repositories {
+        mavenLocal()
+        maven {
+            url = "https://jitpack.io/"
+            content { includeGroupByRegex "com\\.github\\..*" }
+        }
+        maven { url = "https://maven.minecraftforge.net/" }
+        maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
+        maven {
+            url = "https://mirrors.cloud.tencent.com/nexus/repository/maven-public/"
+            content { excludeGroupByRegex "com\\.github\\..*" }
+        }
+        maven {
+            url = "https://maven.aliyun.com/nexus/content/groups/public/"
+            content { excludeGroupByRegex "com\\.github\\..*" }
+        }
+        maven {
+            url = "https://repo.huaweicloud.com/repository/maven/"
+            content { excludeGroupByRegex "com\\.github\\..*" }
+        }
         mavenCentral()
-        maven { url = "https://jitpack.io/" }
-        maven { url = "https://maven.aliyun.com/nexus/content/groups/public/" }
-        maven { url = "https://mirrors.cloud.tencent.com/nexus/repository/maven-public/" }
     }
 }
 
@@ -18,12 +34,24 @@ plugins {
 
 repositories {
     mavenLocal()
-    mavenCentral()
-    maven { url = "https://jitpack.io/" }
+    maven {
+        url = "https://jitpack.io/"
+        content { includeGroupByRegex "com\\.github\\..*" }
+    }
     maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
-    maven { url = "https://maven.aliyun.com/nexus/content/groups/public/" }
-    maven { url = "https://mirrors.cloud.tencent.com/nexus/repository/maven-public/" }
-    maven { url = "https://repo.huaweicloud.com/repository/maven/" }
+    maven {
+        url = "https://mirrors.cloud.tencent.com/nexus/repository/maven-public/"
+        content { excludeGroupByRegex "com\\.github\\..*" }
+    }
+    maven {
+        url = "https://maven.aliyun.com/nexus/content/groups/public/"
+        content { excludeGroupByRegex "com\\.github\\..*" }
+    }
+    maven {
+        url = "https://repo.huaweicloud.com/repository/maven/"
+        content { excludeGroupByRegex "com\\.github\\..*" }
+    }
+    mavenCentral()
 }
 
 archivesBaseName = project.archives_base_name

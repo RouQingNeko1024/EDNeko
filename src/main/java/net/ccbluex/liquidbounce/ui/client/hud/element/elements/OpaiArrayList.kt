@@ -12,6 +12,8 @@ import net.ccbluex.liquidbounce.ui.client.hud.element.Side.Horizontal
 import net.ccbluex.liquidbounce.ui.client.hud.element.Side.Vertical
 import net.ccbluex.liquidbounce.ui.font.AWTFontRenderer.Companion.assumeNonVolatile
 import net.ccbluex.liquidbounce.ui.font.Fonts
+import net.ccbluex.liquidbounce.utils.GlowUtils
+import net.ccbluex.liquidbounce.utils.render.ColorUtils.withAlpha
 import net.ccbluex.liquidbounce.utils.render.RenderUtils
 import net.ccbluex.liquidbounce.utils.render.EmbeddedStencil
 import net.ccbluex.liquidbounce.utils.render.InternalBlurShader
@@ -31,6 +33,10 @@ class OpaiArrayList(
     private val backgroundAlpha by int("BackgroundAlpha", 120, 0..255)
     private val blur by boolean("Blur", true)
     private val blurRadius by float("BlurStrength", 10f, 1f..50f)
+    private val edgeShadow by boolean("EdgeShadow", false)
+    private val edgeShadowColor by color("EdgeShadowColor", Color.BLACK.withAlpha(100)) { edgeShadow }
+    private val edgeShadowRadius by int("EdgeShadowRadius", 8, 1..30) { edgeShadow }
+    private val edgeShadowStrength by int("EdgeShadowStrength", 1, 1..3) { edgeShadow }
     private val maxRadius by float("MaxRadius", 5f, 2f..12f)
     private val stripeWidth by float("StripeWidth", 3f, 1f..8f)
     private val hideRender by boolean("HideRender", true)
@@ -116,14 +122,18 @@ class OpaiArrayList(
                     EmbeddedStencil.checkSetupFBO(mc.framebuffer)
                     EmbeddedStencil.write(false)
                     for (item in items) {
-                        drawRoundedRect(item.bgLeft, item.bgTop, item.bgRight, item.bgBottom, Color.WHITE.rgb, item.radius, item.corners)
+                        drawRoundedRect(
+                            (item.bgLeft + renderX.toFloat()) * scale, (item.bgTop + renderY.toFloat()) * scale,
+                            (item.bgRight + renderX.toFloat()) * scale, (item.bgBottom + renderY.toFloat()) * scale,
+                            Color.WHITE.rgb, item.radius * scale, item.corners
+                        )
                     }
                     EmbeddedStencil.erase(true)
-                    val blurR = blurRadius * (backgroundAlpha / 255f)
-                    val listLeft = items.minOf { it.bgLeft }
-                    val listTop = items.first().bgTop
-                    val listRight = items.first().bgRight
-                    val listBottom = items.last().bgBottom
+                    val blurR = blurRadius * (backgroundAlpha / 255f) * scale
+                    val listLeft = (items.minOf { it.bgLeft } + renderX.toFloat()) * scale
+                    val listTop = (items.first().bgTop + renderY.toFloat()) * scale
+                    val listRight = (items.first().bgRight + renderX.toFloat()) * scale
+                    val listBottom = (items.last().bgBottom + renderY.toFloat()) * scale
                     InternalBlurShader.blurArea(listLeft, listTop, listRight - listLeft, listBottom - listTop, blurR)
                     EmbeddedStencil.dispose()
                 } catch (_: Exception) {}
@@ -131,6 +141,24 @@ class OpaiArrayList(
                 GL11.glScalef(scale, scale, scale)
                 GL11.glTranslated(renderX, renderY, 0.0)
                 GL11.glPopMatrix()
+            }
+
+            if (edgeShadow) {
+                for (item in items) {
+                    val shadowLeft = item.bgLeft
+                    val shadowTop = item.bgTop
+                    val shadowWidth = item.bgRight - item.bgLeft
+                    val shadowHeight = item.bgBottom - item.bgTop
+                    for (i in edgeShadowStrength downTo 1) {
+                        val layerAlpha = (edgeShadowColor.alpha * i / edgeShadowStrength).coerceIn(0, 255)
+                        GlowUtils.drawGlow(
+                            shadowLeft, shadowTop,
+                            shadowWidth, shadowHeight,
+                            edgeShadowRadius * i / edgeShadowStrength,
+                            Color(edgeShadowColor.red, edgeShadowColor.green, edgeShadowColor.blue, layerAlpha)
+                        )
+                    }
+                }
             }
 
             val bgColor = Color(0, 0, 0, backgroundAlpha).rgb

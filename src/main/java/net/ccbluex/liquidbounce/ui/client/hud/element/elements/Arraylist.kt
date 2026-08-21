@@ -123,6 +123,11 @@ class Arraylist(
     private val blur by boolean("Blur", false)
     private val blurStrength by float("Blur-Strength", 10F, 1F..50F) { blur }
 
+    private val edgeShadow by boolean("EdgeShadow", false)
+    private val edgeShadowColor by color("EdgeShadowColor", Color.BLACK.withAlpha(100)) { edgeShadow }
+    private val edgeShadowRadius by int("EdgeShadowRadius", 8, 1..30) { edgeShadow }
+    private val edgeShadowStrength by int("EdgeShadowStrength", 1, 1..3) { edgeShadow }
+
     private val displayIcons by boolean("DisplayIcons", true)
     private val iconShadows by boolean("IconShadows", true) { displayIcons }
     private val xDistance by float("ShadowXDistance", 0F, -2F..2F) { iconShadows }
@@ -364,10 +369,10 @@ class Arraylist(
                         val xPos = -module.slide - if (displayIcons) 2 else 3
 
                         if (blur && module.slide > 0) {
-                            val blurX = if (side.horizontal == Horizontal.LEFT) renderX.toFloat() else renderX.toFloat() + xPos - if (rectMode == "Right") 5 else 2
-                            val blurY = renderY.toFloat() + yPos
-                            val blurWidth = -xPos + if (rectMode == "Right") 2 else 0
-                            val blurHeight = textSpacer
+                            val blurX = (renderX.toFloat() + xPos - if (rectMode == "Right") 5 else 2) * scale
+                            val blurY = (renderY.toFloat() + yPos) * scale
+                            val blurWidth = (-xPos + if (rectMode == "Right") 2 else 0) * scale
+                            val blurHeight = textSpacer * scale
 
                             GL11.glPushMatrix()
                             GL11.glTranslated(-renderX, -renderY, 0.0)
@@ -378,7 +383,7 @@ class Arraylist(
                                 EmbeddedStencil.write(false)
                                 drawRoundedRect(
                                     blurX, blurY, blurX + blurWidth, blurY + blurHeight,
-                                    Color.WHITE.rgb, roundedBackgroundRadius,
+                                    Color.WHITE.rgb, roundedBackgroundRadius * scale,
                                     if (rectMode == "Left") {
                                         RenderUtils.RoundedCorners.NONE
                                     } else {
@@ -386,7 +391,7 @@ class Arraylist(
                                     }
                                 )
                                 EmbeddedStencil.erase(true)
-                                val scaledBlurRadius = blurStrength * (bgColors.color().alpha / 255f)
+                                val scaledBlurRadius = blurStrength * (bgColors.color().alpha / 255f) * scale
                                 InternalBlurShader.blurArea(blurX, blurY, blurWidth, blurHeight, scaledBlurRadius)
                                 EmbeddedStencil.dispose()
                             } catch (_: Exception) {}
@@ -394,6 +399,20 @@ class Arraylist(
                             GL11.glScalef(scale, scale, scale)
                             GL11.glTranslated(renderX, renderY, 0.0)
                             GL11.glPopMatrix()
+                        }
+
+                        if (edgeShadow && module.slide > 0) {
+                            val shadowLeft = xPos - if (rectMode == "Right") 5 else 2
+                            val shadowWidth = (if (rectMode == "Right") -3F else -1F) - shadowLeft
+                            for (i in edgeShadowStrength downTo 1) {
+                                val layerAlpha = (edgeShadowColor.alpha * i / edgeShadowStrength).coerceIn(0, 255)
+                                GlowUtils.drawGlow(
+                                    shadowLeft, yPos,
+                                    shadowWidth, textSpacer,
+                                    edgeShadowRadius * i / edgeShadowStrength,
+                                    Color(edgeShadowColor.red, edgeShadowColor.green, edgeShadowColor.blue, layerAlpha)
+                                )
+                            }
                         }
 
                         when (glowMode) {
@@ -591,10 +610,10 @@ class Arraylist(
                         val xPos = -(textWidth - module.slide) + if (rectMode == "Left") 6 else 3
 
                         if (blur && module.slide > 0) {
-                            val blurX = renderX.toFloat() + if (rectMode == "Left") 1f else 0f
-                            val blurY = renderY.toFloat() + yPos
-                            val blurWidth = (textWidth + if (rectMode == "Right") 4 else 1).toFloat()
-                            val blurHeight = textSpacer
+                            val blurX = (renderX.toFloat() + if (rectMode == "Left") 1f else 0f) * scale
+                            val blurY = (renderY.toFloat() + yPos) * scale
+                            val blurWidth = (textWidth + if (rectMode == "Right") 4 else 1).toFloat() * scale
+                            val blurHeight = textSpacer * scale
 
                             GL11.glPushMatrix()
                             GL11.glTranslated(-renderX, -renderY, 0.0)
@@ -605,7 +624,7 @@ class Arraylist(
                                 EmbeddedStencil.write(false)
                                 drawRoundedRect(
                                     blurX, blurY, blurX + blurWidth, blurY + blurHeight,
-                                    Color.WHITE.rgb, roundedBackgroundRadius,
+                                    Color.WHITE.rgb, roundedBackgroundRadius * scale,
                                     if (rectMode == "Right") {
                                         RenderUtils.RoundedCorners.NONE
                                     } else {
@@ -613,7 +632,7 @@ class Arraylist(
                                     }
                                 )
                                 EmbeddedStencil.erase(true)
-                                val scaledBlurRadius = blurStrength * (bgColors.color().alpha / 255f)
+                                val scaledBlurRadius = blurStrength * (bgColors.color().alpha / 255f) * scale
                                 InternalBlurShader.blurArea(blurX, blurY, blurWidth, blurHeight, scaledBlurRadius)
                                 EmbeddedStencil.dispose()
                             } catch (_: Exception) {}
@@ -621,6 +640,20 @@ class Arraylist(
                             GL11.glScalef(scale, scale, scale)
                             GL11.glTranslated(renderX, renderY, 0.0)
                             GL11.glPopMatrix()
+                        }
+
+                        if (edgeShadow && module.slide > 0) {
+                            val shadowLeft = if (rectMode == "Left") 1f else 0f
+                            val shadowWidth = (xPos + textWidth + if (rectMode == "Right") 4 else 1) - shadowLeft
+                            for (i in edgeShadowStrength downTo 1) {
+                                val layerAlpha = (edgeShadowColor.alpha * i / edgeShadowStrength).coerceIn(0, 255)
+                                GlowUtils.drawGlow(
+                                    shadowLeft, yPos,
+                                    shadowWidth, textSpacer,
+                                    edgeShadowRadius * i / edgeShadowStrength,
+                                    Color(edgeShadowColor.red, edgeShadowColor.green, edgeShadowColor.blue, layerAlpha)
+                                )
+                            }
                         }
 
                         when (glowMode) {

@@ -1,5 +1,12 @@
 # EDNeko
 
+<div align="center">
+<img width="64" height="64" alt="icon_64x64" src="https://github.com/user-attachments/assets/a7c7a81a-d86b-4d21-94d4-a4975352046b" />
+  <br><br>
+  <b>A super-skid client, Power by AirClient.</b>
+  <br><br>
+</div>
+
 ### 简介
 
 EDNeko 是一个免费开源的 Minecraft 作弊客户端，基于 AirClient 代码库构建。本项目由 AI 全程编写 + skid 代码，拥有现代化的设计和丰富的自定义选项。

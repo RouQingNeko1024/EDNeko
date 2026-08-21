@@ -19,6 +19,7 @@ import net.ccbluex.liquidbounce.utils.render.RenderUtils.deltaTime
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawHead
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawRoundedBorderRect
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawRoundedRect
+import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawArc
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.withClipping
 import net.ccbluex.liquidbounce.utils.render.Stencil
 import net.ccbluex.liquidbounce.utils.render.animation.AnimationUtil
@@ -98,7 +99,8 @@ class Target : Element("Target"), Listenable {
             "Glitch",
             "Aqua",
             "Outline",
-            "Elegant"
+            "Elegant",
+            "Loftily"
         ),
         "Flux"
     )
@@ -127,7 +129,7 @@ class Target : Element("Target"), Listenable {
     private val moon4BGColorA by int("Moon4-BGA", 180, 0..255) { hudStyle == "Moon4" }
     private val moon4AnimSpeed by int("Moon4-AnimSpeed", 4, 1..10) { hudStyle == "Moon4" }
 
-    private val newStyleAvatarSize by int("NewStyle-AvatarSize", 30, 20..50) { hudStyle in listOf("Liquid", "Radar", "Digital", "Crystal", "Matrix", "Pixel", "Neon", "Glitch", "Aqua", "Outline", "Elegant") }
+    private val newStyleAvatarSize by int("NewStyle-AvatarSize", 30, 20..50) { hudStyle in listOf("Liquid", "Radar", "Digital", "Crystal", "Matrix", "Pixel", "Neon", "Glitch", "Aqua", "Outline", "Elegant", "Loftily") }
 
     private val rainbow by boolean("Myau-Rainbow", true) { hudStyle == "Myau" }
     private val borderRed by int("Myau-Border-Red", 255, 0..255) { hudStyle == "Myau" }
@@ -204,6 +206,12 @@ class Target : Element("Target"), Listenable {
     private val defaultVanishDelay by int("Default-VanishDelay", 300, 0..500) { hudStyle == "Default" }
     private val defaultRoundHealthBarShape by boolean("Default-RoundHealthBarShape", true) { hudStyle == "Default" }
 
+    private val loftilyBgColor by color("Loftily-BgColor", Color(20, 20, 30, 220)) { hudStyle == "Loftily" }
+    private val loftilyArcColor by color("Loftily-ArcColor", Color(0, 200, 255)) { hudStyle == "Loftily" }
+    private val loftilyArcBgColor by color("Loftily-ArcBgColor", Color(50, 50, 60, 150)) { hudStyle == "Loftily" }
+    private val loftilyShowStatus by boolean("Loftily-ShowStatus", true) { hudStyle == "Loftily" }
+    private val loftilyArcWidth by float("Loftily-ArcWidth", 3F, 1F..6F) { hudStyle == "Loftily" }
+
     private val riseHealthBarColor by color("Rise-HealthBar-Color", Color(0, 120, 255)) { hudStyle == "Rise" }
 
     private val followTarget by boolean("FollowTarget", false)
@@ -214,6 +222,7 @@ class Target : Element("Target"), Listenable {
     private var hue = 0.0f
 
     private var easingHealth = 0F
+    private var loftilyHealthArcAngle = 0F
     private var moon4EasingHealth = 0F
     private var southsideEasingHealth = 0F
     private var slideIn = 0F
@@ -699,6 +708,7 @@ class Target : Element("Target"), Listenable {
                 "aqua" -> renderAquaHUD(renderX, renderY)
                 "outline" -> renderOutlineHUD(renderX, renderY)
                 "elegant" -> renderElegantHUD(renderX, renderY)
+                "loftily" -> renderLoftilyHUD(renderX, renderY)
                 else -> renderFluxHUD(renderX, renderY)
             }
             
@@ -736,6 +746,7 @@ class Target : Element("Target"), Listenable {
             "aqua" -> renderAquaHUD(renderX, renderY)
             "outline" -> renderOutlineHUD(renderX, renderY)
             "elegant" -> renderElegantHUD(renderX, renderY)
+            "loftily" -> renderLoftilyHUD(renderX, renderY)
             else -> renderFluxHUD(renderX, renderY)
         }
     }
@@ -3874,5 +3885,81 @@ class Target : Element("Target"), Listenable {
 
         GlStateManager.popMatrix()
         return Border(x, y, x + tWidth, y + 50F)
+    }
+
+    private fun renderLoftilyHUD(x: Float, y: Float): Border {
+        val entity = target ?: lastTarget ?: return Border(0f, 0f, 0f, 0f)
+        updateAnim(entity.health)
+
+        val name = entity.name
+        val health = entity.health
+        val maxHealth = entity.maxHealth
+        val myHealth = mc.thePlayer.health
+        val avatarSize = newStyleAvatarSize.toFloat()
+        val height = 40F
+
+        val nameWidth = Fonts.font40.getStringWidth(name)
+        val healthText = "${String.format("%.1f", health)}/${String.format("%.1f", maxHealth)}"
+        val healthTextWidth = Fonts.font35.getStringWidth(healthText)
+        val minWidth = 125F
+        val tWidth = maxOf(minWidth, maxOf(nameWidth, healthTextWidth) + 80F)
+
+        val playerInfo = mc.netHandler.getPlayerInfo(entity.uniqueID)
+
+        if (entity.hurtTime > 0) {
+            hurtAlpha = 1F
+        } else {
+            hurtAlpha = lerp(hurtAlpha, 0F, 0.1F)
+        }
+
+        GlStateManager.pushMatrix()
+        GlStateManager.translate(x, y, 0f)
+
+        RenderUtils.drawRoundedRect(0F, 0F, tWidth, height, loftilyBgColor.rgb, 3F)
+
+        if (playerInfo != null) {
+            Stencil.write(false)
+            glDisable(GL_TEXTURE_2D)
+            glEnable(GL_BLEND)
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+            RenderUtils.fastRoundedRect(2F, 2F, 2F + avatarSize, 2F + avatarSize, 3F)
+            glDisable(GL_BLEND)
+            glEnable(GL_TEXTURE_2D)
+            Stencil.erase(true)
+            drawHead(playerInfo.locationSkin, 2, 2, avatarSize.toInt(), avatarSize.toInt(), Color.WHITE)
+            Stencil.dispose()
+
+            if (hurtAlpha > 0.01F) {
+                RenderUtils.drawRoundedRect(2F, 2F, 2F + avatarSize, 2F + avatarSize, Color(255, 0, 0, (hurtAlpha * 150).toInt()).rgb, 3F)
+            }
+        }
+
+        GlStateManager.resetColor()
+        glColor4f(1F, 1F, 1F, 1F)
+
+        val textX = avatarSize + 14F
+        Fonts.font40.drawString(name, textX, 5F, Color.WHITE.rgb)
+        Fonts.font35.drawString(healthText, textX, 18F, ColorUtils.getHealthColor(health, maxHealth).rgb)
+
+        if (loftilyShowStatus && health != myHealth) {
+            val statusText = if (health <= myHealth) "Winning" else "Losing"
+            val statusColor = if (health <= myHealth) Color(80, 255, 80) else Color(255, 80, 80)
+            Fonts.font35.drawString(statusText, textX, 28F, statusColor.rgb)
+        }
+
+        val healthPercent = (health / maxHealth).coerceIn(0F, 1F)
+        val startAngle = -90F
+        val targetEndAngle = startAngle + 360F * healthPercent
+        loftilyHealthArcAngle = lerp(loftilyHealthArcAngle, targetEndAngle, 0.15F)
+
+        val arcCx = tWidth - 20F
+        val arcCy = height / 2F
+        val arcRadius = avatarSize / 2F - 3F
+
+        RenderUtils.drawArc(arcCx, arcCy, arcRadius, 0F, 360F, loftilyArcWidth, loftilyArcBgColor.rgb)
+        RenderUtils.drawArc(arcCx, arcCy, arcRadius, startAngle, loftilyHealthArcAngle, loftilyArcWidth, loftilyArcColor.rgb)
+
+        GlStateManager.popMatrix()
+        return Border(x, y, x + tWidth, y + height)
     }
 }

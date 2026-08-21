@@ -24,6 +24,7 @@ import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.matr
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.ncp.*
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.other.BalanceTimer
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.other.*
+import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.rise.*
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.spartan.SpartanYPort
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.spectre.SpectreBHop
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.spectre.SpectreLowHop
@@ -112,7 +113,28 @@ object Speed : Module("Speed", Category.MOVEMENT, Keyboard.KEY_X) {
         SlowHop,
         Legit,
         CustomSpeed,
-        BalanceTimer
+        BalanceTimer,
+
+        // Rise
+        RiseBlocksMC,
+        RiseKoksCraft,
+        RiseLegit,
+        RiseStrafe,
+        RiseNCP,
+        RiseOldNCPYPort,
+        RiseVanilla,
+        RisePolar,
+        RiseMatrix,
+        RiseTatako,
+        RiseMineMenClub,
+        RiseGrim,
+        RiseGrim2,
+        RiseVerus,
+        RiseVulcan,
+        RiseWatchdog6Tick,
+        RiseWatchdogPrediction,
+        RiseWatchdog,
+        RiseMiniBlox
     )
 
     /**
@@ -155,6 +177,55 @@ object Speed : Module("Speed", Category.MOVEMENT, Keyboard.KEY_X) {
     val vanillaHopSpeed by float("VanillaHop-Speed", 0.4f, 0.1f..2f) { mode.get() == "VanillaHop" }
     val vanillaHopJump by boolean("VanillaHop-Jump", true) { mode.get() == "VanillaHop" }
     val vanillaHopFastStop by boolean("VanillaHop-FastStop", true) { mode.get() == "VanillaHop" }
+
+    // BalanceTimer Speed
+    val balanceTimerRiseTimer by float("BalanceTimer-RiseTimer", 1.5f, 0.1f..10f) { mode.get() == "BalanceTimer" }
+    val balanceTimerFallTimer by float("BalanceTimer-FallTimer", 0.5f, 0.01f..10f) { mode.get() == "BalanceTimer" }
+    val balanceTimerAutoBlink by boolean("BalanceTimer-AutoBlink", false) { mode.get() == "BalanceTimer" }
+    val balanceTimerBlinkThreshold by int("BalanceTimer-BlinkThreshold", 500, 10..1000) { balanceTimerAutoBlink && mode.get() == "BalanceTimer" }
+    val balanceTimerDebug by boolean("BalanceTimer-Debug", false) { mode.get() == "BalanceTimer" }
+
+    // Rise Vanilla
+    val riseVanillaSpeed by float("RiseVanilla-Speed", 1f, 0.1f..9.5f) { mode.get() == "RiseVanilla" }
+
+    // Rise Legit
+    val riseLegitNoJumpDelay by boolean("RiseLegit-NoJumpDelay", true) { mode.get() == "RiseLegit" }
+    val riseLegitTimerBoost by boolean("RiseLegit-TimerBoost", true) { mode.get() == "RiseLegit" }
+
+    // Rise Strafe
+    val riseStrafeHurtBoost by boolean("RiseStrafe-HurtBoost", false) { mode.get() == "RiseStrafe" }
+    val riseStrafeBoostSpeed by float("RiseStrafe-BoostSpeed", 1f, 0.1f..9.5f) { riseStrafeHurtBoost && mode.get() == "RiseStrafe" }
+
+    // Rise NCP
+    val riseNCPJumpMotion by float("RiseNCP-JumpMotion", 0.4f, 0.4f..0.42f) { mode.get() == "RiseNCP" }
+    val riseNCPGroundSpeed by float("RiseNCP-GroundSpeed", 1.75f, 0.1f..2.5f) { mode.get() == "RiseNCP" }
+    val riseNCPBunnySlope by float("RiseNCP-BunnySlope", 0.66f, 0f..1f) { mode.get() == "RiseNCP" }
+    val riseNCPTimer by float("RiseNCP-Timer", 1f, 0.1f..10f) { mode.get() == "RiseNCP" }
+    val riseNCPCustomBoost by boolean("RiseNCP-CustomBoost", false) { mode.get() == "RiseNCP" }
+    val riseNCPBoostSpeed by float("RiseNCP-BoostSpeed", 0.8f, 0.1f..9.5f) { riseNCPCustomBoost && mode.get() == "RiseNCP" }
+    val riseNCPLowHop by boolean("RiseNCP-LowHop", false) { mode.get() == "RiseNCP" }
+    val riseNCPYPortHop by boolean("RiseNCP-YPortHop", false) { mode.get() == "RiseNCP" }
+    val riseNCPHurtTime by int("RiseNCP-HurtTime", 6, 1..10) { riseNCPCustomBoost && mode.get() == "RiseNCP" }
+
+    // Rise Matrix
+    val riseMatrixTimerSneak by float("RiseMatrix-TimerSneak", 30f, 1f..100f) { mode.get() == "RiseMatrix" }
+
+    // Rise Grim
+    val riseGrimFastFall by boolean("RiseGrim-FastFall", true) { mode.get() == "RiseGrim" }
+    val riseGrimMoveFlyingIncrease by float("RiseGrim-MoveFlyingIncrease", 0.0001f, 0f..0.001f) { mode.get() == "RiseGrim" }
+
+    // Rise Grim2
+    val riseGrim2Speed by float("RiseGrim2-Speed", 1f, 0f..1f) { mode.get() == "RiseGrim2" }
+    val riseGrim2HighPing by boolean("RiseGrim2-HighPing", false) { mode.get() == "RiseGrim2" }
+
+    // Rise Verus
+    val riseVerusMode by choices("RiseVerus-Mode", arrayOf("LowHop", "Hop", "yPort"), "LowHop") { mode.get() == "RiseVerus" }
+
+    // Rise Vulcan
+    val riseVulcanMode by choices("RiseVulcan-Mode", arrayOf("LowHop", "Yport", "Ground"), "LowHop") { mode.get() == "RiseVulcan" }
+
+    // Rise Watchdog
+    val riseWatchdogMode by choices("RiseWatchdog-Mode", arrayOf("Strafe", "LowHop", "Hop"), "Strafe") { mode.get() == "RiseWatchdog" }
 
     // Extra options
     val resetXZ by boolean("ResetXZ", false) { mode.get() == "Custom" }

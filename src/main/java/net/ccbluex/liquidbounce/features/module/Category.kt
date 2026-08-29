@@ -17,7 +17,8 @@ enum class Category(val displayName: String) {
     MISC("杂项"),
     EXPLOIT("漏洞"),
     FUN("娱乐"),
-    CLIENT("客户端");
+    CLIENT("客户端"),
+    RISE("Rise");
 
     companion object {
         @JvmStatic

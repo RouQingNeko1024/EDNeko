@@ -666,6 +666,7 @@ class NeverloseScreen : GuiScreen() {
         Category.EXPLOIT -> "◎"
         Category.FUN -> "★"
         Category.CLIENT -> "⚙"
+        Category.RISE -> "R"
     }
 
     private fun isHovered(x: Int, y: Int, width: Int, height: Int, mouseX: Int, mouseY: Int): Boolean {

@@ -17,14 +17,23 @@ object Spammer : Module("Spammer", Category.MISC, subjective = true) {
 
     private val delay by intRange("Delay", 500..1000, 0..5000)
 
-    private val message by text("Message", "$CLIENT_NAME Client | Sup3r Sk1dder Cl1ent | j01n at 722573066")
-
     private val custom by boolean("Custom", false)
+
+    private val message by text("Message", "$CLIENT_NAME Client | %s | j01n at 722573066") { custom }
+
+    private val lines by text("Lines", "$CLIENT_NAME Client,$CLIENT_NAME on top,GG") { !custom }
+    private val separator by text("Separator", ",") { !custom }
+    private val randomSuffix by boolean("RandomSuffix", true) { !custom }
 
     val onUpdate = loopSequence {
         mc.thePlayer?.sendChatMessage(
             if (custom) replace(message)
-            else message + " >" + randomString(nextInt(5, 11)) + "<"
+            else {
+                val lineList = lines.split(separator).map { it.trim() }.filter { it.isNotEmpty() }
+                val selectedLine = lineList.randomOrNull() ?: lines
+                if (randomSuffix) selectedLine + " >" + randomString(nextInt(5, 11)) + "<"
+                else selectedLine
+            }
         )
 
         delay(delay.random().toLong())

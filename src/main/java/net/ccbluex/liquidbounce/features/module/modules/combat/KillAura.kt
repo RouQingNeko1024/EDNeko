@@ -467,6 +467,10 @@ object KillAura : Module("KillAura", Category.COMBAT, Keyboard.KEY_R) {
         synchronized(swingFails) {
             swingFails.clear()
         }
+
+        if (!state) {
+            RotationUtils.resetRotation()
+        }
     }
 
     val onRotationUpdate = handler<RotationUpdateEvent> {
@@ -2086,4 +2090,3 @@ object KillAura : Module("KillAura", Category.COMBAT, Keyboard.KEY_R) {
 }
 
 data class SwingFailData(val vec3: Vec3, val startTime: Long)
-

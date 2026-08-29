@@ -990,7 +990,7 @@ object RotationUtils : MinecraftInstance, Listenable {
             update()
         }
     }
-    private fun resetRotation() {
+    fun resetRotation() {
         resetTicks = 0
         currentRotation?.let { (yaw, _) ->
             mc.thePlayer?.let {

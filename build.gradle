@@ -128,7 +128,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlin_coroutines_version"
 
     // Swing LookAndFeel
-    implementation "com.formdev:flatlaf:3.5.4"
+    implementation "com.formdev:flatlaf:3.7.2"
 
     // JLayer and MP3SPI for MP3 playback
     implementation "javazoom:jlayer:1.0.1"

@@ -1003,11 +1003,14 @@ object Backtrack : Module("Backtrack", Category.COMBAT) {
 
         glColor(color)
 
+        val halfWidth = (entity.entityBoundingBox.maxX - entity.entityBoundingBox.minX) / 2.0
+        val halfDepth = (entity.entityBoundingBox.maxZ - entity.entityBoundingBox.minZ) / 2.0
+
         glBegin(GL_LINE_LOOP)
-        glVertex3d(x - 0.3, y, z - 0.3)
-        glVertex3d(x + 0.3, y, z - 0.3)
-        glVertex3d(x + 0.3, y + entity.height, z - 0.3)
-        glVertex3d(x - 0.3, y + entity.height, z - 0.3)
+        glVertex3d(x - halfWidth, y, z - halfDepth)
+        glVertex3d(x + halfWidth, y, z - halfDepth)
+        glVertex3d(x + halfWidth, y + entity.height, z - halfDepth)
+        glVertex3d(x - halfWidth, y + entity.height, z - halfDepth)
         glEnd()
 
         glPopMatrix()
@@ -1030,19 +1033,19 @@ object Backtrack : Module("Backtrack", Category.COMBAT) {
 
         glTranslated(x, y + entity.height + verticalOffset, z)
 
-        glColor4f(0.3f, 0.3f, 0.3f, 0.7f) // 灰色半透明背景
+        glColor4f(0.3f, 0.3f, 0.3f, 0.7f)
         drawRoundedRect(-barWidth/2, -barHeight/2, barWidth/2, barHeight/2, cornerRadius)
 
         val barLeft = (-barWidth/2)
         val barRight = (barLeft + barWidth * healthPercent)
 
         val barColor = when {
-            healthPercent > 0.5f -> Color(0f, 1f, 0f, 0.7f) // 绿色
-            healthPercent > 0.2f -> Color(1f, 1f, 0f, 0.7f) // 黄色
+            healthPercent > 0.5f -> Color(0f, 1f, 0f, 0.7f)
+            healthPercent > 0.2f -> Color(1f, 1f, 0f, 0.7f)
             else -> Color(1f, 0f, 0f, 0.7f)
         }
 
-        glColor4f(barColor.red.toFloat(), barColor.green.toFloat(), barColor.blue.toFloat(), barColor.alpha.toFloat())
+        glColor4f(barColor.red / 255f, barColor.green / 255f, barColor.blue / 255f, barColor.alpha / 255f)
         glBegin(GL_QUADS)
         glVertex3d(barLeft.toDouble(), (-barHeight/2).toDouble(), 0.0)
         glVertex3d(barRight.toDouble(), (-barHeight/2).toDouble(), 0.0)
@@ -1138,9 +1141,19 @@ object Backtrack : Module("Backtrack", Category.COMBAT) {
         glColor(color)
         glLineWidth(2f)
 
-        glBegin(GL_LINES)
-        glVertex3d(x, y + entity.height / 2, z)
-        glVertex3d(x, y + entity.height / 2 + arrowSize / 10, z)
+        val centerY = y + entity.height / 2
+        val arrowHeadSize = arrowSize / 10.0
+        val shaftLength = arrowSize / 10.0
+
+        glBegin(GL_LINE_STRIP)
+        glVertex3d(x, centerY - shaftLength, z)
+        glVertex3d(x, centerY + shaftLength, z)
+        glEnd()
+
+        glBegin(GL_LINE_STRIP)
+        glVertex3d(x - arrowHeadSize, centerY + shaftLength - arrowHeadSize, z)
+        glVertex3d(x, centerY + shaftLength, z)
+        glVertex3d(x + arrowHeadSize, centerY + shaftLength - arrowHeadSize, z)
         glEnd()
 
         glPopMatrix()

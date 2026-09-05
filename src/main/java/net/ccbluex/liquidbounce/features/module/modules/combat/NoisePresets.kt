@@ -153,8 +153,8 @@ object NoisePresets {
 
     private val antiML1Preset: NoiseApplier = { r ->
         val adversarial = (random.nextFloat() - 0.5f) * 0.15f
-        val temporal = sin(tickCounter * 0.05f + random.nextDouble() * PI) * 0.1f
-        val freqNoise = cos(tickCounter * 0.13f) * 0.08f
+        val temporal = sin(tickCounter * 0.05f + random.nextDouble() * PI).toFloat() * 0.1f
+        val freqNoise = cos(tickCounter * 0.13f).toFloat() * 0.08f
         Rotation(r.yaw + adversarial + temporal + freqNoise, r.pitch + adversarial * 0.4f + temporal * 0.5f)
     }
 
@@ -449,7 +449,7 @@ object NoisePresets {
         val burst = if (tickCounter % interval == 0L) {
             (random.nextFloat() - 0.5f) * 3f
         } else {
-            (random.nextFloat() - 0.5f) * 0.2f * 0.9f.pow((tickCounter % interval).toDouble()).toFloat()
+            (random.nextFloat() - 0.5f) * 0.2f * 0.9f.pow((tickCounter % interval).toFloat()).toFloat()
         }
         Rotation(r.yaw + burst, r.pitch + burst * 0.5f)
     }
@@ -484,16 +484,16 @@ object NoisePresets {
         val mu = 0.0
         val sigma = 0.05
         val dt = 1.0
-        ouState += theta * (mu - ouState) * dt + sigma * sqrt(dt) * random.nextGaussian()
+        ouState += theta * (mu - ouState) * dt + sigma * sqrt(dt) * nextGaussian()
         val noise = ouState.toFloat() * 50f
         Rotation(r.yaw + noise, r.pitch + noise * 0.5f)
     }
 
     private val levyFlightPreset: NoiseApplier = { r ->
         val alpha = 1.5
-        val u = random.nextGaussian()
-        val v = random.nextGaussian()
-        val levy = (u / abs(v).pow(1.0 / alpha)) * 0.1f
+        val u = nextGaussian()
+        val v = nextGaussian()
+        val levy = (u / abs(v).pow(1.0 / alpha)) * 0.1
         Rotation(r.yaw + levy.toFloat() * 30f, r.pitch + levy.toFloat() * 15f)
     }
 
@@ -550,7 +550,7 @@ object NoisePresets {
         val scale = 0.05
         val probability = 0.03
         val jump = if (random.nextFloat() < probability) {
-            scale * tan(PI * (random.nextDouble() - 0.5)).toFloat() * 30f
+            (scale * tan(PI * (random.nextDouble() - 0.5)) * 30.0).toFloat()
         } else 0f
         Rotation(r.yaw + jump, r.pitch + jump * 0.5f)
     }
@@ -568,7 +568,7 @@ object NoisePresets {
         val sigma = 0.8
         val pulseRate = 0.03
         val pulse = if (random.nextFloat() < pulseRate) {
-            exp(mu + sigma * random.nextGaussian()).toFloat() * 5f
+            exp(mu + sigma * nextGaussian()).toFloat() * 5f
         } else 0f
         Rotation(r.yaw + pulse, r.pitch + pulse * 0.5f)
     }
@@ -599,9 +599,9 @@ object NoisePresets {
         val mu2 = 0.5
         val sigma2 = 0.5
         val sample = if (random.nextFloat() < weight1) {
-            mu1 + sigma1 * random.nextGaussian()
+            mu1 + sigma1 * nextGaussian()
         } else {
-            mu2 + sigma2 * random.nextGaussian()
+            mu2 + sigma2 * nextGaussian()
         }
         Rotation(r.yaw + sample.toFloat() * 5f, r.pitch + sample.toFloat() * 2.5f)
     }
@@ -846,7 +846,7 @@ object NoisePresets {
         val lengthScale = 1.0
         val gpNoise = 0.05
         val kernel = exp(-0.5 * sin(tickCounter * 0.1f).pow(2) / lengthScale)
-        val noise = (kernel * random.nextGaussian() + gpNoise * random.nextGaussian()).toFloat() * 0.5f
+        val noise = (kernel * nextGaussian() + gpNoise * nextGaussian()).toFloat() * 0.5f
         Rotation(r.yaw + noise, r.pitch + noise * 0.5f)
     }
 
@@ -865,7 +865,7 @@ object NoisePresets {
             pfWeights[i] = exp(-pfParticles[i] * pfParticles[i] * 10f)
         }
         val totalWeight = pfWeights.sum()
-        val noise = pfParticles.indices.sumOf { pfParticles[it] * pfWeights[it] } / totalWeight
+        val noise = pfParticles.indices.sumOf { (pfParticles[it] * pfWeights[it]).toDouble() }.toFloat() / totalWeight
         if (totalWeight < 0.3f) {
             val newParticles = FloatArray(50)
             val newWeights = FloatArray(50)
@@ -874,8 +874,8 @@ object NoisePresets {
                 newParticles[i] = pfParticles[idx] + (random.nextFloat() - 0.5f) * 0.05f
                 newWeights[i] = 1f / 50f
             }
-            pfParticles = newParticles
-            pfWeights = newWeights
+            pfParticles = newParticles.toTypedArray()
+            pfWeights = newWeights.toTypedArray()
         }
         Rotation(r.yaw + noise.toFloat(), r.pitch + noise.toFloat() * 0.5f)
     }
@@ -978,7 +978,7 @@ object NoisePresets {
                 newPop[i] = crossover + mutation
                 newPop[i + 1] = crossover - mutation
             }
-            gaPopulation = newPop
+            gaPopulation = newPop.toTypedArray()
         }
         val idx = (tickCounter % 20).toInt()
         Rotation(r.yaw + gaPopulation[idx] * 0.5f, r.pitch + gaPopulation[idx] * 0.25f)
@@ -1001,7 +1001,7 @@ object NoisePresets {
     private var cmaesSigma = 0.5f
     private val cmaesAimPreset: NoiseApplier = { r ->
         val popSize = 10
-        val samples = (0 until popSize).map { cmaesMean + cmaesSigma * random.nextGaussian().toFloat() }
+        val samples = (0 until popSize).map { cmaesMean + cmaesSigma * nextGaussian().toFloat() }
         val sorted = samples.sortedBy { abs(it) }
         cmaesMean = sorted.take(popSize / 2).average().toFloat()
         cmaesSigma = (cmaesSigma * 0.95f).coerceAtLeast(0.01f)
@@ -1033,7 +1033,7 @@ object NoisePresets {
         Rotation(r.yaw + ucb, r.pitch + ucb * 0.5f)
     }
 
-    private val hyperbandAimPreset: NoiseApplier = { r ->
+    private val hyperbandAimPreset: NoiseApplier = { rot ->
         val maxIter = 81
         val eta = 3
         val sMax = (ln(maxIter.toFloat()) / ln(eta.toFloat())).toInt()
@@ -1041,7 +1041,7 @@ object NoisePresets {
         val n = (maxIter * eta.toFloat().pow(sMax - s)).toInt()
         val r = maxIter / n
         val noise = sin(tickCounter * 0.1f) * r.toFloat() / maxIter * 0.5f
-        Rotation(r.yaw + noise, r.pitch + noise * 0.5f)
+        Rotation(rot.yaw + noise, rot.pitch + noise * 0.5f)
     }
 
     private val bohbAimPreset: NoiseApplier = { r ->

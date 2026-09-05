@@ -574,6 +574,7 @@ class RiseClickGui : GuiScreen() {
 
     private fun Category.riseIcon() = when (this) {
         Category.COMBAT -> "a"
+        Category.KILLAURA -> "a"
         Category.MOVEMENT -> "b"
         Category.PLAYER -> "c"
         Category.RENDER -> "g"

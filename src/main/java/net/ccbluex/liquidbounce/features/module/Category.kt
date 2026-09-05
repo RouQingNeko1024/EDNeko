@@ -10,6 +10,7 @@ import net.minecraft.util.ResourceLocation
 enum class Category(val displayName: String) {
 
     COMBAT("战斗"),
+    KILLAURA("KillAura"),
     PLAYER("玩家"),
     MOVEMENT("移动"),
     RENDER("渲染"),

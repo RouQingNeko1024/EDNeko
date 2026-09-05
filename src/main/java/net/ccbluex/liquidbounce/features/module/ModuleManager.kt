@@ -7,6 +7,16 @@ package net.ccbluex.liquidbounce.features.module
 import net.ccbluex.liquidbounce.event.*
 import net.ccbluex.liquidbounce.features.command.CommandManager.registerCommand
 import net.ccbluex.liquidbounce.features.module.modules.combat.*
+import net.ccbluex.liquidbounce.features.module.modules.killaura.KillAuraCPS
+import net.ccbluex.liquidbounce.features.module.modules.killaura.KillAuraRange
+import net.ccbluex.liquidbounce.features.module.modules.killaura.KillAuraTargeting
+import net.ccbluex.liquidbounce.features.module.modules.killaura.KillAuraBypass
+import net.ccbluex.liquidbounce.features.module.modules.killaura.KillAuraAutoBlock
+import net.ccbluex.liquidbounce.features.module.modules.killaura.KillAuraRotations
+import net.ccbluex.liquidbounce.features.module.modules.killaura.KillAuraPrediction
+import net.ccbluex.liquidbounce.features.module.modules.killaura.KillAuraVisuals
+import net.ccbluex.liquidbounce.features.module.modules.killaura.KillAuraRenderAimPointBox
+import net.ccbluex.liquidbounce.features.module.modules.killaura.KillAuraDebug
 import net.ccbluex.liquidbounce.features.module.modules.exploit.*
 import net.ccbluex.liquidbounce.features.module.modules.`fun`.AutoL
 import net.ccbluex.liquidbounce.features.module.modules.`fun`.Derp
@@ -50,6 +60,18 @@ object ModuleManager : Listenable, Collection<Module> by MODULE_REGISTRY {
 
         // Register modules
         val modules = arrayOf(
+
+            KillAura,
+            KillAuraCPS,
+            KillAuraRange,
+            KillAuraTargeting,
+            KillAuraBypass,
+            KillAuraAutoBlock,
+            KillAuraRotations,
+            KillAuraPrediction,
+            KillAuraVisuals,
+            KillAuraRenderAimPointBox,
+            KillAuraDebug,
             Velocity2,
             AbortBreaking,
             Aimbot,
@@ -159,7 +181,6 @@ object ModuleManager : Listenable, Collection<Module> by MODULE_REGISTRY {
             KeepTabList,
             KeyPearl,
             Kick,
-            KillAura,
             RageBot,
             LagRange,
             LiquidWalk,

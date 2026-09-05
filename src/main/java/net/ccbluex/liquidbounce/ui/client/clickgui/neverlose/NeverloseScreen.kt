@@ -110,7 +110,7 @@ class NeverloseScreen : GuiScreen() {
 
     private fun drawSidebar(mouseX: Int, mouseY: Int) {
         val groups = listOf(
-            "Combat" to listOf(Category.COMBAT, Category.PLAYER),
+            "Combat" to listOf(Category.COMBAT, Category.KILLAURA, Category.PLAYER),
             "Common" to listOf(Category.MOVEMENT, Category.WORLD, Category.MISC, Category.EXPLOIT),
             "Visuals" to listOf(Category.RENDER, Category.FUN),
             "Presets" to listOf(Category.CLIENT)
@@ -323,7 +323,7 @@ class NeverloseScreen : GuiScreen() {
         if (mouseButton != 0) return
 
         val groups = listOf(
-            listOf(Category.COMBAT, Category.PLAYER),
+            listOf(Category.COMBAT, Category.KILLAURA, Category.PLAYER),
             listOf(Category.MOVEMENT, Category.WORLD, Category.MISC, Category.EXPLOIT),
             listOf(Category.RENDER, Category.FUN),
             listOf(Category.CLIENT)
@@ -682,6 +682,7 @@ class NeverloseScreen : GuiScreen() {
 
     private fun categoryIcon(category: Category) = when (category) {
         Category.COMBAT -> "⚔"
+        Category.KILLAURA -> "⚔"
         Category.PLAYER -> "●"
         Category.MOVEMENT -> "➜"
         Category.RENDER -> "◈"

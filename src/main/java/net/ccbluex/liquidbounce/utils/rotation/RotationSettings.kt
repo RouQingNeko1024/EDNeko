@@ -598,4 +598,6 @@ open class RotationSettings(owner: Module, generalApply: () -> Boolean = { true 
     init {
         owner.addValues(this.values)
     }
+
+    var noiseFunction: ((Rotation) -> Rotation)? = null
 }

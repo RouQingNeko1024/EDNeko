@@ -331,6 +331,58 @@ class ListValue(
         values = newValues
     }
 }
+class MultiListValue(
+    name: String,
+    var values: Array<String>,
+    value: Set<String>,
+) : Value<Set<String>>(name, value) {
+
+    override fun validate(newValue: Set<String>): Set<String> =
+        newValue.filter { v -> values.any { it.equals(v, true) } }.toSet()
+
+    var openList = false
+
+    operator fun contains(string: String?) = get().any { it.equals(string, true) }
+
+    fun isActive(name: String) = get().any { it.equals(name, true) }
+
+    fun toggle(name: String) {
+        val current = get().toMutableSet()
+        val matched = values.find { it.equals(name, true) } ?: return
+        if (current.any { it.equals(name, true) }) {
+            current.removeIf { it.equals(name, true) }
+        } else {
+            current.add(matched)
+        }
+        set(current.toSet())
+    }
+
+    override fun toJson(): JsonElement {
+        val arr = JsonArray()
+        get().forEach { arr.add(it) }
+        return arr
+    }
+
+    override fun fromJsonF(element: JsonElement): Set<String>? =
+        when {
+            element.isJsonArray -> {
+                val set = mutableSetOf<String>()
+                element.asJsonArray.forEach { e ->
+                    if (e.isJsonPrimitive) {
+                        val str = e.asString
+                        if (values.any { it.equals(str, true) }) set.add(str)
+                    }
+                }
+                set.toSet()
+            }
+            else -> null
+        }
+
+    override fun fromTextF(text: String): Set<String>? {
+        val items = text.split(",").map { it.trim() }.filter { v -> values.any { it.equals(v, true) } }
+        return if (items.isEmpty()) null else items.toSet()
+    }
+}
 
 class ColorValue(
     name: String, defaultColor: Color, var rainbow: Boolean = false

@@ -809,7 +809,9 @@ object RotationUtils : MinecraftInstance, Listenable {
             straightLinePitch = it
         }
 
-        return currentRotation.plus(Rotation(straightLineYaw, straightLinePitch))
+        return currentRotation.plus(Rotation(straightLineYaw, straightLinePitch)).let { result ->
+            activeSettings?.noiseFunction?.invoke(result) ?: result
+        }
     }
 
     private fun applySlowDown(

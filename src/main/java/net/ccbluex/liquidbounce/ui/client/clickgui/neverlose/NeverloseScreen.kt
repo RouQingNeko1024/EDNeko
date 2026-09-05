@@ -11,6 +11,7 @@ import net.ccbluex.liquidbounce.config.ColorValue
 import net.ccbluex.liquidbounce.config.FloatValue
 import net.ccbluex.liquidbounce.config.IntValue
 import net.ccbluex.liquidbounce.config.ListValue
+import net.ccbluex.liquidbounce.config.MultiListValue
 import net.ccbluex.liquidbounce.config.TextValue
 import net.ccbluex.liquidbounce.config.Value
 import net.ccbluex.liquidbounce.features.module.Category
@@ -210,6 +211,7 @@ class NeverloseScreen : GuiScreen() {
             is IntValue -> drawNumberValue(value.get().toFloat(), value.minimum.toFloat(), value.maximum.toFloat(), x, y, width, value.get().toString())
             is FloatValue -> drawNumberValue(value.get(), value.minimum, value.maximum, x, y, width, "%.2f".format(value.get()))
             is ListValue -> drawChoiceValue(value, x, y, width)
+            is MultiListValue -> drawMultiChoiceValue(value, x, y, width)
             is TextValue -> drawTextValue(value, x, y, width)
             is ColorValue -> drawColorValue(value, x, y, width)
             else -> Fonts.font30.drawString(fitText(value.toText(), 120), (x + width - Fonts.font30.getStringWidth(fitText(value.toText(), 120)) - 6).toFloat(), (y + 8).toFloat(), MUTED.rgb)
@@ -239,6 +241,12 @@ class NeverloseScreen : GuiScreen() {
 
     private fun drawChoiceValue(value: ListValue, x: Int, y: Int, width: Int) {
         val text = fitText(value.get(), 100)
+        Fonts.font30.drawString(text, (x + width - Fonts.font30.getStringWidth(text) - 6).toFloat(), (y + 8).toFloat(), ACCENT.rgb)
+    }
+
+    private fun drawMultiChoiceValue(value: MultiListValue, x: Int, y: Int, width: Int) {
+        val selected = value.get().joinToString(", ")
+        val text = fitText(if (selected.isEmpty()) "None" else selected, 100)
         Fonts.font30.drawString(text, (x + width - Fonts.font30.getStringWidth(text) - 6).toFloat(), (y + 8).toFloat(), ACCENT.rgb)
     }
 
@@ -389,6 +397,15 @@ class NeverloseScreen : GuiScreen() {
                             valuesConfigDirty = true
                         } else if (mouseButton == 1) {
                             previousChoice(value)
+                            valuesConfigDirty = true
+                        }
+                    }
+                    is MultiListValue -> {
+                        if (mouseButton == 0) {
+                            nextMultiChoice(value)
+                            valuesConfigDirty = true
+                        } else if (mouseButton == 1) {
+                            value.set(emptySet())
                             valuesConfigDirty = true
                         }
                     }
@@ -550,6 +567,13 @@ class NeverloseScreen : GuiScreen() {
     private fun previousChoice(value: ListValue) {
         val index = value.values.indexOfFirst { it.equals(value.get(), ignoreCase = true) }
         value.set(value.values[(index - 1).floorMod(value.values.size)], false)
+    }
+
+    private fun nextMultiChoice(value: MultiListValue) {
+        val current = value.get()
+        val index = value.values.indexOfFirst { it in current }
+        val nextIndex = if (index == -1) 0 else (index + 1).floorMod(value.values.size)
+        value.toggle(value.values[nextIndex])
     }
 
     private fun focusTextValue(value: TextValue) {

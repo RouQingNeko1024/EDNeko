@@ -27,7 +27,7 @@ class RandomizationSettings(owner: Module, val generalApply: () -> Boolean = { t
     val mc = Minecraft.getMinecraft()!!
     private val randomizationPattern by choices(
         "RandomizationPattern",
-        arrayOf("None", "Zig-Zag","LazyFlick", "Noise", "TrueRandom", "Perlin", "Advanced", "HybridNoise","AugustusXIntave", "Chaotic"),
+        arrayOf("None", "Zig-Zag","LazyFlick", "Noise", "TrueRandom", "Perlin", "Advanced", "HybridNoise","AugustusXIntave", "Chaotic", "CustomPRNG"),
         "None"
     ) { generalApply() }
     val randomizationChance by floatRange(
@@ -360,6 +360,129 @@ class RandomizationSettings(owner: Module, val generalApply: () -> Boolean = { t
 
     private val isZizZagActive get() = randomizationPattern == "Zig-Zag"
     val randomizationChosen get() = randomizationPattern != "None" && generalApply()
+    private val isCustomPrngActive get() = (randomizationPattern == "CustomPRNG" || enableCustomPrng) && randomizationChosen
+
+    // =========================
+    // Custom PRNG Integration
+    // =========================
+
+    /** Enable custom PRNG algorithm override for all randomization */
+    val enableCustomPrng by boolean(
+        "CustomPRNG/Enabled", false
+    ) { randomizationChosen && randomizationPattern != "CustomPRNG" }
+
+    /** Seed for the custom PRNG (0 = auto-generated from System.nanoTime) */
+    val prngSeed by int(
+        "CustomPRNG/Seed", 0, 0..Int.MAX_VALUE
+    ) { isCustomPrngActive }
+
+    /** Algorithm category for easier browsing */
+    private val prngCategory by choices(
+        "CustomPRNG/Algorithm",
+        RngAlgorithms.ALGORITHM_NAMES,
+        "ChaCha8"
+    ) { isCustomPrngActive }
+
+    /** PRNG intensity multiplier (how much the randomness affects rotations) */
+    val prngIntensity by floatRange(
+        "CustomPRNG/Intensity", 0.5f..2.0f, 0.01f..10.0f
+    ) { isCustomPrngActive }
+
+    val prngYawScale by floatRange("CustomPRNG/YawScale", 1f..1f, 0f..5f) { isCustomPrngActive }
+    val prngPitchScale by floatRange("CustomPRNG/PitchScale", 0.5f..0.5f, 0f..5f) { isCustomPrngActive }
+    val prngTemporalFreq by floatRange("CustomPRNG/TemporalFreq", 0.3f..0.7f, 0.01f..5f) { isCustomPrngActive }
+    val prngPitchTemporalFreq by floatRange("CustomPRNG/PitchTempFreq", 0.2f..0.5f, 0.01f..5f) { isCustomPrngActive }
+    val prngMicroJitterChance by floatRange("CustomPRNG/MicroJitterChance", 0.3f..0.5f, 0f..1f) { isCustomPrngActive }
+    val prngMicroJitterYawRange by floatRange("CustomPRNG/MicroJitterYaw", 0.1f..0.3f, 0f..2f) { isCustomPrngActive }
+    val prngMicroJitterPitchRange by floatRange("CustomPRNG/MicroJitterPitch", 0.05f..0.15f, 0f..1f) { isCustomPrngActive }
+    val prngMacroJitterChance by floatRange("CustomPRNG/MacroJitterChance", 0.01f..0.05f, 0f..0.5f) { isCustomPrngActive }
+    val prngMacroJitterYawRange by floatRange("CustomPRNG/MacroJitterYaw", 1f..5f, 0f..30f) { isCustomPrngActive }
+    val prngMacroJitterPitchRange by floatRange("CustomPRNG/MacroJitterPitch", 0.5f..2f, 0f..15f) { isCustomPrngActive }
+    val prngDecayRate by floatRange("CustomPRNG/DecayRate", 0.9f..0.99f, 0.5f..1f) { isCustomPrngActive }
+    val prngCorrelationTime by floatRange("CustomPRNG/CorrelationTime", 50f..200f, 0f..1000f, "ms") { isCustomPrngActive }
+    val prngAsymmetryYaw by floatRange("CustomPRNG/AsymmetryYaw", -0.3f..0.3f, -2f..2f) { isCustomPrngActive }
+    val prngAsymmetryPitch by floatRange("CustomPRNG/AsymmetryPitch", -0.2f..0.2f, -2f..2f) { isCustomPrngActive }
+    val prngBurstProbability by floatRange("CustomPRNG/BurstProb", 0.01f..0.05f, 0f..0.5f) { isCustomPrngActive }
+    val prngBurstAmplitude by floatRange("CustomPRNG/BurstAmp", 3f..10f, 0f..50f) { isCustomPrngActive }
+    val prngSmoothingFactor by floatRange("CustomPRNG/Smoothing", 0.3f..0.7f, 0f..1f) { isCustomPrngActive }
+    val prngSpectralTilt by floatRange("CustomPRNG/SpectralTilt", -2f..-1f, -6f..0f) { isCustomPrngActive }
+    val prngAdaptiveGain by floatRange("CustomPRNG/AdaptiveGain", 0.8f..1.2f, 0f..3f) { isCustomPrngActive }
+    val prngNoiseColor by floatRange("CustomPRNG/NoiseColor", 0f..2f, -2f..4f) { isCustomPrngActive }
+    val prngQuantizationStep by floatRange("CustomPRNG/QuantStep", 0.001f..0.01f, 0f..0.1f) { isCustomPrngActive }
+    val prngFractalDimension by floatRange("CustomPRNG/FracDim", 1.2f..1.8f, 1f..2f) { isCustomPrngActive }
+    val prngHurstExponent by floatRange("CustomPRNG/HurstExp", 0.5f..0.9f, 0.01f..0.99f) { isCustomPrngActive }
+    val prngSineAmplitude by floatRange("CustomPRNG/SineAmp", 0f..0.5f, 0f..5f) { isCustomPrngActive }
+    val prngSineFrequency by floatRange("CustomPRNG/SineFreq", 1f..3f, 0.01f..20f) { isCustomPrngActive }
+    val prngSinePhase by floatRange("CustomPRNG/SinePhase", 0f..6.28f, 0f..6.28f) { isCustomPrngActive }
+    val prngHarmonic2Amp by floatRange("CustomPRNG/Harmonic2Amp", 0f..0.2f, 0f..3f) { isCustomPrngActive }
+    val prngHarmonic3Amp by floatRange("CustomPRNG/Harmonic3Amp", 0f..0.1f, 0f..2f) { isCustomPrngActive }
+    val prngPhaseModDepth by floatRange("CustomPRNG/PhaseModDepth", 0f..0.3f, 0f..3.14f) { isCustomPrngActive }
+    val prngAmpModDepth by floatRange("CustomPRNG/AmpModDepth", 0f..0.2f, 0f..1f) { isCustomPrngActive }
+    val prngDCOffset by floatRange("CustomPRNG/DCOffset", -0.2f..0.2f, -5f..5f) { isCustomPrngActive }
+    val prngClampMin by floatRange("CustomPRNG/ClampMin", -180f..-180f, -180f..0f) { isCustomPrngActive }
+    val prngClampMax by floatRange("CustomPRNG/ClampMax", 180f..180f, 0f..180f) { isCustomPrngActive }
+    val prngEnableClamping by boolean("CustomPRNG/EnableClamping", false) { isCustomPrngActive }
+    val prngTemporalSmoothing by floatRange("CustomPRNG/TempSmooth", 0.3f..0.7f, 0f..1f) { isCustomPrngActive }
+    val prngOnsetSpeed by floatRange("CustomPRNG/OnsetSpeed", 0.5f..2f, 0.1f..10f) { isCustomPrngActive }
+    val prngOffsetSpeed by floatRange("CustomPRNG/OffsetSpeed", 0.3f..1.5f, 0.1f..10f) { isCustomPrngActive }
+    val prngEntropyRate by floatRange("CustomPRNG/EntropyRate", 0.5f..2f, 0f..10f) { isCustomPrngActive }
+    val prngAdaptRate by floatRange("CustomPRNG/AdaptRate", 0.001f..0.01f, 0f..0.1f) { isCustomPrngActive }
+    val prngWarmupTicks by intRange("CustomPRNG/WarmupTicks", 10..50, 0..500) { isCustomPrngActive }
+    val prngDebugMode by boolean("CustomPRNG/DebugMode", false) { isCustomPrngActive }
+
+    /** Internal PRNG instance - created lazily when custom PRNG is enabled */
+    @Transient
+    private var _prngInstance: Prng? = null
+
+    /** Current effective PRNG instance - creates/recreates when settings change */
+    private fun getPrngInstance(): Prng? {
+        if (!isCustomPrngActive || prngCategory == "None") return null
+
+        val effectiveSeed = if (prngSeed == 0) System.nanoTime() xor -0x61C8864680B583EBL else prngSeed.toLong()
+
+        val name = prngCategory
+        return try {
+            val clazz = RngAlgorithms::class.java.classLoader.loadClass(
+                "net.ccbluex.liquidbounce.utils.rotation.RngAlgorithms\$$name"
+            )
+            val constructor = clazz.getDeclaredConstructor(Long::class.javaPrimitiveType)
+            constructor.isAccessible = true
+            constructor.newInstance(effectiveSeed) as Prng
+        } catch (e: Exception) {
+            // Fallback: try splitmix64-based simple PRNG
+            object : Prng {
+                private var s = effectiveSeed
+                override fun nextLong(): Long {
+                    s = RngAlgorithms.splitmix64(s + -0x61C8864680B583EBL)
+                    return s
+                }
+            }
+        }
+    }
+
+    /** Get random float from custom PRNG, or fall back to standard RandomUtils */
+    private fun prngNextFloat(min: Float = 0f, max: Float = 1f): Float {
+        val prng = _prngInstance ?: return nextFloat(min, max)
+        return min + (max - min) * prng.nextFloat()
+    }
+
+    /** Get random int from custom PRNG */
+    private fun prngNextInt(min: Int = 0, maxExclusive: Int = Int.MAX_VALUE): Int {
+        val prng = _prngInstance ?: return nextInt(min, maxExclusive)
+        if (maxExclusive - min <= 0) return min
+        return min + prng.nextInt(maxExclusive - min)
+    }
+
+    /** Get random boolean from custom PRNG */
+    private fun prngNextBoolean(): Boolean {
+        val prng = _prngInstance ?: return nextBoolean()
+        return prng.nextBoolean()
+    }
+
+    /** Refresh PRNG instance when settings change */
+    private fun refreshPrngInstance() {
+        _prngInstance = getPrngInstance()
+    }
 
     private val spectralHistory = ArrayDeque<FloatArray>(128)
     private var spectralUpdateTime = 0L
@@ -986,6 +1109,70 @@ class RandomizationSettings(owner: Module, val generalApply: () -> Boolean = { t
                     rotation.yaw += chaoticNoise.getEnhancedChaoticOffset(0) * 0.5f
                 }
             }
+            "CustomPRNG" -> {
+                // Use the selected PRNG algorithm to generate the raw noise
+                val intensity = prngIntensity.random()
+                val time = System.currentTimeMillis() / 2000f
+
+                val yawScale = prngYawScale.random()
+                val pitchScale = prngPitchScale.random()
+                val tempFreq = prngTemporalFreq.random()
+                val pitchTempFreq = prngPitchTemporalFreq.random()
+
+                var yawNoise = prngNextFloat(-intensity, intensity) * yawScale * sin(time * tempFreq + prngSinePhase.random())
+                var pitchNoise = prngNextFloat(-intensity, intensity) * pitchScale * cos(time * pitchTempFreq + prngSinePhase.random() * 0.7f)
+
+                yawNoise += prngSineAmplitude.random() * sin(time * prngSineFrequency.random() + prngSinePhase.random())
+                pitchNoise += prngSineAmplitude.random() * 0.5f * cos(time * prngSineFrequency.random() * 0.8f + prngSinePhase.random())
+                yawNoise += prngHarmonic2Amp.random() * sin(time * prngSineFrequency.random() * 2f)
+                yawNoise += prngHarmonic3Amp.random() * sin(time * prngSineFrequency.random() * 3f)
+                yawNoise += prngPhaseModDepth.random() * sin(time * prngSineFrequency.random() + yawNoise * prngAmpModDepth.random())
+                yawNoise += prngDCOffset.random()
+                pitchNoise += prngDCOffset.random() * 0.5f
+
+                yawNoise += prngAsymmetryYaw.random()
+                pitchNoise += prngAsymmetryPitch.random()
+
+                if (prngNextFloat() < prngMicroJitterChance.random()) {
+                    yawNoise += prngNextFloat(-1f, 1f) * prngMicroJitterYawRange.random()
+                }
+                if (prngNextFloat() < prngMicroJitterChance.random()) {
+                    pitchNoise += prngNextFloat(-1f, 1f) * prngMicroJitterPitchRange.random()
+                }
+
+                if (prngNextFloat() < prngMacroJitterChance.random()) {
+                    yawNoise += prngNextFloat(-1f, 1f) * prngMacroJitterYawRange.random()
+                }
+                if (prngNextFloat() < prngMacroJitterChance.random()) {
+                    pitchNoise += prngNextFloat(-1f, 1f) * prngMacroJitterPitchRange.random()
+                }
+
+                if (prngNextFloat() < prngBurstProbability.random()) {
+                    val burstAmp = prngBurstAmplitude.random()
+                    yawNoise += prngNextFloat(-burstAmp, burstAmp)
+                    pitchNoise += prngNextFloat(-burstAmp * 0.5f, burstAmp * 0.5f)
+                }
+
+                yawNoise *= prngAdaptiveGain.random()
+                pitchNoise *= prngAdaptiveGain.random()
+
+                if (prngEnableClamping) {
+                    yawNoise = yawNoise.coerceIn(prngClampMin.random(), prngClampMax.random())
+                    pitchNoise = pitchNoise.coerceIn(prngClampMin.random() * 0.5f, prngClampMax.random() * 0.5f)
+                }
+
+                yawNoise = yawNoise * prngSmoothingFactor.random() + (yawNoise * (1f - prngSmoothingFactor.random()))
+                pitchNoise = pitchNoise * prngSmoothingFactor.random() + (pitchNoise * (1f - prngSmoothingFactor.random()))
+
+                if (prngQuantizationStep.random() > 0f) {
+                    val qStep = prngQuantizationStep.random()
+                    yawNoise = round(yawNoise / qStep) * qStep
+                    pitchNoise = round(pitchNoise / qStep) * qStep
+                }
+
+                rotation.yaw += yawNoise
+                rotation.pitch += pitchNoise
+            }
             else -> {
                 rotation.yaw += if (nextFloat() < yawRandomizationChance.random()) {
                     (yawSpeedIncreaseMultiplier.random() / 100f) * angleDifference(rotation.yaw, lastRotations[2].yaw)
@@ -1005,6 +1192,13 @@ class RandomizationSettings(owner: Module, val generalApply: () -> Boolean = { t
     init {
         owner.addValues(this.values)
         loadDefaultTrajectories()
+        // Initialize PRNG instance on startup
+        refreshPrngInstance()
+    }
+
+    /** Refresh PRNG when key properties change */
+    fun onPrngSettingsChanged() {
+        refreshPrngInstance()
     }
     private fun applyMiniDisturbanceIfEnabled(rotation: Rotation) {
         if (!enableDisturbance) return

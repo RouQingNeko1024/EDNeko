@@ -9,6 +9,7 @@ import net.ccbluex.liquidbounce.config.Configurable
 import net.ccbluex.liquidbounce.event.Listenable
 import net.ccbluex.liquidbounce.event.ModuleToggleEvent
 import net.ccbluex.liquidbounce.features.module.modules.misc.GameDetector
+import net.ccbluex.liquidbounce.features.module.modules.client.Language
 import net.ccbluex.liquidbounce.features.module.modules.client.Sound
 import net.ccbluex.liquidbounce.file.FileManager.modulesConfig
 import net.ccbluex.liquidbounce.file.FileManager.saveConfig
@@ -60,7 +61,9 @@ open class Module(
     // Module information
 
     // Get normal or spaced name
-    open fun getName(spaced: Boolean = Arraylist.spacedModulesValue.get()) = if (spaced) spacedName else name
+    open fun getName(spaced: Boolean = Arraylist.spacedModulesValue.get()): String {
+        return if (spaced) spacedName else Language.getName(name)
+    }
 
     var keyBind = defaultKeyBind
         set(keyBind) {

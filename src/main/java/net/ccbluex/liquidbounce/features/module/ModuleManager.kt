@@ -129,6 +129,8 @@ object ModuleManager : Listenable, Collection<Module> by MODULE_REGISTRY {
             Chams,
             ChestAura,
             ChatPrefix,
+            IRC,
+            Language,
             ChestStealer,
             CivBreak,
             ClickGUI,

@@ -8,6 +8,7 @@ import net.ccbluex.liquidbounce.event.Render3DEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
+import net.ccbluex.liquidbounce.features.module.modules.client.IRC
 import net.ccbluex.liquidbounce.features.module.modules.misc.AntiBot.isBot
 import net.ccbluex.liquidbounce.ui.font.Fonts
 import net.ccbluex.liquidbounce.utils.GlowUtils
@@ -133,7 +134,11 @@ object NameTags : Module("NameTags", Category.RENDER) {
                 if (!isSelected(entity, false)) continue
             }
 
-            val name = entity.displayName.unformattedText ?: continue
+            val rawName = entity.displayName.unformattedText ?: continue
+            val name = if (entity is EntityPlayer) {
+                val playerName = entity.name
+                if (IRC.isEDNekoPlayer(playerName)) "\u00A7b[\u00A7lEDNeko\u00A7b] \u00A7r$rawName" else rawName
+            } else rawName
 
             val distanceSquared = mc.thePlayer.getDistanceSqToEntity(entity)
 

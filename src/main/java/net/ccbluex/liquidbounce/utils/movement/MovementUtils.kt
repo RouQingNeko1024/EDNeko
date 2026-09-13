@@ -8,6 +8,7 @@ import net.ccbluex.liquidbounce.event.*
 import net.ccbluex.liquidbounce.utils.client.MinecraftInstance
 import net.ccbluex.liquidbounce.utils.extensions.*
 import net.minecraft.network.play.client.C03PacketPlayer
+import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import kotlin.math.cos
 import kotlin.math.sin
@@ -134,5 +135,14 @@ object MovementUtils : MinecraftInstance, Listenable {
         }
     }
 
-    
+    fun isBlockUnder(): Boolean {
+        val player = mc.thePlayer ?: return false
+        for (i in 0..4) {
+            val pos = BlockPos(player.posX, player.posY - i, player.posZ)
+            if (mc.theWorld.getBlockState(pos).block != net.minecraft.init.Blocks.air) {
+                return true
+            }
+        }
+        return false
+    }
 }

@@ -9,6 +9,7 @@ import net.ccbluex.liquidbounce.config.Configurable
 import net.ccbluex.liquidbounce.event.Listenable
 import net.ccbluex.liquidbounce.event.PacketEvent
 import net.ccbluex.liquidbounce.event.handler
+import net.ccbluex.liquidbounce.features.special.eagler.EaglercraftManager
 import net.ccbluex.liquidbounce.utils.client.ClientUtils.LOGGER
 import net.ccbluex.liquidbounce.utils.client.MinecraftInstance
 import net.minecraft.network.PacketBuffer
@@ -38,6 +39,12 @@ object ClientFixes : Configurable("Features"), MinecraftInstance, Listenable {
     var clientBrand by choices("ClientBrand", possibleBrands, "Vanilla")
 
     var bungeeSpoofValue = boolean("BungeeSpoof", false)
+
+    var eaglercraftEnabled by boolean("Eaglercraft", false)
+
+    var eaglercraftUrl by text("EaglercraftUrl", "")
+
+    var eaglercraftDebug by boolean("EaglercraftDebug", false)
 
     var autoReconnectDelayValue = int("AutoReconnectDelay", 5000, AutoReconnect.MIN..AutoReconnect.MAX).onChanged { value ->
         AutoReconnect.isEnabled = value < AutoReconnect.MAX

@@ -2,6 +2,7 @@ package net.ccbluex.liquidbounce.features.module.modules.killaura
 
 import net.ccbluex.liquidbounce.LiquidBounce
 import net.ccbluex.liquidbounce.event.*
+import net.ccbluex.liquidbounce.utils.customizable.CustomizableController
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.features.module.modules.combat.Backtrack
@@ -84,6 +85,22 @@ import kotlin.math.sin
 
 object KillAura : Module("KillAura", Category.KILLAURA, Keyboard.KEY_R) {
 
+    /**
+     * Customizable 模式开关
+     * 开启后完全由自定义逻辑编辑器控制 KillAura 行为
+     */
+    val customizable = boolean("Customizable", false).onChanged {
+        if (it) {
+            CustomizableController.enable()
+            if (!CustomizableController.isEditorOpen()) {
+                CustomizableController.openEditor()
+            }
+        } else {
+            CustomizableController.closeEditor()
+            CustomizableController.disable()
+        }
+    }
+
     val autoBlock get() = KillAuraAutoBlock.autoBlock
     val blinkAutoBlock get() = KillAuraAutoBlock.blinkAutoBlock
     val forceBlockRender get() = KillAuraAutoBlock.forceBlockRender
@@ -139,6 +156,19 @@ object KillAura : Module("KillAura", Category.KILLAURA, Keyboard.KEY_R) {
         clicks = 0
         KillAuraDebug.reset()
 
+        // 处理 Customizable 模式
+        if (customizable.get()) {
+            if (state) {
+                CustomizableController.enable()
+            } else {
+                CustomizableController.disable()
+            }
+        } else {
+            if (!state) {
+                CustomizableController.disable()
+            }
+        }
+
         if (KillAuraAutoBlock.blinkAutoBlock) {
             BlinkUtils.unblink()
             blinked = false
@@ -162,7 +192,62 @@ object KillAura : Module("KillAura", Category.KILLAURA, Keyboard.KEY_R) {
     }
 
     val onRotationUpdate = handler<RotationUpdateEvent> {
+        // Customizable 模式：跳过原有转头逻辑，使用自定义逻辑
+        if (customizable.get() && CustomizableController.isCustomizableActive) {
+            executeCustomLogic()
+            return@handler
+        }
         update()
+    }
+
+    /**
+     * 执行自定义逻辑
+     * 在 Customizable 模式下替代原有的所有 KillAura 逻辑
+     */
+    private fun executeCustomLogic() {
+        if (mc.thePlayer == null || mc.theWorld == null) return
+
+        // 设置当前目标（由 CustomizableController 管理）
+        CustomizableController.currentTarget = target
+
+        // 执行自定义 Tick 逻辑
+        val output = CustomizableController.executeTick()
+
+        // 应用自定义输出的旋转
+        val finalYaw = output.finalYaw
+        val finalPitch = output.finalPitch
+        if (finalYaw != null && finalPitch != null) {
+            // 使用 LiquidBounce 的旋转系统设置目标旋转
+            RotationUtils.setTargetRotation(Rotation(finalYaw, finalPitch), options = KillAuraRotations.options)
+        } else if (output.hasRotation) {
+            // 如果有目标旋转但没有最终旋转，使用目标 Yaw/Pitch
+            RotationUtils.setTargetRotation(Rotation(output.targetYaw, output.targetPitch), options = KillAuraRotations.options)
+        }
+
+        // 应用自定义输出的攻击状态
+        if (output.shouldAttack) {
+            val currentTarget = target
+            if (currentTarget != null && mc.thePlayer!!.getDistanceToEntityBox(currentTarget) <= KillAuraRange.range) {
+                hittable = true
+                if (output.shouldBlock) {
+                    startBlocking(currentTarget, KillAuraAutoBlock.interactAutoBlock, KillAuraAutoBlock.autoBlock == "Fake")
+                }
+                attackEntity(currentTarget, true)
+            }
+        } else {
+            hittable = false
+        }
+
+        // 应用自定义输出的格挡状态
+        if (output.shouldBlock && !blockStatus) {
+            val currentTarget = target
+            if (currentTarget != null && mc.thePlayer?.heldItem?.item is net.minecraft.item.ItemSword) {
+                startBlocking(currentTarget, KillAuraAutoBlock.interactAutoBlock, KillAuraAutoBlock.autoBlock == "Fake")
+            }
+        }
+        if (output.forceStopBlock && blockStatus) {
+            stopBlocking(true)
+        }
     }
 
     fun update() {
@@ -208,6 +293,23 @@ object KillAura : Module("KillAura", Category.KILLAURA, Keyboard.KEY_R) {
         NoisePresets.tick()
         KillAuraRotations.noiseFunction = generateNoise()
         KillAuraCPS.tickCPS()
+
+        // Customizable 模式：跳过原有攻击/格挡逻辑
+        if (customizable.get() && CustomizableController.isCustomizableActive) {
+            // Customizable 模式下的目标选择（复用原目标选择逻辑）
+            updateTarget()
+
+            // 如果编辑器有自定义目标，使用自定义目标
+            val customOutput = CustomizableController.getLastOutput()
+            if (customOutput != null && customOutput.shouldSwitchTarget) {
+                // 允许自定义逻辑切换目标
+            }
+
+            blockStatus = false
+            renderBlocking = false
+            clicks = 0
+            return@handler
+        }
 
         if (blockStatus && player.heldItem?.item !is ItemSword) {
             blockStatus = false
@@ -615,6 +717,12 @@ object KillAura : Module("KillAura", Category.KILLAURA, Keyboard.KEY_R) {
         }
 
         if (bestTarget != null) {
+            // Customizable 模式：跳过原有旋转计算，直接选择目标
+            if (customizable.get() && CustomizableController.isCustomizableActive) {
+                target = bestTarget
+                return
+            }
+
             if (Backtrack.runWithNearestTrackedDistance(bestTarget) { updateRotations(bestTarget) }) {
                 target = bestTarget
                 return
@@ -765,6 +873,12 @@ object KillAura : Module("KillAura", Category.KILLAURA, Keyboard.KEY_R) {
     private fun ticksSinceClick() = runTimeTicks - (attackTickTimes.lastOrNull()?.second ?: 0)
 
     private fun updateHittable() {
+        // Customizable 模式：跳过原有 hittable 计算
+        if (customizable.get() && CustomizableController.isCustomizableActive) {
+            hittable = true
+            return
+        }
+
         val eyes = mc.thePlayer.eyes
 
         val currentRotation = currentRotation ?: mc.thePlayer.rotation

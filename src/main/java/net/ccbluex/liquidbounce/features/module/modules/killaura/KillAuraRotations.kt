@@ -11,251 +11,441 @@ object KillAuraRotations : Module("KillAura-Rotations", Category.KILLAURA, canBe
 
     val options = RotationSettings(KillAura).withoutKeepRotation()
 
-    val rotationsActive: Boolean
-        get() = options.rotationsActive
+    val rotationsActive: Boolean get() = options.rotationsActive
 
     val raycastValue = boolean("RayCast", true) { options.rotationsActive }
     val raycast: Boolean get() = raycastValue.isActive()
-    val raycastIgnored by boolean("RayCastIgnored", false) {
-        raycastValue.isActive() && options.rotationsActive
-    }
-    val livingRaycast by boolean("LivingRayCast", true) {
-        raycastValue.isActive() && options.rotationsActive
-    }
+    val raycastIgnored by boolean("RayCastIgnored", false) { raycastValue.isActive() && options.rotationsActive }
+    val livingRaycast by boolean("LivingRayCast", true) { raycastValue.isActive() && options.rotationsActive }
 
     val randomization = RandomizationSettings(KillAura) { options.rotationsActive }
     val outBorder by boolean("OutBorder", false) { options.rotationsActive }
 
-    val noisePreset = multiChoices(
-        "NoisePreset", arrayOf(
-            "Custom", "Vanilla", "Legit", "SemiBlatant", "Blatant",
-            "AntiML1", "AntiML2", "AntiML3", "AntiML4", "AntiML5",
-            "AntiML6", "AntiML7", "AntiML8", "AntiML9", "AntiML10",
-            "NeuralBypass", "DeepLearningBypass", "ReinforcementBypass", "GANBypass",
-            "TransformerBypass", "LSTMBypass", "GRUBypass", "AttentionBypass",
-            "DiffusionBypass", "FlowMatchingBypass", "SSMBypass", "MambaBypass",
-            "RWKVBypass", "JambaBypass", "MixtralBypass", "MoEBypass",
-            "ChaosMax", "MicroJitter", "MacroSim", "HumanSim", "RobotSim",
-            "Butterfly", "SineWave", "Sawtooth", "SquareWave", "TriangleWave",
-            "PulseJitter", "FractalNoise", "WaveletNoise", "OrnsteinUhlenbeck",
-            "LevyFlight", "PoissonJitter", "GammaBurst", "BetaBlend",
-            "WeibullDrift", "CauchyJump", "StudentTNoise", "LogNormalPulse",
-            "ExponentialDecay", "DoubleExponential", "GaussianMixture", "LaplaceShock",
-            "VonMisesWrap", "DirichletMix", "MultinomialPick", "UniformBand",
-            "TriangularTaper", "PiecewiseLinear", "CubicSpline", "BSplineWiggle",
-            "NURBSCurve", "RBFInterpolation", "KNNBlend", "SVMDecision",
-            "RandomForestAim", "XGBoostAim", "GradientBoostAim", "AdaBoostAim",
-            "BaggingAim", "StackingAim", "VotingAim", "BayesianOptAim",
-            "GaussianProcessAim", "MCMCSampleAim", "ParticleFilterAim",
-            "KalmanFilterAim", "ExtendedKalmanAim", "UnscentedKalmanAim",
-            "EnsembleKalmanAim", "ParticleSwarmAim", "AntColonyAim",
-            "SimulatedAnnealingAim", "GeneticAlgorithmAim", "DifferentialEvolutionAim",
-            "CMAESAim", "HillClimbingAim", "RandomSearchAim", "GridSearchAim",
-            "BayesianSearchAim", "HyperbandAim", "BOHBAim"
-        ), setOf("Custom")
-    ) { options.rotationsActive }
-
-    val yawMicroJitter by floatRange("YawMicroJitter", 0f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val pitchMicroJitter by floatRange("PitchMicroJitter", 0f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val yawMacroJitter by floatRange("YawMacroJitter", 0f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val pitchMacroJitter by floatRange("PitchMacroJitter", 0f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val jitterDecayRate by floatRange("JitterDecayRate", 0.95f..Float.MAX_VALUE, 0.5f..Float.MAX_VALUE) { options.rotationsActive }
-    val jitterBurstProbability by floatRange("JitterBurstProbability", 0f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val jitterBurstStrength by floatRange("JitterBurstStrength", 1f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val jitterAdaptiveDecay by boolean("JitterAdaptiveDecay", false) { options.rotationsActive }
-    val jitterTimeCorrelation by floatRange("JitterTimeCorrelation", 0f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val jitterAxisCoupling by floatRange("JitterAxisCoupling", 0f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val sineAmplitude by floatRange("SineAmplitude", 0f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val sineFrequency by floatRange("SineFrequency", 0.5f..Float.MAX_VALUE, 0.01f..Float.MAX_VALUE) { options.rotationsActive }
-    val sinePhaseOffset by floatRange("SinePhaseOffset", 0f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val sinePitchRatio by floatRange("SinePitchRatio", 0.5f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val sineHarmonicCount by intRange("SineHarmonicCount", 1..Int.MAX_VALUE, 1..Int.MAX_VALUE) { options.rotationsActive }
-    val sineHarmonicDecay by floatRange("SineHarmonicDecay", 0.5f..Float.MAX_VALUE, 0.1f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val sawtoothAmplitude by floatRange("SawtoothAmplitude", 0f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val sawtoothFrequency by floatRange("SawtoothFrequency", 0.5f..Float.MAX_VALUE, 0.01f..Float.MAX_VALUE) { options.rotationsActive }
-    val sawtoothPitchRatio by floatRange("SawtoothPitchRatio", 0.5f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val squareAmplitude by floatRange("SquareAmplitude", 0f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val squareFrequency by floatRange("SquareFrequency", 0.5f..Float.MAX_VALUE, 0.01f..Float.MAX_VALUE) { options.rotationsActive }
-    val squareDutyCycle by floatRange("SquareDutyCycle", 0.5f..Float.MAX_VALUE, 0.01f..Float.MAX_VALUE) { options.rotationsActive }
-    val squarePitchRatio by floatRange("SquarePitchRatio", 0.5f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val triangleAmplitude by floatRange("TriangleAmplitude", 0f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val triangleFrequency by floatRange("TriangleFrequency", 0.5f..Float.MAX_VALUE, 0.01f..Float.MAX_VALUE) { options.rotationsActive }
-    val trianglePitchRatio by floatRange("TrianglePitchRatio", 0.5f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val pulseJitterAmplitude by floatRange("PulseJitterAmplitude", 0f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val pulseJitterInterval by intRange("PulseJitterInterval", 5..Int.MAX_VALUE, 1..Int.MAX_VALUE) { options.rotationsActive }
-    val pulseJitterDecay by floatRange("PulseJitterDecay", 0.8f..Float.MAX_VALUE, 0.1f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val ouTheta by floatRange("OU-Theta", 0.1f..Float.MAX_VALUE, 0.01f..Float.MAX_VALUE) { options.rotationsActive }
-    val ouMu by floatRange("OU-Mu", 0f..Float.MAX_VALUE, -Float.MAX_VALUE..Float.MAX_VALUE) { options.rotationsActive }
-    val ouSigma by floatRange("OU-Sigma", 0.01f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val ouYawScale by floatRange("OU-YawScale", 1f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val ouPitchScale by floatRange("OU-PitchScale", 0.5f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val levyAlpha by floatRange("Levy-Alpha", 1.5f..Float.MAX_VALUE, 0.5f..Float.MAX_VALUE) { options.rotationsActive }
-    val levyScale by floatRange("Levy-Scale", 0.01f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val levyYawWeight by floatRange("Levy-YawWeight", 1f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val levyPitchWeight by floatRange("Levy-PitchWeight", 0.5f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val poissonLambda by floatRange("Poisson-Lambda", 1f..Float.MAX_VALUE, 0.1f..Float.MAX_VALUE) { options.rotationsActive }
-    val poissonJitterScale by floatRange("Poisson-JitterScale", 0.1f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val gammaShape by floatRange("Gamma-Shape", 2f..Float.MAX_VALUE, 0.1f..Float.MAX_VALUE) { options.rotationsActive }
-    val gammaScale by floatRange("Gamma-Scale", 0.01f..Float.MAX_VALUE, 0.001f..Float.MAX_VALUE) { options.rotationsActive }
-    val gammaBurstThreshold by floatRange("Gamma-BurstThreshold", 3f..Float.MAX_VALUE, 1f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val betaAlpha by floatRange("Beta-Alpha", 2f..Float.MAX_VALUE, 0.1f..Float.MAX_VALUE) { options.rotationsActive }
-    val betaBetaParam by floatRange("Beta-Beta", 2f..Float.MAX_VALUE, 0.1f..Float.MAX_VALUE) { options.rotationsActive }
-    val betaBlendStrength by floatRange("Beta-BlendStrength", 0.1f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val weibullShape by floatRange("Weibull-Shape", 1f..Float.MAX_VALUE, 0.1f..Float.MAX_VALUE) { options.rotationsActive }
-    val weibullScale by floatRange("Weibull-Scale", 0.5f..Float.MAX_VALUE, 0.01f..Float.MAX_VALUE) { options.rotationsActive }
-    val weibullDriftRate by floatRange("Weibull-DriftRate", 0.01f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val cauchyScale by floatRange("Cauchy-Scale", 0.01f..Float.MAX_VALUE, 0.001f..Float.MAX_VALUE) { options.rotationsActive }
-    val cauchyJumpProbability by floatRange("Cauchy-JumpProbability", 0.01f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val studentTDof by floatRange("StudentT-DOF", 3f..Float.MAX_VALUE, 1f..Float.MAX_VALUE) { options.rotationsActive }
-    val studentTScale by floatRange("StudentT-Scale", 0.1f..Float.MAX_VALUE, 0.01f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val logNormalMu by floatRange("LogNormal-Mu", -Float.MAX_VALUE..Float.MAX_VALUE, -Float.MAX_VALUE..Float.MAX_VALUE) { options.rotationsActive }
-    val logNormalSigma by floatRange("LogNormal-Sigma", 0.5f..Float.MAX_VALUE, 0.01f..Float.MAX_VALUE) { options.rotationsActive }
-    val logNormalPulseRate by floatRange("LogNormal-PulseRate", 0.01f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val expDecayRate by floatRange("ExpDecay-Rate", 0.5f..Float.MAX_VALUE, 0.01f..Float.MAX_VALUE) { options.rotationsActive }
-    val expDecayAmplitude by floatRange("ExpDecay-Amplitude", 0.5f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val expDecayTriggerProb by floatRange("ExpDecay-TriggerProbability", 0.01f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val doubleExpScale by floatRange("DoubleExp-Scale", 0.5f..Float.MAX_VALUE, 0.01f..Float.MAX_VALUE) { options.rotationsActive }
-    val doubleExpAsymmetry by floatRange("DoubleExp-Asymmetry", 0f..Float.MAX_VALUE, -Float.MAX_VALUE..Float.MAX_VALUE) { options.rotationsActive }
-
-    val gaussianMixWeight1 by floatRange("GaussianMix-Weight1", 0.3f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val gaussianMixMu1 by floatRange("GaussianMix-Mu1", -Float.MAX_VALUE..Float.MAX_VALUE, -Float.MAX_VALUE..Float.MAX_VALUE) { options.rotationsActive }
-    val gaussianMixSigma1 by floatRange("GaussianMix-Sigma1", 0.1f..Float.MAX_VALUE, 0.01f..Float.MAX_VALUE) { options.rotationsActive }
-    val gaussianMixMu2 by floatRange("GaussianMix-Mu2", 0f..Float.MAX_VALUE, -Float.MAX_VALUE..Float.MAX_VALUE) { options.rotationsActive }
-    val gaussianMixSigma2 by floatRange("GaussianMix-Sigma2", 0.3f..Float.MAX_VALUE, 0.01f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val laplaceMu by floatRange("Laplace-Mu", 0f..Float.MAX_VALUE, -Float.MAX_VALUE..Float.MAX_VALUE) { options.rotationsActive }
-    val laplaceB by floatRange("Laplace-B", 0.1f..Float.MAX_VALUE, 0.01f..Float.MAX_VALUE) { options.rotationsActive }
-    val laplaceShockProb by floatRange("Laplace-ShockProbability", 0.01f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val laplaceShockScale by floatRange("Laplace-ShockScale", 2f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val vonMisesMu by floatRange("VonMises-Mu", 0f..Float.MAX_VALUE, -Float.MAX_VALUE..Float.MAX_VALUE) { options.rotationsActive }
-    val vonMisesKappa by floatRange("VonMises-Kappa", 1f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val uniformBandWidth by floatRange("UniformBand-Width", 0.5f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val uniformBandCenter by floatRange("UniformBand-Center", 0f..Float.MAX_VALUE, -Float.MAX_VALUE..Float.MAX_VALUE) { options.rotationsActive }
-    val uniformBandPitchRatio by floatRange("UniformBand-PitchRatio", 0.5f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val triangularPeak by floatRange("Triangular-Peak", 0f..Float.MAX_VALUE, -Float.MAX_VALUE..Float.MAX_VALUE) { options.rotationsActive }
-    val triangularWidth by floatRange("Triangular-Width", 1f..Float.MAX_VALUE, 0.1f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val cubicSplineTension by floatRange("CubicSpline-Tension", 0.3f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val cubicSplineSmoothness by floatRange("CubicSpline-Smoothness", 0.5f..Float.MAX_VALUE, 0.01f..Float.MAX_VALUE) { options.rotationsActive }
-    val cubicSplineControlPoints by intRange("CubicSpline-ControlPoints", 4..Int.MAX_VALUE, 2..Int.MAX_VALUE) { options.rotationsActive }
-
-    val bSplineDegree by intRange("BSpline-Degree", 3..Int.MAX_VALUE, 1..Int.MAX_VALUE) { options.rotationsActive }
-    val bSplineKnotDensity by floatRange("BSpline-KnotDensity", 0.5f..Float.MAX_VALUE, 0.1f..Float.MAX_VALUE) { options.rotationsActive }
-    val bSplineWiggleAmplitude by floatRange("BSpline-WiggleAmplitude", 0f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val rbfKernelWidth by floatRange("RBF-KernelWidth", 0.5f..Float.MAX_VALUE, 0.01f..Float.MAX_VALUE) { options.rotationsActive }
-    val rbfRegularization by floatRange("RBF-Regularization", 0.01f..Float.MAX_VALUE, 0.001f..Float.MAX_VALUE) { options.rotationsActive }
-    val rbfCenterCount by intRange("RBF-CenterCount", 5..Int.MAX_VALUE, 2..Int.MAX_VALUE) { options.rotationsActive }
-
-    val kalmanProcessNoise by floatRange("Kalman-ProcessNoise", 0.01f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val kalmanMeasurementNoise by floatRange("Kalman-MeasurementNoise", 0.1f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val kalmanInitialUncertainty by floatRange("Kalman-InitialUncertainty", 1f..Float.MAX_VALUE, 0.1f..Float.MAX_VALUE) { options.rotationsActive }
-    val kalmanAdaptive by boolean("Kalman-Adaptive", false) { options.rotationsActive }
-    val kalmanAdaptiveRate by floatRange("Kalman-AdaptiveRate", 0.01f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive && kalmanAdaptive }
-
-    val particleCount by intRange("ParticleFilter-Count", 50..Int.MAX_VALUE, 10..Int.MAX_VALUE) { options.rotationsActive }
-    val particleResampleThreshold by floatRange("ParticleFilter-ResampleThreshold", 0.5f..Float.MAX_VALUE, 0.1f..Float.MAX_VALUE) { options.rotationsActive }
-    val particleDiffusion by floatRange("ParticleFilter-Diffusion", 0.01f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val swarmParticleCount by intRange("Swarm-ParticleCount", 20..Int.MAX_VALUE, 5..Int.MAX_VALUE) { options.rotationsActive }
-    val swarmInertia by floatRange("Swarm-Inertia", 0.5f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val swarmCognitive by floatRange("Swarm-Cognitive", 1f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val swarmSocial by floatRange("Swarm-Social", 1f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val swarmMaxVelocity by floatRange("Swarm-MaxVelocity", 0.1f..Float.MAX_VALUE, 0.01f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val annealingInitialTemp by floatRange("Annealing-InitialTemp", 1f..Float.MAX_VALUE, 0.1f..Float.MAX_VALUE) { options.rotationsActive }
-    val annealingCoolingRate by floatRange("Annealing-CoolingRate", 0.95f..Float.MAX_VALUE, 0.5f..Float.MAX_VALUE) { options.rotationsActive }
-    val annealingMinTemp by floatRange("Annealing-MinTemp", 0.01f..Float.MAX_VALUE, 0.001f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val geneticPopSize by intRange("Genetic-PopSize", 20..Int.MAX_VALUE, 5..Int.MAX_VALUE) { options.rotationsActive }
-    val geneticMutationRate by floatRange("Genetic-MutationRate", 0.01f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val geneticCrossoverRate by floatRange("Genetic-CrossoverRate", 0.7f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val geneticElitism by intRange("Genetic-Elitism", 1..Int.MAX_VALUE, 0..Int.MAX_VALUE) { options.rotationsActive }
-
-    val cmaesPopulation by intRange("CMAES-Population", 10..Int.MAX_VALUE, 5..Int.MAX_VALUE) { options.rotationsActive }
-    val cmaesInitialStep by floatRange("CMAES-InitialStepSize", 0.5f..Float.MAX_VALUE, 0.01f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val bayesianExploration by floatRange("Bayesian-Exploration", 0.1f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val bayesianExploitation by floatRange("Bayesian-Exploitation", 0.7f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val bayesianGPNoise by floatRange("Bayesian-GPNoise", 0.01f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val fractalDimension by floatRange("Fractal-Dimension", 1.5f..Float.MAX_VALUE, 0.5f..Float.MAX_VALUE) { options.rotationsActive }
-    val fractalOctaves by intRange("Fractal-Octaves", 3..Int.MAX_VALUE, 1..Int.MAX_VALUE) { options.rotationsActive }
-    val fractalLacunarity by floatRange("Fractal-Lacunarity", 2f..Float.MAX_VALUE, 1f..Float.MAX_VALUE) { options.rotationsActive }
-    val fractalGain by floatRange("Fractal-Gain", 0.5f..Float.MAX_VALUE, 0.1f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val waveletType by choices("Wavelet-Type", arrayOf("Haar", "Daubechies4", "Symlet4", "Coiflet3", "Biorthogonal"), "Haar") { options.rotationsActive }
-    val waveletDecompositionLevel by intRange("Wavelet-DecompositionLevel", 2..Int.MAX_VALUE, 1..Int.MAX_VALUE) { options.rotationsActive }
-    val waveletThreshold by floatRange("Wavelet-Threshold", 0.1f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val humanReactionDelay by intRange("Human-ReactionDelay", 50..Int.MAX_VALUE, 0..Int.MAX_VALUE, "ms") { options.rotationsActive }
-    val humanAccelerationPhase by floatRange("Human-AccelerationPhase", 0.3f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val humanDecelerationPhase by floatRange("Human-DecelerationPhase", 0.5f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val humanOvershootProbability by floatRange("Human-OvershootProbability", 0.1f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val humanOvershootAmount by floatRange("Human-OvershootAmount", 1f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val humanMicroCorrection by floatRange("Human-MicroCorrection", 0.1f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val humanFatigueRate by floatRange("Human-FatigueRate", 0.001f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val humanVariability by floatRange("Human-Variability", 0.5f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val macroStepInterval by intRange("Macro-StepInterval", 50..Int.MAX_VALUE, 10..Int.MAX_VALUE, "ms") { options.rotationsActive }
-    val macroAcceleration by floatRange("Macro-Acceleration", 1f..Float.MAX_VALUE, 0.1f..Float.MAX_VALUE) { options.rotationsActive }
-    val macroMaxSpeed by floatRange("Macro-MaxSpeed", 5f..Float.MAX_VALUE, 0.1f..Float.MAX_VALUE) { options.rotationsActive }
-    val macroSmoothness by floatRange("Macro-Smoothness", 0.5f..Float.MAX_VALUE, 0.01f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val butterflyWingScale by floatRange("Butterfly-WingScale", 0.5f..Float.MAX_VALUE, 0.01f..Float.MAX_VALUE) { options.rotationsActive }
-    val butterflyFlapFrequency by floatRange("Butterfly-FlapFrequency", 1f..Float.MAX_VALUE, 0.1f..Float.MAX_VALUE) { options.rotationsActive }
-    val butterflyChaosFactor by floatRange("Butterfly-ChaosFactor", 0.01f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-
-    val antiMLObfuscationStrength by floatRange("AntiML-ObfuscationStrength", 0.1f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val antiMLTemporalNoise by floatRange("AntiML-TemporalNoise", 0.05f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val antiMLFrequencyNoise by floatRange("AntiML-FrequencyNoise", 0.05f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val antiMLBehaviorMimicry by boolean("AntiML-BehaviorMimicry", true) { options.rotationsActive }
-    val antiMLPatternBreak by floatRange("AntiML-PatternBreak", 0.01f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val antiMLDistributionMatch by floatRange("AntiML-DistributionMatch", 0.5f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val antiMLEntropyTarget by floatRange("AntiML-EntropyTarget", 0.7f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val antiMLKLDivergenceLimit by floatRange("AntiML-KLDivergenceLimit", 0.1f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
-    val antiMLWassersteinLimit by floatRange("AntiML-WassersteinLimit", 0.1f..Float.MAX_VALUE, 0f..Float.MAX_VALUE) { options.rotationsActive }
+    var noiseFunction: ((Rotation) -> Rotation)? = null
 
     val highestBodyPointToTargetValue = choices(
         "HighestBodyPointToTarget", arrayOf("Head", "Body", "Feet"), "Head"
-    ) { options.rotationsActive }.onChange { _, new ->
-        val newPoint = RotationUtils.BodyPoint.fromString(new)
-        val lowestPoint = RotationUtils.BodyPoint.fromString(lowestBodyPointToTarget)
-        RotationUtils.coerceBodyPoint(newPoint, lowestPoint, RotationUtils.BodyPoint.HEAD).displayName
-    }
+    ) { options.rotationsActive }
     val highestBodyPointToTarget: String by highestBodyPointToTargetValue
 
     val lowestBodyPointToTargetValue = choices(
         "LowestBodyPointToTarget", arrayOf("Head", "Body", "Feet"), "Feet"
-    ) { options.rotationsActive }.onChange { _, new ->
-        val newPoint = RotationUtils.BodyPoint.fromString(new)
-        val highestPoint = RotationUtils.BodyPoint.fromString(highestBodyPointToTarget)
-        RotationUtils.coerceBodyPoint(newPoint, RotationUtils.BodyPoint.FEET, highestPoint).displayName
-    }
+    ) { options.rotationsActive }
     val lowestBodyPointToTarget: String by lowestBodyPointToTargetValue
 
-    val horizontalBodySearchRange by floatRange(
-        "HorizontalBodySearchRange", 0f..Float.MAX_VALUE, 0f..Float.MAX_VALUE
-    ) { options.rotationsActive }
+    val horizontalBodySearchRange by floatRange("HorizontalBodySearchRange", 0f..1f, 0f..1f) { options.rotationsActive }
 
-    var noiseFunction: ((Rotation) -> Rotation)? = null
+    val swarmCognitive by floatRange("SwarmCognitive", 1.5f..2.5f, 0f..4f) { options.rotationsActive }
+    val annealingInitialTemp by floatRange("AnnealingInitTemp", 1f..10f, 0.01f..100f) { options.rotationsActive }
+    val geneticCrossoverRate by floatRange("GeneticCrossoverRate", 0.6f..0.9f, 0f..1f) { options.rotationsActive }
+    val ouSigma by floatRange("OuSigma", 0.1f..0.5f, 0f..5f) { options.rotationsActive }
+    val ouTheta by floatRange("OuTheta", 0.1f..0.5f, 0f..5f) { options.rotationsActive }
+
+    val rotationMode by choices("RotationMode", arrayOf(
+        "Simple", "Advanced", "Human", "Robot", "Chaos", "ML", "Waveform",
+        "Statistical", "Physics", "Curl", "Gradient", "Pathfinding", "Hybrid",
+        "Adaptive", "Reactive", "Predictive", "Randomized", "Burst", "Oscillating",
+        "Spinning", "Flicking", "Dragging", "Snapping", "Sliding", "Gliding",
+        "Easing", "Elastic", "Bouncy", "Back", "Expo", "Circ", "Quad", "Cubic",
+        "Quart", "Quint", "Sine", "Poly", "Step", "Stagger", "Progressive",
+        "Degressive", "Regressive", "Aggressive", "Passive", "Defensive",
+        "Offensive", "Tactical", "Strategic", "RandomMode", "CycleMode", "PingPongMode"
+    ), "Advanced") { options.rotationsActive }
+    val noisePreset = multiChoices("NoisePreset", arrayOf("Custom", "Vanilla", "Legit", "SemiBlatant", "Blatant", "AntiML1", "AntiML2", "AntiML3", "AntiML4", "AntiML5", "AntiML6", "AntiML7", "AntiML8", "AntiML9", "AntiML10", "AntiML11", "AntiML12", "AntiML13", "AntiML14", "AntiML15", "AntiML16", "AntiML17", "AntiML18", "AntiML19", "AntiML20", "AntiML21", "AntiML22", "AntiML23", "AntiML24", "AntiML25", "AntiML26", "AntiML27", "AntiML28", "AntiML29", "AntiML30", "AntiML31", "AntiML32", "AntiML33", "AntiML34", "AntiML35", "AntiML36", "AntiML37", "AntiML38", "AntiML39", "AntiML40", "AntiML41", "AntiML42", "AntiML43", "AntiML44", "AntiML45", "AntiML46", "AntiML47", "AntiML48", "AntiML49", "AntiML50", "NeuralBypass", "DeepLearningBypass", "ReinforcementBypass", "GANBypass", "TransformerBypass", "LSTMBypass", "GRUBypass", "AttentionBypass", "DiffusionBypass", "FlowMatchingBypass", "SSMBypass", "MambaBypass", "RWKVBypass", "JambaBypass", "MixtralBypass", "MoEBypass", "GPTBypass", "ClaudeBypass", "LlamaBypass", "GeminiBypass", "FalconBypass", "PhiBypass", "QwenBypass", "DeepSeekBypass", "YiBypass", "DBRXBypass", "CommandBypass", "CohereBypass", "ChaosMax", "ChaosLorenz", "ChaosRossler", "ChaosHenon", "ChaosLogistic", "ChaosTent", "ChaosArnold", "ChaosIkeda", "ChaosChua", "ChaosSprott", "ChaosChen", "ChaosLu", "ChaosQi", "ChaosLiu", "ChaosBao", "ChaosHalvorsen", "ChaosNose", "ChaosThomas", "ChaosBurke", "ChaosMoore", "MicroJitter", "MacroSim", "HumanSim", "RobotSim", "HumanSimV2", "HumanSimV3", "HumanSimV4", "HumanSimV5", "HumanSimV6", "HumanSimV7", "HumanSimV8", "HumanSimV9", "HumanSimV10", "RobotSimV2", "RobotSimV3", "RobotSimV4", "RobotSimV5", "Butterfly", "ButterflyV2", "ButterflyV3", "ButterflyV4", "ButterflyV5", "SineWave", "SineWaveV2", "SineWaveV3", "SineWaveV4", "SineWaveV5", "Sawtooth", "SawtoothV2", "SawtoothV3", "SawtoothV4", "SawtoothV5", "SquareWave", "SquareWaveV2", "SquareWaveV3", "SquareWaveV4", "SquareWaveV5", "TriangleWave", "TriangleWaveV2", "TriangleWaveV3", "TriangleWaveV4", "TriangleWaveV5", "PulseJitter", "PulseJitterV2", "PulseJitterV3", "PulseJitterV4", "PulseJitterV5", "FractalNoiseV1", "FractalNoiseV2", "FractalNoiseV3", "FractalNoiseV4", "FractalNoiseV5", "FractalNoiseV6", "FractalNoiseV7", "FractalNoiseV8", "FractalNoiseV9", "FractalNoiseV10", "FractalNoise", "OrnsteinUhlenbeck", "OrnsteinUhlenbeckV2", "OrnsteinUhlenbeckV3", "OrnsteinUhlenbeckV4", "OrnsteinUhlenbeckV5", "LevyFlight", "LevyFlightV2", "LevyFlightV3", "LevyFlightV4", "LevyFlightV5", "PoissonJitter", "PoissonJitterV2", "PoissonJitterV3", "PoissonJitterV4", "PoissonJitterV5", "GammaBurst", "GammaBurstV2", "GammaBurstV3", "GammaBurstV4", "GammaBurstV5", "BetaBlend", "BetaBlendV2", "BetaBlendV3", "BetaBlendV4", "BetaBlendV5", "WeibullDrift", "WeibullDriftV2", "WeibullDriftV3", "WeibullDriftV4", "WeibullDriftV5", "CauchyJump", "CauchyJumpV2", "CauchyJumpV3", "CauchyJumpV4", "CauchyJumpV5", "StudentTNoise", "StudentTNoiseV2", "StudentTNoiseV3", "StudentTNoiseV4", "StudentTNoiseV5", "LogNormalPulse", "LogNormalPulseV2", "LogNormalPulseV3", "LogNormalPulseV4", "LogNormalPulseV5", "ExponentialDecay", "ExponentialDecayV2", "ExponentialDecayV3", "ExponentialDecayV4", "ExponentialDecayV5", "DoubleExponential", "DoubleExponentialV2", "DoubleExponentialV3", "DoubleExponentialV4", "DoubleExponentialV5", "GaussianMixture", "GaussianMixtureV2", "GaussianMixtureV3", "GaussianMixtureV4", "GaussianMixtureV5", "LaplaceShock", "LaplaceShockV2", "LaplaceShockV3", "LaplaceShockV4", "LaplaceShockV5", "VonMisesWrap", "VonMisesWrapV2", "VonMisesWrapV3", "VonMisesWrapV4", "VonMisesWrapV5", "DirichletMix", "DirichletMixV2", "DirichletMixV3", "DirichletMixV4", "DirichletMixV5", "MultinomialPick", "MultinomialPickV2", "MultinomialPickV3", "MultinomialPickV4", "MultinomialPickV5", "UniformBand", "UniformBandV2", "UniformBandV3", "UniformBandV4", "UniformBandV5", "TriangularTaper", "TriangularTaperV2", "TriangularTaperV3", "TriangularTaperV4", "TriangularTaperV5", "PiecewiseLinear", "PiecewiseLinearV2", "PiecewiseLinearV3", "PiecewiseLinearV4", "PiecewiseLinearV5", "CubicSpline", "CubicSplineV2", "CubicSplineV3", "CubicSplineV4", "CubicSplineV5", "BSplineWiggle", "BSplineWiggleV2", "BSplineWiggleV3", "BSplineWiggleV4", "BSplineWiggleV5", "NURBSCurve", "NURBSCurveV2", "NURBSCurveV3", "NURBSCurveV4", "NURBSCurveV5", "RBFInterpolation", "RBFInterpolationV2", "RBFInterpolationV3", "RBFInterpolationV4", "RBFInterpolationV5", "KNNBlend", "KNNBlendV2", "KNNBlendV3", "SVMDecision", "SVMDecisionV2", "SVMDecisionV3", "RandomForestAim", "RandomForestAimV2", "RandomForestAimV3", "XGBoostAim", "XGBoostAimV2", "XGBoostAimV3", "GradientBoostAim", "GradientBoostAimV2", "GradientBoostAimV3", "AdaBoostAim", "AdaBoostAimV2", "AdaBoostAimV3", "BaggingAim", "BaggingAimV2", "BaggingAimV3", "StackingAim", "StackingAimV2", "StackingAimV3", "VotingAim", "VotingAimV2", "VotingAimV3", "BayesianOptAim", "BayesianOptAimV2", "BayesianOptAimV3", "GaussianProcessAim", "GaussianProcessAimV2", "GaussianProcessAimV3", "MCMCSampleAim", "MCMCSampleAimV2", "MCMCSampleAimV3", "ParticleFilterAim", "ParticleFilterAimV2", "ParticleFilterAimV3", "KalmanFilterAim", "KalmanFilterAimV2", "KalmanFilterAimV3", "ExtendedKalmanAim", "ExtendedKalmanAimV2", "ExtendedKalmanAimV3", "UnscentedKalmanAim", "UnscentedKalmanAimV2", "UnscentedKalmanAimV3", "EnsembleKalmanAim", "EnsembleKalmanAimV2", "EnsembleKalmanAimV3", "ParticleSwarmAim", "ParticleSwarmAimV2", "ParticleSwarmAimV3", "AntColonyAim", "AntColonyAimV2", "AntColonyAimV3", "SimulatedAnnealingAim", "SimulatedAnnealingAimV2", "SimulatedAnnealingAimV3", "GeneticAlgorithmAim", "GeneticAlgorithmAimV2", "GeneticAlgorithmAimV3", "DifferentialEvolutionAim", "DifferentialEvolutionAimV2", "DifferentialEvolutionAimV3", "CMAESAim", "CMAESAimV2", "CMAESAimV3", "HillClimbingAim", "HillClimbingAimV2", "HillClimbingAimV3", "RandomSearchAim", "RandomSearchAimV2", "RandomSearchAimV3", "GridSearchAim", "GridSearchAimV2", "GridSearchAimV3", "BayesianSearchAim", "BayesianSearchAimV2", "BayesianSearchAimV3", "HyperbandAim", "HyperbandAimV2", "HyperbandAimV3", "BOHBAim", "BOHBAimV2", "BOHBAimV3", "PerlinNoise", "PerlinNoiseV2", "PerlinNoiseV3", "PerlinNoiseV4", "PerlinNoiseV5", "SimplexNoise", "SimplexNoiseV2", "SimplexNoiseV3", "SimplexNoiseV4", "SimplexNoiseV5", "WorleyNoise", "WorleyNoiseV2", "WorleyNoiseV3", "WorleyNoiseV4", "WorleyNoiseV5", "VoronoiNoise", "VoronoiNoiseV2", "VoronoiNoiseV3", "VoronoiNoiseV4", "VoronoiNoiseV5", "WhiteNoise", "WhiteNoiseV2", "WhiteNoiseV3", "WhiteNoiseV4", "WhiteNoiseV5", "PinkNoise", "PinkNoiseV2", "PinkNoiseV3", "PinkNoiseV4", "PinkNoiseV5", "BrownianNoise", "BrownianNoiseV2", "BrownianNoiseV3", "BrownianNoiseV4", "BrownianNoiseV5", "BlueNoise", "BlueNoiseV2", "BlueNoiseV3", "BlueNoiseV4", "BlueNoiseV5", "VioletNoise", "VioletNoiseV2", "VioletNoiseV3", "VioletNoiseV4", "VioletNoiseV5", "GreyNoise", "GreyNoiseV2", "GreyNoiseV3", "GreyNoiseV4", "GreyNoiseV5", "RedNoise", "RedNoiseV2", "RedNoiseV3", "RedNoiseV4", "RedNoiseV5", "BlackNoise", "BlackNoiseV2", "BlackNoiseV3", "BlackNoiseV4", "BlackNoiseV5", "GreenNoise", "GreenNoiseV2", "GreenNoiseV3", "GreenNoiseV4", "GreenNoiseV5", "Lorenz63", "Lorenz63V2", "Lorenz63V3", "Lorenz63V4", "Lorenz63V5", "Lorenz96", "Lorenz96V2", "Lorenz96V3", "Lorenz96V4", "Lorenz96V5", "Rossler76", "Rossler76V2", "Rossler76V3", "Rossler76V4", "Rossler76V5", "HenonMap", "HenonMapV2", "HenonMapV3", "HenonMapV4", "HenonMapV5", "LogisticMap", "LogisticMapV2", "LogisticMapV3", "LogisticMapV4", "LogisticMapV5", "TentMap", "TentMapV2", "TentMapV3", "TentMapV4", "TentMapV5", "CatMap", "CatMapV2", "CatMapV3", "CatMapV4", "CatMapV5", "ArnoldMap", "ArnoldMapV2", "ArnoldMapV3", "ArnoldMapV4", "ArnoldMapV5", "IkedaMap", "IkedaMapV2", "IkedaMapV3", "IkedaMapV4", "IkedaMapV5", "StandardMap", "StandardMapV2", "StandardMapV3", "StandardMapV4", "StandardMapV5", "ChirikovMap", "ChirikovMapV2", "ChirikovMapV3", "ChirikovMapV4", "ChirikovMapV5", "DuffingMap", "DuffingMapV2", "DuffingMapV3", "DuffingMapV4", "DuffingMapV5", "VanDerPol", "VanDerPolV2", "VanDerPolV3", "VanDerPolV4", "VanDerPolV5", "FitzHughNagumo", "FitzHughNagumoV2", "FitzHughNagumoV3", "FitzHughNagumoV4", "FitzHughNagumoV5", "HodgkinHuxley", "HodgkinHuxleyV2", "HodgkinHuxleyV3", "HodgkinHuxleyV4", "HodgkinHuxleyV5", "Brusselator", "BrusselatorV2", "BrusselatorV3", "BrusselatorV4", "BrusselatorV5", "Oregonator", "OregonatorV2", "OregonatorV3", "OregonatorV4", "OregonatorV5", "BelousovZhabotinsky", "BelousovZhabotinskyV2", "BelousovZhabotinskyV3", "BelousovZhabotinskyV4", "BelousovZhabotinskyV5", "KuramotoSivashinsky", "KuramotoSivashinskyV2", "KuramotoSivashinskyV3", "KuramotoSivashinskyV4", "KuramotoSivashinskyV5", "SwiftHohenberg", "SwiftHohenbergV2", "SwiftHohenbergV3", "SwiftHohenbergV4", "SwiftHohenbergV5", "GinzburgLandau", "GinzburgLandauV2", "GinzburgLandauV3", "GinzburgLandauV4", "GinzburgLandauV5", "MackeyGlass", "MackeyGlassV2", "MackeyGlassV3", "MackeyGlassV4", "MackeyGlassV5", "IkedaDelay", "IkedaDelayV2", "IkedaDelayV3", "IkedaDelayV4", "IkedaDelayV5", "LangKobayashi", "LangKobayashiV2", "LangKobayashiV3", "LangKobayashiV4", "LangKobayashiV5", "StochasticResonance", "StochasticResonanceV2", "StochasticResonanceV3", "StochasticResonanceV4", "StochasticResonanceV5", "CoherenceResonance", "CoherenceResonanceV2", "CoherenceResonanceV3", "CoherenceResonanceV4", "CoherenceResonanceV5", "NoiseInducedOrder", "NoiseInducedOrderV2", "NoiseInducedOrderV3", "NoiseInducedOrderV4", "NoiseInducedOrderV5", "Dithering", "DitheringV2", "DitheringV3", "DitheringV4", "DitheringV5", "StochasticRounding", "StochasticRoundingV2", "StochasticRoundingV3", "StochasticRoundingV4", "StochasticRoundingV5", "QuantizationNoise", "QuantizationNoiseV2", "QuantizationNoiseV3", "QuantizationNoiseV4", "QuantizationNoiseV5", "JitteredSampling", "JitteredSamplingV2", "JitteredSamplingV3", "JitteredSamplingV4", "JitteredSamplingV5", "StratifiedSampling", "StratifiedSamplingV2", "StratifiedSamplingV3", "StratifiedSamplingV4", "StratifiedSamplingV5", "LatinHypercube", "LatinHypercubeV2", "LatinHypercubeV3", "LatinHypercubeV4", "LatinHypercubeV5", "SobolSequence", "SobolSequenceV2", "SobolSequenceV3", "SobolSequenceV4", "SobolSequenceV5", "HaltonSequence", "HaltonSequenceV2", "HaltonSequenceV3", "HaltonSequenceV4", "HaltonSequenceV5", "HammersleySet", "HammersleySetV2", "HammersleySetV3", "HammersleySetV4", "HammersleySetV5", "FaureSequence", "FaureSequenceV2", "FaureSequenceV3", "FaureSequenceV4", "FaureSequenceV5", "NiederreiterSequence", "NiederreiterSequenceV2", "NiederreiterSequenceV3", "NiederreiterSequenceV4", "NiederreiterSequenceV5", "PoissonDisk", "PoissonDiskV2", "PoissonDiskV3", "PoissonDiskV4", "PoissonDiskV5", "BlueNoiseSampling", "BlueNoiseSamplingV2", "BlueNoiseSamplingV3", "BlueNoiseSamplingV4", "BlueNoiseSamplingV5", "MitchellSampling", "MitchellSamplingV2", "MitchellSamplingV3", "MitchellSamplingV4", "MitchellSamplingV5", "AdaptiveSampling", "AdaptiveSamplingV2", "AdaptiveSamplingV3", "AdaptiveSamplingV4", "AdaptiveSamplingV5", "ImportanceSampling", "ImportanceSamplingV2", "ImportanceSamplingV3", "ImportanceSamplingV4", "ImportanceSamplingV5", "RejectionSampling", "RejectionSamplingV2", "RejectionSamplingV3", "RejectionSamplingV4", "RejectionSamplingV5", "MetropolisHastings", "MetropolisHastingsV2", "MetropolisHastingsV3", "MetropolisHastingsV4", "MetropolisHastingsV5", "GibbsSampling", "GibbsSamplingV2", "GibbsSamplingV3", "GibbsSamplingV4", "GibbsSamplingV5", "HamiltonianMC", "HamiltonianMCV2", "HamiltonianMCV3", "HamiltonianMCV4", "HamiltonianMCV5", "NUTS", "NUTSV2", "NUTSV3", "NUTSV4", "NUTSV5", "SliceSampling", "SliceSamplingV2", "SliceSamplingV3", "SliceSamplingV4", "SliceSamplingV5", "EllipticalSlice", "EllipticalSliceV2", "EllipticalSliceV3", "EllipticalSliceV4", "EllipticalSliceV5", "RiemannianMC", "RiemannianMCV2", "RiemannianMCV3", "RiemannianMCV4", "RiemannianMCV5", "LangevinMC", "LangevinMCV2", "LangevinMCV3", "LangevinMCV4", "LangevinMCV5", "UnderdampedLangevin", "UnderdampedLangevinV2", "UnderdampedLangevinV3", "UnderdampedLangevinV4", "UnderdampedLangevinV5", "StochasticGradientMC", "StochasticGradientMCV2", "StochasticGradientMCV3", "StochasticGradientMCV4", "StochasticGradientMCV5", "SGHMC", "SGHMCV2", "SGHMCV3", "SGHMCV4", "SGHMCV5", "SGNHT", "SGNHTV2", "SGNHTV3", "SGNHTV4", "SGNHTV5", "LunarLander", "LunarLanderV2", "LunarLanderV3", "LunarLanderV4", "LunarLanderV5", "Pendulum", "PendulumV2", "PendulumV3", "PendulumV4", "PendulumV5", "CartPole", "CartPoleV2", "CartPoleV3", "CartPoleV4", "CartPoleV5", "MountainCar", "MountainCarV2", "MountainCarV3", "MountainCarV4", "MountainCarV5", "Acrobot", "AcrobotV2", "AcrobotV3", "AcrobotV4", "AcrobotV5", "BipedalWalker", "BipedalWalkerV2", "BipedalWalkerV3", "BipedalWalkerV4", "BipedalWalkerV5", "Hopper", "HopperV2", "HopperV3", "HopperV4", "HopperV5", "Walker2d", "Walker2dV2", "Walker2dV3", "Walker2dV4", "Walker2dV5", "HalfCheetah", "HalfCheetahV2", "HalfCheetahV3", "HalfCheetahV4", "HalfCheetahV5", "Ant", "AntV2", "AntV3", "AntV4", "AntV5", "Humanoid", "HumanoidV2", "HumanoidV3", "HumanoidV4", "HumanoidV5", "Swimmer", "SwimmerV2", "SwimmerV3", "SwimmerV4", "SwimmerV5", "Reacher", "ReacherV2", "ReacherV3", "ReacherV4", "ReacherV5", "InvertedPendulum", "InvertedPendulumV2", "InvertedPendulumV3", "InvertedPendulumV4", "InvertedPendulumV5", "InvertedDoublePendulum", "InvertedDoublePendulumV2", "InvertedDoublePendulumV3", "InvertedDoublePendulumV4", "InvertedDoublePendulumV5", "PPO", "PPOV2", "PPOV3", "PPOV4", "PPOV5", "SAC", "SACV2", "SACV3", "SACV4", "SACV5", "TD3", "TD3V2", "TD3V3", "TD3V4", "TD3V5", "DDPG", "DDPGV2", "DDPGV3", "DDPGV4", "DDPGV5", "A2C", "A2CV2", "A2CV3", "A2CV4", "A2CV5", "A3C", "A3CV2", "A3CV3", "A3CV4", "A3CV5", "TRPO", "TRPOV2", "TRPOV3", "TRPOV4", "TRPOV5", "DQN", "DQNV2", "DQNV3", "DQNV4", "DQNV5", "DoubleDQN", "DoubleDQNV2", "DoubleDQNV3", "DoubleDQNV4", "DoubleDQNV5", "DuelingDQN", "DuelingDQNV2", "DuelingDQNV3", "DuelingDQNV4", "DuelingDQNV5", "RainbowDQN", "RainbowDQNV2", "RainbowDQNV3", "RainbowDQNV4", "RainbowDQNV5", "C51", "C51V2", "C51V3", "C51V4", "C51V5", "QRDQN", "QRDQNV2", "QRDQNV3", "QRDQNV4", "QRDQNV5", "IQN", "IQNV2", "IQNV3", "IQNV4", "IQNV5", "FQF", "FQFV2", "FQFV3", "FQFV4", "FQFV5", "Dreamer", "DreamerV2", "DreamerV3", "DreamerV4", "DreamerV5", "MuZero", "MuZeroV2", "MuZeroV3", "MuZeroV4", "MuZeroV5", "AlphaZero", "AlphaZeroV2", "AlphaZeroV3", "AlphaZeroV4", "AlphaZeroV5", "DecisionTransformer", "DecisionTransformerV2", "DecisionTransformerV3", "DecisionTransformerV4", "DecisionTransformerV5", "TrajectoryTransformer", "TrajectoryTransformerV2", "TrajectoryTransformerV3", "TrajectoryTransformerV4", "TrajectoryTransformerV5", "GATO", "GATOV2", "GATOV3", "GATOV4", "GATOV5", "RT2", "RT2V2", "RT2V3", "RT2V4", "RT2V5", "Octo", "OctoV2", "OctoV3", "OctoV4", "OctoV5", "OpenVLA", "OpenVLAV2", "OpenVLAV3", "OpenVLAV4", "OpenVLAV5", "MobileAloha", "MobileAlohaV2", "MobileAlohaV3", "MobileAlohaV4", "MobileAlohaV5", "UMI", "UMIV2", "UMIV3", "UMIV4", "UMIV5", "DiffusionPolicy", "DiffusionPolicyV2", "DiffusionPolicyV3", "DiffusionPolicyV4", "DiffusionPolicyV5", "ACT", "ACTV2", "ACTV3", "ACTV4", "ACTV5", "ALOHA", "ALOHAV2", "ALOHAV3", "ALOHAV4", "ALOHAV5", "ImplicitQ", "ImplicitQV2", "ImplicitQV3", "ImplicitQV4", "ImplicitQV5", "IQL", "IQLV2", "IQLV3", "IQLV4", "IQLV5", "CQL", "CQLV2", "CQLV3", "CQLV4", "CQLV5", "AWAC", "AWACV2", "AWACV3", "AWACV4", "AWACV5", "BCQ", "BCQV2", "BCQV3", "BCQV4", "BCQV5", "BEAR", "BEARV2", "BEARV3", "BEARV4", "BEARV5", "REM", "REMV2", "REMV3", "REMV4", "REMV5", "MunchausenDQN", "MunchausenDQNV2", "MunchausenDQNV3", "MunchausenDQNV4", "MunchausenDQNV5", "SUNRISE", "SUNRISEV2", "SUNRISEV3", "SUNRISEV4", "SUNRISEV5", "REDQ", "REDQV2", "REDQV3", "REDQV4", "REDQV5", "DroQ", "DroQV2", "DroQV3", "DroQV4", "DroQV5", "CrossQ", "CrossQV2", "CrossQV3", "CrossQV4", "CrossQV5", "MaxminDQN", "MaxminDQNV2", "MaxminDQNV3", "MaxminDQNV4", "MaxminDQNV5", "EnsembleDQN", "EnsembleDQNV2", "EnsembleDQNV3", "EnsembleDQNV4", "EnsembleDQNV5", "AveragedDQN", "AveragedDQNV2", "AveragedDQNV3", "AveragedDQNV4", "AveragedDQNV5", "BootstrapDQN", "BootstrapDQNV2", "BootstrapDQNV3", "BootstrapDQNV4", "BootstrapDQNV5", "UCRL", "UCRLV2", "UCRLV3", "UCRLV4", "UCRLV5", "PSRL", "PSRLV2", "PSRLV3", "PSRLV4", "PSRLV5", "ThompsonSampling", "ThompsonSamplingV2", "ThompsonSamplingV3", "ThompsonSamplingV4", "ThompsonSamplingV5", "BayesianDP", "BayesianDPV2", "BayesianDPV3", "BayesianDPV4", "BayesianDPV5", "RMax", "RMaxV2", "RMaxV3", "RMaxV4", "RMaxV5", "E3", "E3V2", "E3V3", "E3V4", "E3V5", "MBIE", "MBIEV2", "MBIEV3", "MBIEV4", "MBIEV5", "NaturalGradient", "NaturalGradientV2", "NaturalGradientV3", "NaturalGradientV4", "NaturalGradientV5", "KFac", "KFacV2", "KFacV3", "KFacV4", "KFacV5", "EKFAC", "EKFACV2", "EKFACV3", "EKFACV4", "EKFACV5", "Shampoo", "ShampooV2", "ShampooV3", "ShampooV4", "ShampooV5", "AdaGrad", "AdaGradV2", "AdaGradV3", "AdaGradV4", "AdaGradV5", "RMSProp", "RMSPropV2", "RMSPropV3", "RMSPropV4", "RMSPropV5", "Adam", "AdamV2", "AdamV3", "AdamV4", "AdamV5", "AdamW", "AdamWV2", "AdamWV3", "AdamWV4", "AdamWV5", "NAdam", "NAdamV2", "NAdamV3", "NAdamV4", "NAdamV5", "RAdam", "RAdamV2", "RAdamV3", "RAdamV4", "RAdamV5", "LAMB", "LAMBV2", "LAMBV3", "LAMBV4", "LAMBV5", "LARS", "LARSV2", "LARSV3", "LARSV4", "LARSV5", "Lookahead", "LookaheadV2", "LookaheadV3", "LookaheadV4", "LookaheadV5", "SWA", "SWAV2", "SWAV3", "SWAV4", "SWAV5", "SAM", "SAMV2", "SAMV3", "SAMV4", "SAMV5", "ScheduleFree", "ScheduleFreeV2", "ScheduleFreeV3", "ScheduleFreeV4", "ScheduleFreeV5", "Lion", "LionV2", "LionV3", "LionV4", "LionV5", "Sophia", "SophiaV2", "SophiaV3", "SophiaV4", "SophiaV5", "AdEMAMix", "AdEMAMixV2", "AdEMAMixV3", "AdEMAMixV4", "AdEMAMixV5", "GaLore", "GaLoreV2", "GaLoreV3", "GaLoreV4", "GaLoreV5", "LoRA", "LoRAV2", "LoRAV3", "LoRAV4", "LoRAV5", "DoRA", "DoRAV2", "DoRAV3", "DoRAV4", "DoRAV5", "QLoRA", "QLoRAV2", "QLoRAV3", "QLoRAV4", "QLoRAV5", "VeRA", "VeRAV2", "VeRAV3", "VeRAV4", "VeRAV5", "PiSSA", "PiSSAV2", "PiSSAV3", "PiSSAV4", "PiSSAV5", "AdaLoRA", "AdaLoRAV2", "AdaLoRAV3", "AdaLoRAV4", "AdaLoRAV5", "DeltaLoRA", "DeltaLoRAV2", "DeltaLoRAV3", "DeltaLoRAV4", "DeltaLoRAV5", "MoRA", "MoRAV2", "MoRAV3", "MoRAV4", "MoRAV5", "LoHA", "LoHAV2", "LoHAV3", "LoHAV4", "LoHAV5", "LoKr", "LoKrV2", "LoKrV3", "LoKrV4", "LoKrV5", "OFT", "OFTV2", "OFTV3", "OFTV4", "OFTV5", "BOFT", "BOFTV2", "BOFTV3", "BOFTV4", "BOFTV5", "ButterflyLoRA", "ButterflyLoRAV2", "ButterflyLoRAV3", "ButterflyLoRAV4", "ButterflyLoRAV5", "Transition", "TransitionV2", "TransitionV3", "TransitionV4", "TransitionV5", "Stride", "StrideV2", "StrideV3", "StrideV4", "StrideV5", "Glide", "GlideV2", "GlideV3", "GlideV4", "GlideV5", "Slide", "SlideV2", "SlideV3", "SlideV4", "SlideV5", "Flow", "FlowV2", "FlowV3", "FlowV4", "FlowV5", "Drift", "DriftV2", "DriftV3", "DriftV4", "DriftV5", "Orbit", "OrbitV2", "OrbitV3", "OrbitV4", "OrbitV5", "Spiral", "SpiralV2", "SpiralV3", "SpiralV4", "SpiralV5", "Helix", "HelixV2", "HelixV3", "HelixV4", "HelixV5", "Cyclone", "CycloneV2", "CycloneV3", "CycloneV4", "CycloneV5", "Vortex", "VortexV2", "VortexV3", "VortexV4", "VortexV5", "Whirlpool", "WhirlpoolV2", "WhirlpoolV3", "WhirlpoolV4", "WhirlpoolV5", "Tornado", "TornadoV2", "TornadoV3", "TornadoV4", "TornadoV5", "Twister", "TwisterV2", "TwisterV3", "TwisterV4", "TwisterV5", "Hurricane", "HurricaneV2", "HurricaneV3", "HurricaneV4", "HurricaneV5", "Typhoon", "TyphoonV2", "TyphoonV3", "TyphoonV4", "TyphoonV5", "Monsoon", "MonsoonV2", "MonsoonV3", "MonsoonV4", "MonsoonV5", "Gale", "GaleV2", "GaleV3", "GaleV4", "GaleV5", "Zephyr", "ZephyrV2", "ZephyrV3", "ZephyrV4", "ZephyrV5", "Breeze", "BreezeV2", "BreezeV3", "BreezeV4", "BreezeV5", "Gust", "GustV2", "GustV3", "GustV4", "GustV5", "Blast", "BlastV2", "BlastV3", "BlastV4", "BlastV5", "Wave", "WaveV2", "WaveV3", "WaveV4", "WaveV5", "Ripple", "RippleV2", "RippleV3", "RippleV4", "RippleV5", "Surge", "SurgeV2", "SurgeV3", "SurgeV4", "SurgeV5", "Tide", "TideV2", "TideV3", "TideV4", "TideV5", "Current", "CurrentV2", "CurrentV3", "CurrentV4", "CurrentV5", "Stream", "StreamV2", "StreamV3", "StreamV4", "StreamV5", "River", "RiverV2", "RiverV3", "RiverV4", "RiverV5", "Cascade", "CascadeV2", "CascadeV3", "CascadeV4", "CascadeV5", "Waterfall", "WaterfallV2", "WaterfallV3", "WaterfallV4", "WaterfallV5", "Fountain", "FountainV2", "FountainV3", "FountainV4", "FountainV5", "Geyser", "GeyserV2", "GeyserV3", "GeyserV4", "GeyserV5", "Spring", "SpringV2", "SpringV3", "SpringV4", "SpringV5", "Well", "WellV2", "WellV3", "WellV4", "WellV5", "Pond", "PondV2", "PondV3", "PondV4", "PondV5", "Lake", "LakeV2", "LakeV3", "LakeV4", "LakeV5", "Sea", "SeaV2", "SeaV3", "SeaV4", "SeaV5", "Ocean", "OceanV2", "OceanV3", "OceanV4", "OceanV5", "Abyss", "AbyssV2", "AbyssV3", "AbyssV4", "AbyssV5", "Trench", "TrenchV2", "TrenchV3", "TrenchV4", "TrenchV5", "Canyon", "CanyonV2", "CanyonV3", "CanyonV4", "CanyonV5", "Valley", "ValleyV2", "ValleyV3", "ValleyV4", "ValleyV5", "Plateau", "PlateauV2", "PlateauV3", "PlateauV4", "PlateauV5", "Mesa", "MesaV2", "MesaV3", "MesaV4", "MesaV5", "Butte", "ButteV2", "ButteV3", "ButteV4", "ButteV5", "Cliff", "CliffV2", "CliffV3", "CliffV4", "CliffV5", "Ridge", "RidgeV2", "RidgeV3", "RidgeV4", "RidgeV5", "Peak", "PeakV2", "PeakV3", "PeakV4", "PeakV5", "Summit", "SummitV2", "SummitV3", "SummitV4", "SummitV5", "Apex", "ApexV2", "ApexV3", "ApexV4", "ApexV5", "Zenith", "ZenithV2", "ZenithV3", "ZenithV4", "ZenithV5", "Nadir", "NadirV2", "NadirV3", "NadirV4", "NadirV5", "Pinnacle", "PinnacleV2", "PinnacleV3", "PinnacleV4", "PinnacleV5", "Crest", "CrestV2", "CrestV3", "CrestV4", "CrestV5", "Trough", "TroughV2", "TroughV3", "TroughV4", "TroughV5", "Basin", "BasinV2", "BasinV3", "BasinV4", "BasinV5", "Crater", "CraterV2", "CraterV3", "CraterV4", "CraterV5", "Caldera", "CalderaV2", "CalderaV3", "CalderaV4", "CalderaV5", "Volcano", "VolcanoV2", "VolcanoV3", "VolcanoV4", "VolcanoV5", "Magma", "MagmaV2", "MagmaV3", "MagmaV4", "MagmaV5", "Lava", "LavaV2", "LavaV3", "LavaV4", "LavaV5", "Eruption", "EruptionV2", "EruptionV3", "EruptionV4", "EruptionV5", "Earthquake", "EarthquakeV2", "EarthquakeV3", "EarthquakeV4", "EarthquakeV5", "Tremor", "TremorV2", "TremorV3", "TremorV4", "TremorV5", "Seismic", "SeismicV2", "SeismicV3", "SeismicV4", "SeismicV5", "Tectonic", "TectonicV2", "TectonicV3", "TectonicV4", "TectonicV5", "Fault", "FaultV2", "FaultV3", "FaultV4", "FaultV5", "Rift", "RiftV2", "RiftV3", "RiftV4", "RiftV5", "Subduction", "SubductionV2", "SubductionV3", "SubductionV4", "SubductionV5", "Convergence", "ConvergenceV2", "ConvergenceV3", "ConvergenceV4", "ConvergenceV5", "Divergence", "DivergenceV2", "DivergenceV3", "DivergenceV4", "DivergenceV5", "Collision", "CollisionV2", "CollisionV3", "CollisionV4", "CollisionV5", "Impact", "ImpactV2", "ImpactV3", "ImpactV4", "ImpactV5", "Shockwave", "ShockwaveV2", "ShockwaveV3", "ShockwaveV4", "ShockwaveV5", "Blastwave", "BlastwaveV2", "BlastwaveV3", "BlastwaveV4", "BlastwaveV5", "Detonation", "DetonationV2", "DetonationV3", "DetonationV4", "DetonationV5", "Explosion", "ExplosionV2", "ExplosionV3", "ExplosionV4", "ExplosionV5", "Implosion", "ImplosionV2", "ImplosionV3", "ImplosionV4", "ImplosionV5", "Combustion", "CombustionV2", "CombustionV3", "CombustionV4", "CombustionV5", "Ignition", "IgnitionV2", "IgnitionV3", "IgnitionV4", "IgnitionV5", "Flame", "FlameV2", "FlameV3", "FlameV4", "FlameV5", "Inferno", "InfernoV2", "InfernoV3", "InfernoV4", "InfernoV5", "Blaze", "BlazeV2", "BlazeV3", "BlazeV4", "BlazeV5", "Wildfire", "WildfireV2", "WildfireV3", "WildfireV4", "WildfireV5", "Firestorm", "FirestormV2", "FirestormV3", "FirestormV4", "FirestormV5", "Pyre", "PyreV2", "PyreV3", "PyreV4", "PyreV5", "Ember", "EmberV2", "EmberV3", "EmberV4", "EmberV5", "Spark", "SparkV2", "SparkV3", "SparkV4", "SparkV5", "Flicker", "FlickerV2", "FlickerV3", "FlickerV4", "FlickerV5", "Glow", "GlowV2", "GlowV3", "GlowV4", "GlowV5", "Radiance", "RadianceV2", "RadianceV3", "RadianceV4", "RadianceV5", "Luminance", "LuminanceV2", "LuminanceV3", "LuminanceV4", "LuminanceV5", "Brilliance", "BrillianceV2", "BrillianceV3", "BrillianceV4", "BrillianceV5", "Shimmer", "ShimmerV2", "ShimmerV3", "ShimmerV4", "ShimmerV5", "Gleam", "GleamV2", "GleamV3", "GleamV4", "GleamV5", "Glisten", "GlistenV2", "GlistenV3", "GlistenV4", "GlistenV5", "Twinkle", "TwinkleV2", "TwinkleV3", "TwinkleV4", "TwinkleV5", "Scintillate", "ScintillateV2", "ScintillateV3", "ScintillateV4", "ScintillateV5", "Coruscate", "CoruscateV2", "CoruscateV3", "CoruscateV4", "CoruscateV5", "Effulge", "EffulgeV2", "EffulgeV3", "EffulgeV4", "EffulgeV5", "Fulminate", "FulminateV2", "FulminateV3", "FulminateV4", "FulminateV5", "Discharge", "DischargeV2", "DischargeV3", "DischargeV4", "DischargeV5", "Arc", "ArcV2", "ArcV3", "ArcV4", "ArcV5", "Bolt", "BoltV2", "BoltV3", "BoltV4", "BoltV5", "Lightning", "LightningV2", "LightningV3", "LightningV4", "LightningV5", "Thunder", "ThunderV2", "ThunderV3", "ThunderV4", "ThunderV5", "Storm", "StormV2", "StormV3", "StormV4", "StormV5", "Maelstrom", "MaelstromV2", "MaelstromV3", "MaelstromV4", "MaelstromV5", "Cataclysm", "CataclysmV2", "CataclysmV3", "CataclysmV4", "CataclysmV5", "Apocalypse", "ApocalypseV2", "ApocalypseV3", "ApocalypseV4", "ApocalypseV5", "Armageddon", "ArmageddonV2", "ArmageddonV3", "ArmageddonV4", "ArmageddonV5", "Ragnarok", "RagnarokV2", "RagnarokV3", "RagnarokV4", "RagnarokV5", "Doomsday", "DoomsdayV2", "DoomsdayV3", "DoomsdayV4", "DoomsdayV5", "Judgment", "JudgmentV2", "JudgmentV3", "JudgmentV4", "JudgmentV5", "Verdict", "VerdictV2", "VerdictV3", "VerdictV4", "VerdictV5", "Sentence", "SentenceV2", "SentenceV3", "SentenceV4", "SentenceV5", "Decree", "DecreeV2", "DecreeV3", "DecreeV4", "DecreeV5", "Edict", "EdictV2", "EdictV3", "EdictV4", "EdictV5", "Mandate", "MandateV2", "MandateV3", "MandateV4", "MandateV5", "Directive", "DirectiveV2", "DirectiveV3", "DirectiveV4", "DirectiveV5", "Command", "CommandV2", "CommandV3", "CommandV4", "CommandV5", "Order", "OrderV2", "OrderV3", "OrderV4", "OrderV5", "Instruction", "InstructionV2", "InstructionV3", "InstructionV4", "InstructionV5", "Protocol", "ProtocolV2", "ProtocolV3", "ProtocolV4", "ProtocolV5", "Algorithm", "AlgorithmV2", "AlgorithmV3", "AlgorithmV4", "AlgorithmV5", "Heuristic", "HeuristicV2", "HeuristicV3", "HeuristicV4", "HeuristicV5", "Metaheuristic", "MetaheuristicV2", "MetaheuristicV3", "MetaheuristicV4", "MetaheuristicV5", "TabuSearch", "TabuSearchV2", "TabuSearchV3", "TabuSearchV4", "TabuSearchV5", "ScatterSearch", "ScatterSearchV2", "ScatterSearchV3", "ScatterSearchV4", "ScatterSearchV5", "GuidedLocalSearch", "GuidedLocalSearchV2", "GuidedLocalSearchV3", "GuidedLocalSearchV4", "GuidedLocalSearchV5", "VariableNeighborhood", "VariableNeighborhoodV2", "VariableNeighborhoodV3", "VariableNeighborhoodV4", "VariableNeighborhoodV5", "IteratedLocal", "IteratedLocalV2", "IteratedLocalV3", "IteratedLocalV4", "IteratedLocalV5", "GreedyRandomized", "GreedyRandomizedV2", "GreedyRandomizedV3", "GreedyRandomizedV4", "GreedyRandomizedV5", "PathRelinking", "PathRelinkingV2", "PathRelinkingV3", "PathRelinkingV4", "PathRelinkingV5", "Memetic", "MemeticV2", "MemeticV3", "MemeticV4", "MemeticV5", "Cultural", "CulturalV2", "CulturalV3", "CulturalV4", "CulturalV5", "HarmonySearch", "HarmonySearchV2", "HarmonySearchV3", "HarmonySearchV4", "HarmonySearchV5", "GravitationalSearch", "GravitationalSearchV2", "GravitationalSearchV3", "GravitationalSearchV4", "GravitationalSearchV5", "ChargedSystem", "ChargedSystemV2", "ChargedSystemV3", "ChargedSystemV4", "ChargedSystemV5", "MagneticOptimization", "MagneticOptimizationV2", "MagneticOptimizationV3", "MagneticOptimizationV4", "MagneticOptimizationV5", "Electromagnetic", "ElectromagneticV2", "ElectromagneticV3", "ElectromagneticV4", "ElectromagneticV5", "WaterCycle", "WaterCycleV2", "WaterCycleV3", "WaterCycleV4", "WaterCycleV5", "Rainfall", "RainfallV2", "RainfallV3", "RainfallV4", "RainfallV5", "Dew", "DewV2", "DewV3", "DewV4", "DewV5", "Mist", "MistV2", "MistV3", "MistV4", "MistV5", "Fog", "FogV2", "FogV3", "FogV4", "FogV5", "Haze", "HazeV2", "HazeV3", "HazeV4", "HazeV5", "Smog", "SmogV2", "SmogV3", "SmogV4", "SmogV5", "Vapor", "VaporV2", "VaporV3", "VaporV4", "VaporV5", "Steam", "SteamV2", "SteamV3", "SteamV4", "SteamV5", "Fume", "FumeV2", "FumeV3", "FumeV4", "FumeV5", "Smoke", "SmokeV2", "SmokeV3", "SmokeV4", "SmokeV5", "Ash", "AshV2", "AshV3", "AshV4", "AshV5", "Dust", "DustV2", "DustV3", "DustV4", "DustV5", "Sand", "SandV2", "SandV3", "SandV4", "SandV5", "Gravel", "GravelV2", "GravelV3", "GravelV4", "GravelV5", "Pebble", "PebbleV2", "PebbleV3", "PebbleV4", "PebbleV5", "Stone", "StoneV2", "StoneV3", "StoneV4", "StoneV5", "Rock", "RockV2", "RockV3", "RockV4", "RockV5", "Boulder", "BoulderV2", "BoulderV3", "BoulderV4", "BoulderV5", "Bedrock", "BedrockV2", "BedrockV3", "BedrockV4", "BedrockV5", "Granite", "GraniteV2", "GraniteV3", "GraniteV4", "GraniteV5", "Basalt", "BasaltV2", "BasaltV3", "BasaltV4", "BasaltV5", "Marble", "MarbleV2", "MarbleV3", "MarbleV4", "MarbleV5", "Quartz", "QuartzV2", "QuartzV3", "QuartzV4", "QuartzV5", "Crystal", "CrystalV2", "CrystalV3", "CrystalV4", "CrystalV5", "Gem", "GemV2", "GemV3", "GemV4", "GemV5", "Diamond", "DiamondV2", "DiamondV3", "DiamondV4", "DiamondV5", "Ruby", "RubyV2", "RubyV3", "RubyV4", "RubyV5", "Sapphire", "SapphireV2", "SapphireV3", "SapphireV4", "SapphireV5", "Emerald", "EmeraldV2", "EmeraldV3", "EmeraldV4", "EmeraldV5", "Topaz", "TopazV2", "TopazV3", "TopazV4", "TopazV5", "Amethyst", "AmethystV2", "AmethystV3", "AmethystV4", "AmethystV5", "Opal", "OpalV2", "OpalV3", "OpalV4", "OpalV5", "Jade", "JadeV2", "JadeV3", "JadeV4", "JadeV5", "Onyx", "OnyxV2", "OnyxV3", "OnyxV4", "OnyxV5", "Obsidian", "ObsidianV2", "ObsidianV3", "ObsidianV4", "ObsidianV5", "Flint", "FlintV2", "FlintV3", "FlintV4", "FlintV5", "Chert", "ChertV2", "ChertV3", "ChertV4", "ChertV5", "Slate", "SlateV2", "SlateV3", "SlateV4", "SlateV5", "Shale", "ShaleV2", "ShaleV3", "ShaleV4", "ShaleV5", "Limestone", "LimestoneV2", "LimestoneV3", "LimestoneV4", "LimestoneV5", "Sandstone", "SandstoneV2", "SandstoneV3", "SandstoneV4", "SandstoneV5", "Chalk", "ChalkV2", "ChalkV3", "ChalkV4", "ChalkV5", "Gypsum", "GypsumV2", "GypsumV3", "GypsumV4", "GypsumV5", "Clay", "ClayV2", "ClayV3", "ClayV4", "ClayV5", "Silt", "SiltV2", "SiltV3", "SiltV4", "SiltV5", "Loam", "LoamV2", "LoamV3", "LoamV4", "LoamV5", "Soil", "SoilV2", "SoilV3", "SoilV4", "SoilV5", "Earth", "EarthV2", "EarthV3", "EarthV4", "EarthV5", "Mud", "MudV2", "MudV3", "MudV4", "MudV5", "Swamp", "SwampV2", "SwampV3", "SwampV4", "SwampV5", "Marsh", "MarshV2", "MarshV3", "MarshV4", "MarshV5", "Bog", "BogV2", "BogV3", "BogV4", "BogV5", "Fen", "FenV2", "FenV3", "FenV4", "FenV5", "Moor", "MoorV2", "MoorV3", "MoorV4", "MoorV5", "Heath", "HeathV2", "HeathV3", "HeathV4", "HeathV5", "Tundra", "TundraV2", "TundraV3", "TundraV4", "TundraV5", "Taiga", "TaigaV2", "TaigaV3", "TaigaV4", "TaigaV5", "Steppe", "SteppeV2", "SteppeV3", "SteppeV4", "SteppeV5", "Savanna", "SavannaV2", "SavannaV3", "SavannaV4", "SavannaV5", "Prairie", "PrairieV2", "PrairieV3", "PrairieV4", "PrairieV5", "Grassland", "GrasslandV2", "GrasslandV3", "GrasslandV4", "GrasslandV5", "Meadow", "MeadowV2", "MeadowV3", "MeadowV4", "MeadowV5", "Pasture", "PastureV2", "PastureV3", "PastureV4", "PastureV5", "Field", "FieldV2", "FieldV3", "FieldV4", "FieldV5", "Plain", "PlainV2", "PlainV3", "PlainV4", "PlainV5", "Desert", "DesertV2", "DesertV3", "DesertV4", "DesertV5", "Dune", "DuneV2", "DuneV3", "DuneV4", "DuneV5", "Oasis", "OasisV2", "OasisV3", "OasisV4", "OasisV5", "Mirage", "MirageV2", "MirageV3", "MirageV4", "MirageV5", "Heat", "HeatV2", "HeatV3", "HeatV4", "HeatV5", "Warmth", "WarmthV2", "WarmthV3", "WarmthV4", "WarmthV5", "Chill", "ChillV2", "ChillV3", "ChillV4", "ChillV5", "Cold", "ColdV2", "ColdV3", "ColdV4", "ColdV5", "Freeze", "FreezeV2", "FreezeV3", "FreezeV4", "FreezeV5", "Frost", "FrostV2", "FrostV3", "FrostV4", "FrostV5", "Ice", "IceV2", "IceV3", "IceV4", "IceV5", "Glacier", "GlacierV2", "GlacierV3", "GlacierV4", "GlacierV5", "Snow", "SnowV2", "SnowV3", "SnowV4", "SnowV5", "Blizzard", "BlizzardV2", "BlizzardV3", "BlizzardV4", "BlizzardV5", "Avalanche", "AvalancheV2", "AvalancheV3", "AvalancheV4", "AvalancheV5", "Crevasse", "CrevasseV2", "CrevasseV3", "CrevasseV4", "CrevasseV5", "Berg", "BergV2", "BergV3", "BergV4", "BergV5", "Iceberg", "IcebergV2", "IcebergV3", "IcebergV4", "IcebergV5", "Floe", "FloeV2", "FloeV3", "FloeV4", "FloeV5", "Frazil", "FrazilV2", "FrazilV3", "FrazilV4", "FrazilV5", "Slush", "SlushV2", "SlushV3", "SlushV4", "SlushV5", "Sleet", "SleetV2", "SleetV3", "SleetV4", "SleetV5", "Hail", "HailV2", "HailV3", "HailV4", "HailV5", "Graupel", "GraupelV2", "GraupelV3", "GraupelV4", "GraupelV5", "Rime", "RimeV2", "RimeV3", "RimeV4", "RimeV5", "Hoarfrost", "HoarfrostV2", "HoarfrostV3", "HoarfrostV4", "HoarfrostV5", "Permafrost", "PermafrostV2", "PermafrostV3", "PermafrostV4", "PermafrostV5", "IceCap", "IceCapV2", "IceCapV3", "IceCapV4", "IceCapV5", "Polar", "PolarV2", "PolarV3", "PolarV4", "PolarV5", "Arctic", "ArcticV2", "ArcticV3", "ArcticV4", "ArcticV5", "Antarctic", "AntarcticV2", "AntarcticV3", "AntarcticV4", "AntarcticV5", "Boreal", "BorealV2", "BorealV3", "BorealV4", "BorealV5", "Austral", "AustralV2", "AustralV3", "AustralV4", "AustralV5", "Equatorial", "EquatorialV2", "EquatorialV3", "EquatorialV4", "EquatorialV5", "Tropical", "TropicalV2", "TropicalV3", "TropicalV4", "TropicalV5", "Subtropical", "SubtropicalV2", "SubtropicalV3", "SubtropicalV4", "SubtropicalV5", "Temperate", "TemperateV2", "TemperateV3", "TemperateV4", "TemperateV5", "Mediterranean", "MediterraneanV2", "MediterraneanV3", "MediterraneanV4", "MediterraneanV5", "Continental", "ContinentalV2", "ContinentalV3", "ContinentalV4", "ContinentalV5", "Maritime", "MaritimeV2", "MaritimeV3", "MaritimeV4", "MaritimeV5", "Coastal", "CoastalV2", "CoastalV3", "CoastalV4", "CoastalV5", "Inland", "InlandV2", "InlandV3", "InlandV4", "InlandV5", "Alpine", "AlpineV2", "AlpineV3", "AlpineV4", "AlpineV5", "Montane", "MontaneV2", "MontaneV3", "MontaneV4", "MontaneV5", "Subalpine", "SubalpineV2", "SubalpineV3", "SubalpineV4", "SubalpineV5", "Foothill", "FoothillV2", "FoothillV3", "FoothillV4", "FoothillV5", "Lowland", "LowlandV2", "LowlandV3", "LowlandV4", "LowlandV5", "Highland", "HighlandV2", "HighlandV3", "HighlandV4", "HighlandV5", "Upland", "UplandV2", "UplandV3", "UplandV4", "UplandV5", "Downland", "DownlandV2", "DownlandV3", "DownlandV4", "DownlandV5", "Wetland", "WetlandV2", "WetlandV3", "WetlandV4", "WetlandV5", "Dryland", "DrylandV2", "DrylandV3", "DrylandV4", "DrylandV5", "Woodland", "WoodlandV2", "WoodlandV3", "WoodlandV4", "WoodlandV5", "Forest", "ForestV2", "ForestV3", "ForestV4", "ForestV5", "Jungle", "JungleV2", "JungleV3", "JungleV4", "JungleV5", "Rainforest", "RainforestV2", "RainforestV3", "RainforestV4", "RainforestV5", "Grove", "GroveV2", "GroveV3", "GroveV4", "GroveV5", "Copse", "CopseV2", "CopseV3", "CopseV4", "CopseV5", "Thicket", "ThicketV2", "ThicketV3", "ThicketV4", "ThicketV5", "Brush", "BrushV2", "BrushV3", "BrushV4", "BrushV5", "Scrub", "ScrubV2", "ScrubV3", "ScrubV4", "ScrubV5", "Chaparral", "ChaparralV2", "ChaparralV3", "ChaparralV4", "ChaparralV5", "Garigue", "GarigueV2", "GarigueV3", "GarigueV4", "GarigueV5", "Maquis", "MaquisV2", "MaquisV3", "MaquisV4", "MaquisV5", "Fynbos", "FynbosV2", "FynbosV3", "FynbosV4", "FynbosV5", "Kwongan", "KwonganV2", "KwonganV3", "KwonganV4", "KwonganV5", "Mallee", "MalleeV2", "MalleeV3", "MalleeV4", "MalleeV5", "Mulga", "MulgaV2", "MulgaV3", "MulgaV4", "MulgaV5", "Spinifex", "SpinifexV2", "SpinifexV3", "SpinifexV4", "SpinifexV5", "Mitchell", "MitchellV2", "MitchellV3", "MitchellV4", "MitchellV5", "Brigalow", "BrigalowV2", "BrigalowV3", "BrigalowV4", "BrigalowV5", "Gidgee", "GidgeeV2", "GidgeeV3", "GidgeeV4", "GidgeeV5", "Coolabah", "CoolabahV2", "CoolabahV3", "CoolabahV4", "CoolabahV5", "Jarrah", "JarrahV2", "JarrahV3", "JarrahV4", "JarrahV5", "Karri", "KarriV2", "KarriV3", "KarriV4", "KarriV5", "Tingle", "TingleV2", "TingleV3", "TingleV4", "TingleV5", "Tuart", "TuartV2", "TuartV3", "TuartV4", "TuartV5", "Wandoo", "WandooV2", "WandooV3", "WandooV4", "WandooV5", "SalmonGum", "SalmonGumV2", "SalmonGumV3", "SalmonGumV4", "SalmonGumV5", "GhostGum", "GhostGumV2", "GhostGumV3", "GhostGumV4", "GhostGumV5", "SnowGum", "SnowGumV2", "SnowGumV3", "SnowGumV4", "SnowGumV5", "MountainAsh", "MountainAshV2", "MountainAshV3", "MountainAshV4", "MountainAshV5", "AlpineAsh", "AlpineAshV2", "AlpineAshV3", "AlpineAshV4", "AlpineAshV5", "Messmate", "MessmateV2", "MessmateV3", "MessmateV4", "MessmateV5", "Stringybark", "StringybarkV2", "StringybarkV3", "StringybarkV4", "StringybarkV5", "Ironbark", "IronbarkV2", "IronbarkV3", "IronbarkV4", "IronbarkV5", "Box", "BoxV2", "BoxV3", "BoxV4", "BoxV5", "Bloodwood", "BloodwoodV2", "BloodwoodV3", "BloodwoodV4", "BloodwoodV5", "Wattle", "WattleV2", "WattleV3", "WattleV4", "WattleV5", "Banksia", "BanksiaV2", "BanksiaV3", "BanksiaV4", "BanksiaV5", "Grevillea", "GrevilleaV2", "GrevilleaV3", "GrevilleaV4", "GrevilleaV5", "Hakea", "HakeaV2", "HakeaV3", "HakeaV4", "HakeaV5", "Melaleuca", "MelaleucaV2", "MelaleucaV3", "MelaleucaV4", "MelaleucaV5", "Callistemon", "CallistemonV2", "CallistemonV3", "CallistemonV4", "CallistemonV5", "Leptospermum", "LeptospermumV2", "LeptospermumV3", "LeptospermumV4", "LeptospermumV5", "Kunzea", "KunzeaV2", "KunzeaV3", "KunzeaV4", "KunzeaV5", "Thryptomene", "ThryptomeneV2", "ThryptomeneV3", "ThryptomeneV4", "ThryptomeneV5", "Verticordia", "VerticordiaV2", "VerticordiaV3", "VerticordiaV4", "VerticordiaV5", "Darwinia", "DarwiniaV2", "DarwiniaV3", "DarwiniaV4", "DarwiniaV5", "Chamelaucium", "ChamelauciumV2", "ChamelauciumV3", "ChamelauciumV4", "ChamelauciumV5", "Eremaea", "EremaeaV2", "EremaeaV3", "EremaeaV4", "EremaeaV5", "Calothamnus", "CalothamnusV2", "CalothamnusV3", "CalothamnusV4", "CalothamnusV5", "Beaufortia", "BeaufortiaV2", "BeaufortiaV3", "BeaufortiaV4", "BeaufortiaV5", "Regelia", "RegeliaV2", "RegeliaV3", "RegeliaV4", "RegeliaV5", "Eucalyptus", "EucalyptusV2", "EucalyptusV3", "EucalyptusV4", "EucalyptusV5", "Corymbia", "CorymbiaV2", "CorymbiaV3", "CorymbiaV4", "CorymbiaV5", "Angophora", "AngophoraV2", "AngophoraV3", "AngophoraV4", "AngophoraV5", "Syncarpia", "SyncarpiaV2", "SyncarpiaV3", "SyncarpiaV4", "SyncarpiaV5", "Lophostemon", "LophostemonV2", "LophostemonV3", "LophostemonV4", "LophostemonV5", "Tristania", "TristaniaV2", "TristaniaV3", "TristaniaV4", "TristaniaV5", "Backhousia", "BackhousiaV2", "BackhousiaV3", "BackhousiaV4", "BackhousiaV5", "Syzygium", "SyzygiumV2", "SyzygiumV3", "SyzygiumV4", "SyzygiumV5", "Acmena", "AcmenaV2", "AcmenaV3", "AcmenaV4", "AcmenaV5", "Waterhousea", "WaterhouseaV2", "WaterhouseaV3", "WaterhouseaV4", "WaterhouseaV5", "Decaspermum", "DecaspermumV2", "DecaspermumV3", "DecaspermumV4", "DecaspermumV5", "Rhodomyrtus", "RhodomyrtusV2", "RhodomyrtusV3", "RhodomyrtusV4", "RhodomyrtusV5", "Austromyrtus", "AustromyrtusV2", "AustromyrtusV3", "AustromyrtusV4", "AustromyrtusV5", "Gossia", "GossiaV2", "GossiaV3", "GossiaV4", "GossiaV5", "Lenwebbia", "LenwebbiaV2", "LenwebbiaV3", "LenwebbiaV4", "LenwebbiaV5", "Pilidiostigma", "PilidiostigmaV2", "PilidiostigmaV3", "PilidiostigmaV4", "PilidiostigmaV5", "Uromyrtus", "UromyrtusV2", "UromyrtusV3", "UromyrtusV4", "UromyrtusV5", "Rhodamnia", "RhodamniaV2", "RhodamniaV3", "RhodamniaV4", "RhodamniaV5", "Xanthostemon", "XanthostemonV2", "XanthostemonV3", "XanthostemonV4", "XanthostemonV5", "Metrosideros", "MetrosiderosV2", "MetrosiderosV3", "MetrosiderosV4", "MetrosiderosV5", "Manuka", "ManukaV2", "ManukaV3", "ManukaV4", "ManukaV5", "Kanuka", "KanukaV2", "KanukaV3", "KanukaV4", "KanukaV5", "Pohutukawa", "PohutukawaV2", "PohutukawaV3", "PohutukawaV4", "PohutukawaV5", "Rata", "RataV2", "RataV3", "RataV4", "RataV5", "Feijoa", "FeijoaV2", "FeijoaV3", "FeijoaV4", "FeijoaV5", "Guava", "GuavaV2", "GuavaV3", "GuavaV4", "GuavaV5", "Jaboticaba", "JaboticabaV2", "JaboticabaV3", "JaboticabaV4", "JaboticabaV5", "Pitanga", "PitangaV2", "PitangaV3", "PitangaV4", "PitangaV5", "Grumichama", "GrumichamaV2", "GrumichamaV3", "GrumichamaV4", "GrumichamaV5", "CamuCamu", "CamuCamuV2", "CamuCamuV3", "CamuCamuV4", "CamuCamuV5", "Araca", "AracaV2", "AracaV3", "AracaV4", "AracaV5", "Cagaita", "CagaitaV2", "CagaitaV3", "CagaitaV4", "CagaitaV5", "Murta", "MurtaV2", "MurtaV3", "MurtaV4", "MurtaV5", "Arrayan", "ArrayanV2", "ArrayanV3", "ArrayanV4", "ArrayanV5", "LillyPilly", "LillyPillyV2", "LillyPillyV3", "LillyPillyV4", "LillyPillyV5", "Riberry", "RiberryV2", "RiberryV3", "RiberryV4", "RiberryV5", "Davidsonia", "DavidsoniaV2", "DavidsoniaV3", "DavidsoniaV4", "DavidsoniaV5", "FingerLime", "FingerLimeV2", "FingerLimeV3", "FingerLimeV4", "FingerLimeV5", "KakaduPlum", "KakaduPlumV2", "KakaduPlumV3", "KakaduPlumV4", "KakaduPlumV5", "Quandong", "QuandongV2", "QuandongV3", "QuandongV4", "QuandongV5", "Muntries", "MuntriesV2", "MuntriesV3", "MuntriesV4", "MuntriesV5", "BushTomato", "BushTomatoV2", "BushTomatoV3", "BushTomatoV4", "BushTomatoV5", "Warrigal", "WarrigalV2", "WarrigalV3", "WarrigalV4", "WarrigalV5", "Saltbush", "SaltbushV2", "SaltbushV3", "SaltbushV4", "SaltbushV5", "Samphire", "SamphireV2", "SamphireV3", "SamphireV4", "SamphireV5", "Seablite", "SeabliteV2", "SeabliteV3", "SeabliteV4", "SeabliteV5", "Pigface", "PigfaceV2", "PigfaceV3", "PigfaceV4", "PigfaceV5", "Carpobrotus", "CarpobrotusV2", "CarpobrotusV3", "CarpobrotusV4", "CarpobrotusV5", "Disphyma", "DisphymaV2", "DisphymaV3", "DisphymaV4", "DisphymaV5", "Sarcozona", "SarcozonaV2", "SarcozonaV3", "SarcozonaV4", "SarcozonaV5", "Tetragonia", "TetragoniaV2", "TetragoniaV3", "TetragoniaV4", "TetragoniaV5", "Sesuvium", "SesuviumV2", "SesuviumV3", "SesuviumV4", "SesuviumV5", "Trianthema", "TrianthemaV2", "TrianthemaV3", "TrianthemaV4", "TrianthemaV5", "Zaleya", "ZaleyaV2", "ZaleyaV3", "ZaleyaV4", "ZaleyaV5", "Aizoon", "AizoonV2", "AizoonV3", "AizoonV4", "AizoonV5", "Galenia", "GaleniaV2", "GaleniaV3", "GaleniaV4", "GaleniaV5", "Mesembryanthemum", "MesembryanthemumV2", "MesembryanthemumV3", "MesembryanthemumV4", "MesembryanthemumV5", "Dorotheanthus", "DorotheanthusV2", "DorotheanthusV3", "DorotheanthusV4", "DorotheanthusV5", "Aptenia", "ApteniaV2", "ApteniaV3", "ApteniaV4", "ApteniaV5", "Lampranthus", "LampranthusV2", "LampranthusV3", "LampranthusV4", "LampranthusV5", "Drosanthemum", "DrosanthemumV2", "DrosanthemumV3", "DrosanthemumV4", "DrosanthemumV5", "Delosperma", "DelospermaV2", "DelospermaV3", "DelospermaV4", "DelospermaV5", "Ruschia", "RuschiaV2", "RuschiaV3", "RuschiaV4", "RuschiaV5", "Bergeranthus", "BergeranthusV2", "BergeranthusV3", "BergeranthusV4", "BergeranthusV5", "Faucaria", "FaucariaV2", "FaucariaV3", "FaucariaV4", "FaucariaV5", "Lithops", "LithopsV2", "LithopsV3", "LithopsV4", "LithopsV5", "Conophytum", "ConophytumV2", "ConophytumV3", "ConophytumV4", "ConophytumV5", "Pleiospilos", "PleiospilosV2", "PleiospilosV3", "PleiospilosV4", "PleiospilosV5", "Argyroderma", "ArgyrodermaV2", "ArgyrodermaV3", "ArgyrodermaV4", "ArgyrodermaV5", "Fenestraria", "FenestrariaV2", "FenestrariaV3", "FenestrariaV4", "FenestrariaV5", "Frithia", "FrithiaV2", "FrithiaV3", "FrithiaV4", "FrithiaV5", "Gibbaeum", "GibbaeumV2", "GibbaeumV3", "GibbaeumV4", "GibbaeumV5", "Glottiphyllum", "GlottiphyllumV2", "GlottiphyllumV3", "GlottiphyllumV4", "GlottiphyllumV5", "Aloinopsis", "AloinopsisV2", "AloinopsisV3", "AloinopsisV4", "AloinopsisV5", "Titanopsis", "TitanopsisV2", "TitanopsisV3", "TitanopsisV4", "TitanopsisV5", "Rhombophyllum", "RhombophyllumV2", "RhombophyllumV3", "RhombophyllumV4", "RhombophyllumV5", "Bijlia", "BijliaV2", "BijliaV3", "BijliaV4", "BijliaV5", "Hereroa", "HereroaV2", "HereroaV3", "HereroaV4", "HereroaV5", "Machairophyllum", "MachairophyllumV2", "MachairophyllumV3", "MachairophyllumV4", "MachairophyllumV5", "Stomatium", "StomatiumV2", "StomatiumV3", "StomatiumV4", "StomatiumV5", "Chasmatophyllum", "ChasmatophyllumV2", "ChasmatophyllumV3", "ChasmatophyllumV4", "ChasmatophyllumV5", "Mossia", "MossiaV2", "MossiaV3", "MossiaV4", "MossiaV5", "Rabiea", "RabieaV2", "RabieaV3", "RabieaV4", "RabieaV5", "Prepodesma", "PrepodesmaV2", "PrepodesmaV3", "PrepodesmaV4", "PrepodesmaV5", "Nananthus", "NananthusV2", "NananthusV3", "NananthusV4", "NananthusV5", "Tanquana", "TanquanaV2", "TanquanaV3", "TanquanaV4", "TanquanaV5", "Didymaotus", "DidymaotusV2", "DidymaotusV3", "DidymaotusV4", "DidymaotusV5", "Lapidaria", "LapidariaV2", "LapidariaV3", "LapidariaV4", "LapidariaV5", "Dinteranthus", "DinteranthusV2", "DinteranthusV3", "DinteranthusV4", "DinteranthusV5", "Schwantesia", "SchwantesiaV2", "SchwantesiaV3", "SchwantesiaV4", "SchwantesiaV5", "Vanheerdea", "VanheerdeaV2", "VanheerdeaV3", "VanheerdeaV4", "VanheerdeaV5", "Cerochlamys", "CerochlamysV2", "CerochlamysV3", "CerochlamysV4", "CerochlamysV5", "Stayneria", "StayneriaV2", "StayneriaV3", "StayneriaV4", "StayneriaV5", "Acrodon", "AcrodonV2", "AcrodonV3", "AcrodonV4", "AcrodonV5", "Erepsia", "ErepsiaV2", "ErepsiaV3", "ErepsiaV4", "ErepsiaV5", "Skiatophytum", "SkiatophytumV2", "SkiatophytumV3", "SkiatophytumV4", "SkiatophytumV5", "Cylindrophyllum", "CylindrophyllumV2", "CylindrophyllumV3", "CylindrophyllumV4", "CylindrophyllumV5", "Calitzdorpia", "CalitzdorpiaV2", "CalitzdorpiaV3", "CalitzdorpiaV4", "CalitzdorpiaV5", "Namaquanthus", "NamaquanthusV2", "NamaquanthusV3", "NamaquanthusV4", "NamaquanthusV5", "Wooleya", "WooleyaV2", "WooleyaV3", "WooleyaV4", "WooleyaV5", "Jensenobotrya", "JensenobotryaV2", "JensenobotryaV3", "JensenobotryaV4", "JensenobotryaV5", "Muiria", "MuiriaV2", "MuiriaV3", "MuiriaV4", "MuiriaV5", "Oophytum", "OophytumV2", "OophytumV3", "OophytumV4", "OophytumV5", "Diplosoma", "DiplosomaV2", "DiplosomaV3", "DiplosomaV4", "DiplosomaV5", "Monilaria", "MonilariaV2", "MonilariaV3", "MonilariaV4", "MonilariaV5", "Meyerophytum", "MeyerophytumV2", "MeyerophytumV3", "MeyerophytumV4", "MeyerophytumV5", "Mitrophyllum", "MitrophyllumV2", "MitrophyllumV3", "MitrophyllumV4", "MitrophyllumV5", "Mimetophytum", "MimetophytumV2", "MimetophytumV3", "MimetophytumV4", "MimetophytumV5", "Dicrocaulon", "DicrocaulonV2", "DicrocaulonV3", "DicrocaulonV4", "DicrocaulonV5", "Brownanthus", "BrownanthusV2", "BrownanthusV3", "BrownanthusV4", "BrownanthusV5", "Psilocaulon", "PsilocaulonV2", "PsilocaulonV3", "PsilocaulonV4", "PsilocaulonV5", "Aspazoma", "AspazomaV2", "AspazomaV3", "AspazomaV4", "AspazomaV5", "Dactylopsis", "DactylopsisV2", "DactylopsisV3", "DactylopsisV4", "DactylopsisV5", "Phyllobolus", "PhyllobolusV2", "PhyllobolusV3", "PhyllobolusV4", "PhyllobolusV5", "Prenia", "PreniaV2", "PreniaV3", "PreniaV4", "PreniaV5", "Sceletium", "SceletiumV2", "SceletiumV3", "SceletiumV4", "SceletiumV5", "Aridaria", "AridariaV2", "AridariaV3", "AridariaV4", "AridariaV5", "Nycteranthus", "NycteranthusV2", "NycteranthusV3", "NycteranthusV4", "NycteranthusV5", "Herrea", "HerreaV2", "HerreaV3", "HerreaV4", "HerreaV5", "Conicosia", "ConicosiaV2", "ConicosiaV3", "ConicosiaV4", "ConicosiaV5", "Hymenogyne", "HymenogyneV2", "HymenogyneV3", "HymenogyneV4", "HymenogyneV5", "Cephalophyllum", "CephalophyllumV2", "CephalophyllumV3", "CephalophyllumV4", "CephalophyllumV5", "Jordaaniella", "JordaaniellaV2", "JordaaniellaV3", "JordaaniellaV4", "JordaaniellaV5", "Leipoldtia", "LeipoldtiaV2", "LeipoldtiaV3", "LeipoldtiaV4", "LeipoldtiaV5", "Octopoma", "OctopomaV2", "OctopomaV3", "OctopomaV4", "OctopomaV5", "Zeuktophyllum", "ZeuktophyllumV2", "ZeuktophyllumV3", "ZeuktophyllumV4", "ZeuktophyllumV5", "Smicrostigma", "SmicrostigmaV2", "SmicrostigmaV3", "SmicrostigmaV4", "SmicrostigmaV5", "Rhinephyllum", "RhinephyllumV2", "RhinephyllumV3", "RhinephyllumV4", "RhinephyllumV5", "Antimima", "AntimimaV2", "AntimimaV3", "AntimimaV4", "AntimimaV5", "Braunsia", "BraunsiaV2", "BraunsiaV3", "BraunsiaV4", "BraunsiaV5", "Carpanthea", "CarpantheaV2", "CarpantheaV3", "CarpantheaV4", "CarpantheaV5", "Eberlanzia", "EberlanziaV2", "EberlanziaV3", "EberlanziaV4", "EberlanziaV5", "Hallianthus", "HallianthusV2", "HallianthusV3", "HallianthusV4", "HallianthusV5", "Hammeria", "HammeriaV2", "HammeriaV3", "HammeriaV4", "HammeriaV5", "Ihlenfeldtia", "IhlenfeldtiaV2", "IhlenfeldtiaV3", "IhlenfeldtiaV4", "IhlenfeldtiaV5", "Jacobsenia", "JacobseniaV2", "JacobseniaV3", "JacobseniaV4", "JacobseniaV5", "Khadia", "KhadiaV2", "KhadiaV3", "KhadiaV4", "KhadiaV5", "Malephora", "MalephoraV2", "MalephoraV3", "MalephoraV4", "MalephoraV5", "Mestoklema", "MestoklemaV2", "MestoklemaV3", "MestoklemaV4", "MestoklemaV5", "Nelia", "NeliaV2", "NeliaV3", "NeliaV4", "NeliaV5", "Ophthalmophyllum", "OphthalmophyllumV2", "OphthalmophyllumV3", "OphthalmophyllumV4", "OphthalmophyllumV5", "Orthopterum", "OrthopterumV2", "OrthopterumV3", "OrthopterumV4", "OrthopterumV5", "Oscularia", "OsculariaV2", "OsculariaV3", "OsculariaV4", "OsculariaV5", "Peersia", "PeersiaV2", "PeersiaV3", "PeersiaV4", "PeersiaV5", "Polymita", "PolymitaV2", "PolymitaV3", "PolymitaV4", "PolymitaV5", "Psammophora", "PsammophoraV2", "PsammophoraV3", "PsammophoraV4", "PsammophoraV5", "Ruschianthus", "RuschianthusV2", "RuschianthusV3", "RuschianthusV4", "RuschianthusV5", "Ruschiella", "RuschiellaV2", "RuschiellaV3", "RuschiellaV4", "RuschiellaV5", "Saphesia", "SaphesiaV2", "SaphesiaV3", "SaphesiaV4", "SaphesiaV5", "Schlechteranthus", "SchlechteranthusV2", "SchlechteranthusV3", "SchlechteranthusV4", "SchlechteranthusV5", "Scopelogena", "ScopelogenaV2", "ScopelogenaV3", "ScopelogenaV4", "ScopelogenaV5", "Semnanthe", "SemnantheV2", "SemnantheV3", "SemnantheV4", "SemnantheV5", "Stoeberia", "StoeberiaV2", "StoeberiaV3", "StoeberiaV4", "StoeberiaV5", "Trichodiadema", "TrichodiademaV2", "TrichodiademaV3", "TrichodiademaV4", "TrichodiademaV5", "Vanzijlia", "VanzijliaV2", "VanzijliaV3", "VanzijliaV4", "VanzijliaV5", "Vlokia", "VlokiaV2", "VlokiaV3", "VlokiaV4", "VlokiaV5"), setOf("Custom")) { options.rotationsActive }
+
+    // === Jitter Parameters ===
+    val yawMicroJitter by floatRange("YawMicroJitter", 0f..0f, 0f..5f) { options.rotationsActive }
+    val pitchMicroJitter by floatRange("PitchMicroJitter", 0f..0f, 0f..5f) { options.rotationsActive }
+    val yawMacroJitter by floatRange("YawMacroJitter", 0f..0f, 0f..30f) { options.rotationsActive }
+    val pitchMacroJitter by floatRange("PitchMacroJitter", 0f..0f, 0f..30f) { options.rotationsActive }
+    val jitterDecayRate by floatRange("JitterDecayRate", 0.95f..0.99f, 0.5f..1f) { options.rotationsActive }
+    val jitterCorrelationTime by floatRange("JitterCorrelationTime", 50f..200f, 0f..1000f, "ms") { options.rotationsActive }
+    val jitterIntensityScale by floatRange("JitterIntensityScale", 0.5f..1.5f, 0f..5f) { options.rotationsActive }
+    val jitterAsymmetryYaw by floatRange("JitterAsymmetryYaw", -0.5f..0.5f, -2f..2f) { options.rotationsActive }
+    val jitterAsymmetryPitch by floatRange("JitterAsymmetryPitch", -0.3f..0.3f, -2f..2f) { options.rotationsActive }
+    val jitterBurstProbability by floatRange("JitterBurstProbability", 0.01f..0.05f, 0f..0.5f) { options.rotationsActive }
+    val jitterBurstAmplitude by floatRange("JitterBurstAmplitude", 5f..15f, 0f..50f) { options.rotationsActive }
+    val jitterTemporalSmoothing by floatRange("JitterTemporalSmoothing", 0.3f..0.7f, 0f..1f) { options.rotationsActive }
+    val jitterSpectralTilt by floatRange("JitterSpectralTilt", -3f..-1f, -6f..0f) { options.rotationsActive }
+    val jitterAdaptiveGain by floatRange("JitterAdaptiveGain", 0.8f..1.2f, 0f..3f) { options.rotationsActive }
+    val jitterNoiseColor by floatRange("JitterNoiseColor", 0f..2f, -2f..4f) { options.rotationsActive }
+    val jitterQuantizationStep by floatRange("JitterQuantizationStep", 0.001f..0.01f, 0f..0.1f) { options.rotationsActive }
+    val jitterFractalDimension by floatRange("JitterFractalDimension", 1.2f..1.8f, 1f..2f) { options.rotationsActive }
+    val jitterHurstExponent by floatRange("JitterHurstExponent", 0.5f..0.9f, 0.01f..0.99f) { options.rotationsActive }
+    val jitterOnsetSpeed by floatRange("JitterOnsetSpeed", 0.5f..2f, 0.1f..10f) { options.rotationsActive }
+    val jitterOffsetSpeed by floatRange("JitterOffsetSpeed", 0.3f..1.5f, 0.1f..10f) { options.rotationsActive }
+
+    // === Sine Wave Parameters ===
+    val sineAmplitude by floatRange("SineAmplitude", 0f..0f, 0f..10f) { options.rotationsActive }
+    val sineFrequency by floatRange("SineFrequency", 0.5f..2f, 0.01f..20f) { options.rotationsActive }
+    val sinePhase by floatRange("SinePhase", 0f..6.28f, 0f..6.28f) { options.rotationsActive }
+    val sineDecay by floatRange("SineDecay", 0f..0.1f, 0f..1f) { options.rotationsActive }
+    val sineHarmonic2Amplitude by floatRange("SineHarmonic2Amp", 0f..0f, 0f..5f) { options.rotationsActive }
+    val sineHarmonic3Amplitude by floatRange("SineHarmonic3Amp", 0f..0f, 0f..3f) { options.rotationsActive }
+    val sineHarmonic4Amplitude by floatRange("SineHarmonic4Amp", 0f..0f, 0f..2f) { options.rotationsActive }
+    val sineHarmonic5Amplitude by floatRange("SineHarmonic5Amp", 0f..0f, 0f..1f) { options.rotationsActive }
+    val sinePhaseModulationDepth by floatRange("SinePhaseModDepth", 0f..0.5f, 0f..3.14f) { options.rotationsActive }
+    val sinePhaseModulationRate by floatRange("SinePhaseModRate", 0.1f..1f, 0f..10f) { options.rotationsActive }
+    val sineAmplitudeModulationDepth by floatRange("SineAmpModDepth", 0f..0.3f, 0f..1f) { options.rotationsActive }
+    val sineAmplitudeModulationRate by floatRange("SineAmpModRate", 0.05f..0.5f, 0f..5f) { options.rotationsActive }
+    val sineFrequencyDrift by floatRange("SineFreqDrift", -0.01f..0.01f, -0.1f..0.1f) { options.rotationsActive }
+    val sineDCOffset by floatRange("SineDCOffset", -0.5f..0.5f, -5f..5f) { options.rotationsActive }
+    val sineClippingThreshold by floatRange("SineClipThreshold", 5f..10f, 0f..20f) { options.rotationsActive }
+
+    // === Waveform Parameters ===
+    val waveformType by choices("WaveformType", arrayOf("Sine", "Cosine", "Triangle", "Sawtooth", "Square", "Pulse", "Staircase", "Sinc", "Gaussian", "Chirp"), "Sine") { options.rotationsActive }
+    val waveformDutyCycle by floatRange("WaveformDutyCycle", 0.5f..0.5f, 0.01f..0.99f) { options.rotationsActive }
+    val waveformRiseTime by floatRange("WaveformRiseTime", 0.1f..0.3f, 0f..1f) { options.rotationsActive }
+    val waveformFallTime by floatRange("WaveformFallTime", 0.1f..0.3f, 0f..1f) { options.rotationsActive }
+    val waveformSymmetry by floatRange("WaveformSymmetry", 0.5f..0.5f, 0f..1f) { options.rotationsActive }
+    val waveformOvershoot by floatRange("WaveformOvershoot", 0f..0.1f, 0f..1f) { options.rotationsActive }
+    val waveformPreshoot by floatRange("WaveformPreshoot", 0f..0.05f, 0f..0.5f) { options.rotationsActive }
+    val waveformRingingFreq by floatRange("WaveformRingingFreq", 5f..15f, 0f..50f) { options.rotationsActive }
+    val waveformRingingDecay by floatRange("WaveformRingingDecay", 0.5f..0.9f, 0f..1f) { options.rotationsActive }
+
+    // === Kalman Filter Parameters ===
+    val kalmanProcessNoise by floatRange("Kalman-ProcessNoise", 0.01f..0.05f, 0f..1f) { options.rotationsActive }
+    val kalmanMeasurementNoise by floatRange("Kalman-MeasurementNoise", 0.1f..0.5f, 0f..5f) { options.rotationsActive }
+    val kalmanInitialStateUncertainty by floatRange("Kalman-InitUncertainty", 1f..5f, 0f..20f) { options.rotationsActive }
+    val kalmanAdaptationRate by floatRange("Kalman-AdaptRate", 0.01f..0.1f, 0f..1f) { options.rotationsActive }
+    val kalmanSmoothingFactor by floatRange("Kalman-SmoothFactor", 0.8f..0.98f, 0f..1f) { options.rotationsActive }
+    val kalmanPredictionHorizon by intRange("Kalman-PredHorizon", 1..3, 1..10) { options.rotationsActive }
+    val kalmanInnovationGateSize by floatRange("Kalman-InnovGate", 2f..3f, 1f..5f) { options.rotationsActive }
+    val kalmanFadingFactor by floatRange("Kalman-FadingFactor", 0.95f..1f, 0.5f..1.5f) { options.rotationsActive }
+    val kalmanStateDimension by intRange("Kalman-StateDim", 2..4, 1..10) { options.rotationsActive }
+    val kalmanObservationDimension by intRange("Kalman-ObsDim", 1..2, 1..5) { options.rotationsActive }
+
+    // === Particle Filter Parameters ===
+    val particleCount by intRange("PF-ParticleCount", 100..500, 10..5000) { options.rotationsActive }
+    val particleResampleThreshold by floatRange("PF-ResampleThresh", 0.5f..0.5f, 0.1f..1f) { options.rotationsActive }
+    val particleDiffusionScale by floatRange("PF-DiffusionScale", 0.01f..0.1f, 0f..1f) { options.rotationsActive }
+    val particleLikelihoodSigma by floatRange("PF-LikelihoodSigma", 0.1f..0.5f, 0.01f..5f) { options.rotationsActive }
+
+    // === Human Simulation Parameters ===
+    val humanReactionDelay by intRange("Human-ReactionDelay", 50..150, 0..500, "ms") { options.rotationsActive }
+    val humanAccelerationPhase by floatRange("Human-AccelPhase", 0.3f..0.5f, 0f..1f) { options.rotationsActive }
+    val humanDecelerationPhase by floatRange("Human-DecelPhase", 0.3f..0.5f, 0f..1f) { options.rotationsActive }
+    val humanOvershootAmount by floatRange("Human-Overshoot", 0.05f..0.15f, 0f..1f) { options.rotationsActive }
+    val humanCorrectionDelay by intRange("Human-CorrectionDelay", 30..80, 0..300, "ms") { options.rotationsActive }
+    val humanCorrectionSmoothness by floatRange("Human-CorrectionSmooth", 0.5f..0.8f, 0f..1f) { options.rotationsActive }
+    val humanFatigueRate by floatRange("Human-FatigueRate", 0.001f..0.01f, 0f..0.1f) { options.rotationsActive }
+    val humanFatigueRecovery by floatRange("Human-FatigueRecovery", 0.005f..0.02f, 0f..0.1f) { options.rotationsActive }
+    val humanTremorAmplitude by floatRange("Human-TremorAmp", 0.1f..0.5f, 0f..5f) { options.rotationsActive }
+    val humanTremorFrequency by floatRange("Human-TremorFreq", 6f..12f, 0f..30f) { options.rotationsActive }
+    val humanMicrosaccadeRate by floatRange("Human-MicrosaccadeRate", 1f..3f, 0f..10f) { options.rotationsActive }
+    val humanMicrosaccadeAmplitude by floatRange("Human-MicrosaccadeAmp", 0.1f..0.3f, 0f..2f) { options.rotationsActive }
+    val humanDriftSpeed by floatRange("Human-DriftSpeed", 0.01f..0.05f, 0f..0.5f) { options.rotationsActive }
+    val humanBlinkSuppression by floatRange("Human-BlinkSuppress", 0.1f..0.3f, 0f..1f) { options.rotationsActive }
+    val humanAttentionVariability by floatRange("Human-AttentionVar", 0.1f..0.3f, 0f..1f) { options.rotationsActive }
+    val humanStressLevel by floatRange("Human-StressLevel", 0f..0.3f, 0f..1f) { options.rotationsActive }
+    val humanExperienceLevel by floatRange("Human-Experience", 0.5f..1f, 0f..1f) { options.rotationsActive }
+    val humanMuscleTension by floatRange("Human-MuscleTension", 0.1f..0.4f, 0f..1f) { options.rotationsActive }
+    val humanHandDominance by floatRange("Human-HandDominance", 0.8f..1f, 0f..1f) { options.rotationsActive }
+    val humanAgeFactor by floatRange("Human-AgeFactor", 0.8f..1.2f, 0.5f..2f) { options.rotationsActive }
+    val humanSensoryNoise by floatRange("Human-SensoryNoise", 0.05f..0.15f, 0f..1f) { options.rotationsActive }
+    val humanMotorNoise by floatRange("Human-MotorNoise", 0.03f..0.1f, 0f..1f) { options.rotationsActive }
+    val humanPlanningHorizon by intRange("Human-PlanHorizon", 50..200, 10..1000, "ms") { options.rotationsActive }
+    val humanAdaptationSpeed by floatRange("Human-AdaptSpeed", 0.01f..0.05f, 0f..0.5f) { options.rotationsActive }
+    val humanLearningRate by floatRange("Human-LearnRate", 0.001f..0.01f, 0f..0.1f) { options.rotationsActive }
+    val humanPredictionErrorWeight by floatRange("Human-PredErrorWeight", 0.5f..0.8f, 0f..1f) { options.rotationsActive }
+
+    // === Anti-ML Parameters ===
+    val antiMLObfuscationStrength by floatRange("AntiML-ObfusStrength", 0.1f..0.3f, 0f..1f) { options.rotationsActive }
+    val antiMLTemporalNoise by floatRange("AntiML-TemporalNoise", 0.05f..0.15f, 0f..1f) { options.rotationsActive }
+    val antiMLFrequencyMasking by floatRange("AntiML-FreqMasking", 0.1f..0.3f, 0f..1f) { options.rotationsActive }
+    val antiMLEntropyInjection by floatRange("AntiML-EntropyInject", 0.05f..0.2f, 0f..1f) { options.rotationsActive }
+    val antiMLPatternBreaking by floatRange("AntiML-PatternBreak", 0.1f..0.2f, 0f..1f) { options.rotationsActive }
+    val antiMLAdversarialPerturb by floatRange("AntiML-AdvPerturb", 0.01f..0.05f, 0f..0.5f) { options.rotationsActive }
+    val antiMLStatisticalDistortion by floatRange("AntiML-StatDistort", 0.05f..0.15f, 0f..1f) { options.rotationsActive }
+    val antiMLFeatureCorruption by floatRange("AntiML-FeatCorrupt", 0.02f..0.1f, 0f..0.5f) { options.rotationsActive }
+    val antiMLGradientNoise by floatRange("AntiML-GradNoise", 0.01f..0.05f, 0f..0.5f) { options.rotationsActive }
+    val antiMLLatentSpaceNoise by floatRange("AntiML-LatentNoise", 0.03f..0.1f, 0f..1f) { options.rotationsActive }
+    val antiMLDistributionShift by floatRange("AntiML-DistShift", 0.05f..0.15f, 0f..1f) { options.rotationsActive }
+    val antiMLDecisionBoundaryNoise by floatRange("AntiML-DecBoundNoise", 0.02f..0.08f, 0f..0.5f) { options.rotationsActive }
+    val antiMLTemporalCorruption by floatRange("AntiML-TempCorrupt", 0.01f..0.05f, 0f..0.5f) { options.rotationsActive }
+    val antiMLSpectralPerturbation by floatRange("AntiML-SpecPerturb", 0.03f..0.1f, 0f..1f) { options.rotationsActive }
+    val antiMLManifoldNoise by floatRange("AntiML-ManifoldNoise", 0.02f..0.08f, 0f..0.5f) { options.rotationsActive }
+    val antiMLAttentionDisruption by floatRange("AntiML-AttnDisrupt", 0.01f..0.05f, 0f..0.3f) { options.rotationsActive }
+    val antiMLEmbeddingPerturbation by floatRange("AntiML-EmbedPerturb", 0.02f..0.06f, 0f..0.5f) { options.rotationsActive }
+    val antiMLActivationNoise by floatRange("AntiML-ActNoise", 0.01f..0.03f, 0f..0.2f) { options.rotationsActive }
+    val antiMLWeightPerturbation by floatRange("AntiML-WeightPerturb", 0.001f..0.005f, 0f..0.05f) { options.rotationsActive }
+    val antiMLBypassDepth by intRange("AntiML-BypassDepth", 1..3, 1..10) { options.rotationsActive }
+
+    // === Statistical Distribution Parameters ===
+    val distGaussianSigma by floatRange("Dist-GaussianSigma", 0.5f..2f, 0.01f..10f) { options.rotationsActive }
+    val distGaussianMu by floatRange("Dist-GaussianMu", -0.5f..0.5f, -5f..5f) { options.rotationsActive }
+    val distPoissonLambda by floatRange("Dist-PoissonLambda", 1f..5f, 0.01f..20f) { options.rotationsActive }
+    val distGammaShape by floatRange("Dist-GammaShape", 1f..3f, 0.01f..10f) { options.rotationsActive }
+    val distGammaScale by floatRange("Dist-GammaScale", 0.5f..2f, 0.01f..10f) { options.rotationsActive }
+    val distBetaAlpha by floatRange("Dist-BetaAlpha", 0.5f..2f, 0.01f..10f) { options.rotationsActive }
+    val distBetaBeta by floatRange("Dist-BetaBeta", 0.5f..2f, 0.01f..10f) { options.rotationsActive }
+    val distWeibullShape by floatRange("Dist-WeibullShape", 0.5f..2f, 0.01f..5f) { options.rotationsActive }
+    val distWeibullScale by floatRange("Dist-WeibullScale", 0.5f..2f, 0.01f..5f) { options.rotationsActive }
+    val distCauchyScale by floatRange("Dist-CauchyScale", 0.1f..1f, 0.01f..5f) { options.rotationsActive }
+    val distStudentTDof by floatRange("Dist-StudentTDof", 3f..10f, 0.1f..30f) { options.rotationsActive }
+    val distLogNormalMu by floatRange("Dist-LogNormMu", -0.5f..0.5f, -5f..5f) { options.rotationsActive }
+    val distLogNormalSigma by floatRange("Dist-LogNormSigma", 0.3f..1f, 0.01f..5f) { options.rotationsActive }
+    val distExponentialRate by floatRange("Dist-ExpRate", 0.5f..2f, 0.01f..10f) { options.rotationsActive }
+    val distLaplaceMu by floatRange("Dist-LaplaceMu", -0.5f..0.5f, -5f..5f) { options.rotationsActive }
+    val distLaplaceB by floatRange("Dist-LaplaceB", 0.1f..1f, 0.01f..5f) { options.rotationsActive }
+    val distVonMisesMu by floatRange("Dist-VonMisesMu", -3.14f..3.14f, -3.14f..3.14f) { options.rotationsActive }
+    val distVonMisesKappa by floatRange("Dist-VonMisesKappa", 0.5f..3f, 0f..10f) { options.rotationsActive }
+    val distUniformMin by floatRange("Dist-UniformMin", -1f..0f, -10f..0f) { options.rotationsActive }
+    val distUniformMax by floatRange("Dist-UniformMax", 0f..1f, 0f..10f) { options.rotationsActive }
+
+    // === Spline & Interpolation Parameters ===
+    val splineTension by floatRange("Spline-Tension", 0f..1f, -1f..2f) { options.rotationsActive }
+    val splineContinuity by floatRange("Spline-Continuity", 0f..0f, -1f..1f) { options.rotationsActive }
+    val splineBias by floatRange("Spline-Bias", 0f..0f, -1f..1f) { options.rotationsActive }
+    val splineDegree by intRange("Spline-Degree", 3..5, 1..10) { options.rotationsActive }
+    val splineSmoothingLambda by floatRange("Spline-SmoothLambda", 0.001f..0.1f, 0f..1f) { options.rotationsActive }
+    val splineKnotCount by intRange("Spline-KnotCount", 5..15, 2..50) { options.rotationsActive }
+    val interpolationMethod by choices("InterpMethod", arrayOf("Linear", "Cubic", "Hermite", "CatmullRom", "Bezier", "BSpline", "NURBS", "Akima", "PCHIP", "Makima"), "Cubic") { options.rotationsActive }
+    val interpolationSmoothing by floatRange("Interp-Smoothing", 0f..0.3f, 0f..1f) { options.rotationsActive }
+    val interpolationExtrapolation by choices("Interp-Extrapolation", arrayOf("None", "Linear", "Periodic", "Mirror", "Constant"), "None") { options.rotationsActive }
+
+    // === Chaos System Parameters ===
+    val chaosLorenzSigma by floatRange("Chaos-LorenzSigma", 10f..10f, 0f..30f) { options.rotationsActive }
+    val chaosLorenzRho by floatRange("Chaos-LorenzRho", 28f..28f, 0f..50f) { options.rotationsActive }
+    val chaosLorenzBeta by floatRange("Chaos-LorenzBeta", 2.667f..2.667f, 0f..10f) { options.rotationsActive }
+    val chaosLogisticR by floatRange("Chaos-LogisticR", 3.9f..3.9f, 0f..4f) { options.rotationsActive }
+    val chaosHenonA by floatRange("Chaos-HenonA", 1.4f..1.4f, 0f..2f) { options.rotationsActive }
+    val chaosHenonB by floatRange("Chaos-HenonB", 0.3f..0.3f, 0f..1f) { options.rotationsActive }
+    val chaosTentMu by floatRange("Chaos-TentMu", 1.5f..1.5f, 0f..2f) { options.rotationsActive }
+    val chaosIkedaU by floatRange("Chaos-IkedaU", 0.9f..0.9f, 0f..1f) { options.rotationsActive }
+    val chaosStepSize by floatRange("Chaos-StepSize", 0.01f..0.01f, 0.001f..0.1f) { options.rotationsActive }
+    val chaosScale by floatRange("Chaos-Scale", 0.1f..1f, 0f..10f) { options.rotationsActive }
+
+    // === Noise Color Parameters ===
+    val noiseColorSlope by floatRange("Noise-ColorSlope", 0f..2f, -4f..4f) { options.rotationsActive }
+    val noiseColorAmplitude by floatRange("Noise-ColorAmp", 0.1f..1f, 0f..10f) { options.rotationsActive }
+    val noiseColorCutoffFreq by floatRange("Noise-ColorCutoff", 0.5f..5f, 0.01f..50f) { options.rotationsActive }
+    val noiseColorOctaves by intRange("Noise-ColorOctaves", 4..8, 1..16) { options.rotationsActive }
+    val noiseColorPersistence by floatRange("Noise-ColorPersist", 0.5f..0.5f, 0.1f..0.9f) { options.rotationsActive }
+    val noiseColorLacunarity by floatRange("Noise-ColorLacunar", 2f..2f, 1f..4f) { options.rotationsActive }
+
+    // === Easing Parameters ===
+    val easingType by choices("EasingType", arrayOf("Linear", "InQuad", "OutQuad", "InOutQuad", "InCubic", "OutCubic", "InOutCubic", "InQuart", "OutQuart", "InOutQuart", "InQuint", "OutQuint", "InOutQuint", "InSine", "OutSine", "InOutSine", "InExpo", "OutExpo", "InOutExpo", "InCirc", "OutCirc", "InOutCirc", "InElastic", "OutElastic", "InOutElastic", "InBack", "OutBack", "InOutBack", "InBounce", "OutBounce", "InOutBounce"), "InOutCubic") { options.rotationsActive }
+    val easingOvershoot by floatRange("Easing-Overshoot", 1.70158f..1.70158f, 0f..5f) { options.rotationsActive }
+    val easingAmplitude by floatRange("Easing-Amplitude", 1f..1f, 0f..3f) { options.rotationsActive }
+    val easingPeriod by floatRange("Easing-Period", 0.3f..0.3f, 0.01f..1f) { options.rotationsActive }
+
+    // === Time Series Parameters ===
+    val timeSeriesAROrder by intRange("TS-AROrder", 1..3, 0..10) { options.rotationsActive }
+    val timeSeriesMAOrder by intRange("TS-MAOrder", 1..2, 0..10) { options.rotationsActive }
+    val timeSeriesDiffOrder by intRange("TS-DiffOrder", 0..1, 0..3) { options.rotationsActive }
+    val timeSeriesSeasonalPeriod by intRange("TS-SeasonPeriod", 0..0, 0..100) { options.rotationsActive }
+    val timeSeriesARCHOrder by intRange("TS-ARCHOrder", 0..1, 0..5) { options.rotationsActive }
+    val timeSeriesGARCHOrder by intRange("TS-GARCHOrder", 0..1, 0..5) { options.rotationsActive }
+    val timeSeriesVolatilityPersistence by floatRange("TS-VolPersist", 0.8f..0.95f, 0f..0.999f) { options.rotationsActive }
+    val timeSeriesLongMemoryParam by floatRange("TS-LongMemParam", 0f..0.5f, 0f..0.99f) { options.rotationsActive }
+
+    // === Entropy & Randomness Parameters ===
+    val entropyTargetRate by floatRange("Entropy-TargetRate", 0.5f..2f, 0f..10f) { options.rotationsActive }
+    val entropyMinEntropy by floatRange("Entropy-MinEntropy", 0.1f..0.5f, 0f..1f) { options.rotationsActive }
+    val entropyCompressionRatio by floatRange("Entropy-CompressRatio", 0.5f..0.9f, 0f..1f) { options.rotationsActive }
+    val entropyKolmogorovBound by floatRange("Entropy-KolmogorovBound", 0.1f..1f, 0f..10f) { options.rotationsActive }
+    val entropyMutualInfoCap by floatRange("Entropy-MutualInfoCap", 0.01f..0.1f, 0f..1f) { options.rotationsActive }
+
+    // === Adaptive Parameters ===
+    val adaptiveLearningRate by floatRange("Adapt-LearnRate", 0.001f..0.01f, 0f..0.1f) { options.rotationsActive }
+    val adaptiveMomentum by floatRange("Adapt-Momentum", 0.9f..0.99f, 0f..1f) { options.rotationsActive }
+    val adaptiveDecayRate by floatRange("Adapt-DecayRate", 0.9f..0.999f, 0f..1f) { options.rotationsActive }
+    val adaptiveEpsilon by floatRange("Adapt-Epsilon", 1e-7f..1e-5f, 1e-10f..1e-2f) { options.rotationsActive }
+    val adaptiveWarmupSteps by intRange("Adapt-WarmupSteps", 10..50, 0..500) { options.rotationsActive }
+    val adaptiveScheduleType by choices("Adapt-Schedule", arrayOf("Constant", "LinearDecay", "CosineDecay", "ExponentialDecay", "WarmupLinear", "WarmupCosine", "OneCycle", "Triangular", "Step"), "WarmupCosine") { options.rotationsActive }
+
+    // === Physics Simulation Parameters ===
+    val physicsSpringConstant by floatRange("Phys-SpringK", 1f..5f, 0f..20f) { options.rotationsActive }
+    val physicsDampingCoeff by floatRange("Phys-DampingC", 0.1f..0.5f, 0f..2f) { options.rotationsActive }
+    val physicsMass by floatRange("Phys-Mass", 0.5f..2f, 0.01f..10f) { options.rotationsActive }
+    val physicsGravity by floatRange("Phys-Gravity", 0f..0.5f, 0f..5f) { options.rotationsActive }
+    val physicsFrictionCoeff by floatRange("Phys-Friction", 0.1f..0.3f, 0f..1f) { options.rotationsActive }
+    val physicsRestitution by floatRange("Phys-Restitution", 0.3f..0.7f, 0f..1f) { options.rotationsActive }
+    val physicsMaxVelocity by floatRange("Phys-MaxVelocity", 5f..20f, 0f..100f) { options.rotationsActive }
+    val physicsTimeStep by floatRange("Phys-TimeStep", 0.016f..0.016f, 0.001f..0.1f) { options.rotationsActive }
+
+    // === Optimization Algorithm Parameters ===
+    val optPopulationSize by intRange("Opt-PopSize", 20..50, 5..200) { options.rotationsActive }
+    val optCrossoverRate by floatRange("Opt-CrossRate", 0.6f..0.9f, 0f..1f) { options.rotationsActive }
+    val optMutationRate by floatRange("Opt-MutRate", 0.01f..0.1f, 0f..0.5f) { options.rotationsActive }
+    val optElitismCount by intRange("Opt-Elitism", 1..3, 0..10) { options.rotationsActive }
+    val optTemperature by floatRange("Opt-Temperature", 1f..10f, 0.01f..100f) { options.rotationsActive }
+    val optCoolingRate by floatRange("Opt-CoolingRate", 0.95f..0.99f, 0.5f..0.999f) { options.rotationsActive }
+    val optInertiaWeight by floatRange("Opt-InertiaW", 0.4f..0.9f, 0f..1f) { options.rotationsActive }
+    val optCognitiveCoeff by floatRange("Opt-CognitiveC", 1.5f..2.5f, 0f..4f) { options.rotationsActive }
+    val optSocialCoeff by floatRange("Opt-SocialC", 1.5f..2.5f, 0f..4f) { options.rotationsActive }
+
+    // === Neural Network Parameters ===
+    val nnHiddenLayers by intRange("NN-HiddenLayers", 1..3, 0..10) { options.rotationsActive }
+    val nnNeuronsPerLayer by intRange("NN-NeuronsPerLayer", 16..64, 1..512) { options.rotationsActive }
+    val nnActivationFunc by choices("NN-Activation", arrayOf("ReLU", "Sigmoid", "Tanh", "GELU", "Swish", "Mish", "ELU", "SELU", "Softplus", "LeakyReLU"), "GELU") { options.rotationsActive }
+    val nnDropoutRate by floatRange("NN-Dropout", 0.1f..0.3f, 0f..0.9f) { options.rotationsActive }
+    val nnWeightDecay by floatRange("NN-WeightDecay", 0.0001f..0.001f, 0f..0.01f) { options.rotationsActive }
+    val nnBatchSize by intRange("NN-BatchSize", 16..64, 1..256) { options.rotationsActive }
+    val nnSequenceLength by intRange("NN-SeqLength", 8..32, 1..128) { options.rotationsActive }
+    val nnAttentionHeads by intRange("NN-AttnHeads", 4..8, 1..32) { options.rotationsActive }
+    val nnEmbeddingDim by intRange("NN-EmbedDim", 32..128, 8..512) { options.rotationsActive }
+
+    // === Sampling Parameters ===
+    val samplingMethod by choices("Sampling-Method", arrayOf("Uniform", "Stratified", "Importance", "Rejection", "MCMC", "Gibbs", "HMC", "NUTS", "Slice", "Langevin"), "MCMC") { options.rotationsActive }
+    val samplingBurnIn by intRange("Sampling-BurnIn", 100..500, 0..5000) { options.rotationsActive }
+    val samplingThinInterval by intRange("Sampling-ThinInterval", 1..5, 1..50) { options.rotationsActive }
+    val samplingStepSize by floatRange("Sampling-StepSize", 0.01f..0.1f, 0.001f..1f) { options.rotationsActive }
+    val samplingAcceptanceTarget by floatRange("Sampling-AcceptTarget", 0.234f..0.65f, 0.01f..0.99f) { options.rotationsActive }
+
+    // === Debug & Monitoring ===
+    val debugMode by boolean("DebugMode", false) { options.rotationsActive }
+    val showNoiseProfile by boolean("ShowNoiseProfile", false) { options.rotationsActive }
+    val showEntropyMeter by boolean("ShowEntropyMeter", false) { options.rotationsActive }
+    val showFrequencySpectrum by boolean("ShowFreqSpectrum", false) { options.rotationsActive }
+    val showPhaseSpace by boolean("ShowPhaseSpace", false) { options.rotationsActive }
+
+    // === Priority Nearest Position (优先瞄准最近位置) ===
+    val priorityNearestEnabled by boolean("PrioNearest-Enabled", true) { options.rotationsActive }
+    val priorityNearestWeight by floatRange("PrioNearest-Weight", 0.5f..0.8f, 0f..1f) { options.rotationsActive }
+    val priorityNearestDistanceScale by floatRange("PrioNearest-DistScale", 1f..1.5f, 0.1f..5f) { options.rotationsActive }
+    val priorityNearestFalloffExponent by floatRange("PrioNearest-FalloffExp", 1f..2f, 0.1f..5f) { options.rotationsActive }
+    val priorityNearestMinDistance by floatRange("PrioNearest-MinDist", 0.5f..1f, 0f..6f) { options.rotationsActive }
+    val priorityNearestMaxDistance by floatRange("PrioNearest-MaxDist", 3f..6f, 1f..64f) { options.rotationsActive }
+    val priorityNearestAngleThreshold by floatRange("PrioNearest-AngleThresh", 30f..60f, 0f..180f) { options.rotationsActive }
+    val priorityNearestAngleDecay by floatRange("PrioNearest-AngleDecay", 0.5f..0.9f, 0f..1f) { options.rotationsActive }
+    val priorityNearestAdaptiveRate by floatRange("PrioNearest-AdaptRate", 0.01f..0.1f, 0f..1f) { options.rotationsActive }
+    val priorityNearestHistoryWeight by floatRange("PrioNearest-HistWeight", 0.2f..0.5f, 0f..1f) { options.rotationsActive }
+    val priorityNearestHistoryLength by intRange("PrioNearest-HistLen", 5..15, 1..100) { options.rotationsActive }
+    val priorityNearestSmoothing by floatRange("PrioNearest-Smoothing", 0.3f..0.7f, 0f..1f) { options.rotationsActive }
+    val priorityNearestYawBias by floatRange("PrioNearest-YawBias", -5f..5f, -30f..30f) { options.rotationsActive }
+    val priorityNearestPitchBias by floatRange("PrioNearest-PitchBias", -3f..3f, -30f..30f) { options.rotationsActive }
+    val priorityNearestVelocityPrediction by floatRange("PrioNearest-VelPred", 0.5f..1f, 0f..3f) { options.rotationsActive }
+    val priorityNearestAccelerationFactor by floatRange("PrioNearest-AccelFactor", 0.1f..0.3f, 0f..1f) { options.rotationsActive }
+    val priorityNearestTickCompensation by intRange("PrioNearest-TickComp", 1..3, 0..10) { options.rotationsActive }
+    val priorityNearestPingCompensation by boolean("PrioNearest-PingComp", true) { options.rotationsActive }
+    val priorityNearestPingScale by floatRange("PrioNearest-PingScale", 0.8f..1.2f, 0f..3f) { options.rotationsActive }
+    val priorityNearestVerticalWeight by floatRange("PrioNearest-VertWeight", 0.6f..1f, 0f..2f) { options.rotationsActive }
+    val priorityNearestHorizontalWeight by floatRange("PrioNearest-HorizWeight", 0.8f..1.2f, 0f..2f) { options.rotationsActive }
+    val priorityNearestEdgeAvoidance by floatRange("PrioNearest-EdgeAvoid", 0.1f..0.3f, 0f..1f) { options.rotationsActive }
+    val priorityNearestNoiseResistance by floatRange("PrioNearest-NoiseResist", 0.5f..0.9f, 0f..1f) { options.rotationsActive }
+
+    // === Priority Magnitude (优先幅度) ===
+    val priorityMagnitudeEnabled by boolean("PrioMag-Enabled", true) { options.rotationsActive }
+    val priorityMagnitudeBase by floatRange("PrioMag-Base", 0.6f..0.9f, 0f..1f) { options.rotationsActive }
+    val priorityMagnitudeDistanceFactor by floatRange("PrioMag-DistFactor", 0.3f..0.6f, 0f..2f) { options.rotationsActive }
+    val priorityMagnitudeAngleFactor by floatRange("PrioMag-AngleFactor", 0.2f..0.5f, 0f..2f) { options.rotationsActive }
+    val priorityMagnitudeHealthFactor by floatRange("PrioMag-HealthFactor", 0.1f..0.3f, 0f..1f) { options.rotationsActive }
+    val priorityMagnitudeThreatFactor by floatRange("PrioMag-ThreatFactor", 0.2f..0.5f, 0f..2f) { options.rotationsActive }
+    val priorityMagnitudeSpeedFactor by floatRange("PrioMag-SpeedFactor", 0.1f..0.3f, 0f..1f) { options.rotationsActive }
+    val priorityMagnitudeExponent by floatRange("PrioMag-Exponent", 1f..2f, 0.1f..5f) { options.rotationsActive }
+    val priorityMagnitudeDecayRate by floatRange("PrioMag-DecayRate", 0.9f..0.99f, 0.5f..1f) { options.rotationsActive }
+    val priorityMagnitudeAttackCountInfluence by floatRange("PrioMag-AtkCountInfl", 0.05f..0.15f, 0f..1f) { options.rotationsActive }
+    val priorityMagnitudeSwitchPenalty by floatRange("PrioMag-SwitchPenalty", 0.1f..0.3f, 0f..1f) { options.rotationsActive }
+    val priorityMagnitudeSwitchCooldown by intRange("PrioMag-SwitchCooldown", 100..300, 0..1000, "ms") { options.rotationsActive }
+    val priorityMagnitudeRampUpTime by intRange("PrioMag-RampUpTime", 50..150, 0..500, "ms") { options.rotationsActive }
+    val priorityMagnitudeRampDownTime by intRange("PrioMag-RampDownTime", 100..300, 0..1000, "ms") { options.rotationsActive }
+    val priorityMagnitudeMaxMagnitude by floatRange("PrioMag-MaxMagnitude", 0.8f..1f, 0f..2f) { options.rotationsActive }
+    val priorityMagnitudeMinMagnitude by floatRange("PrioMag-MinMagnitude", 0.1f..0.3f, 0f..1f) { options.rotationsActive }
+    val priorityMagnitudeOscillationDamping by floatRange("PrioMag-OscDamping", 0.5f..0.9f, 0f..1f) { options.rotationsActive }
+    val priorityMagnitudeAdaptiveThreshold by floatRange("PrioMag-AdaptThresh", 0.3f..0.6f, 0f..1f) { options.rotationsActive }
+    val priorityMagnitudeTemporalSmoothing by floatRange("PrioMag-TempSmooth", 0.3f..0.7f, 0f..1f) { options.rotationsActive }
+    val priorityMagnitudeYawContribution by floatRange("PrioMag-YawContrib", 0.5f..0.8f, 0f..1f) { options.rotationsActive }
+    val priorityMagnitudePitchContribution by floatRange("PrioMag-PitchContrib", 0.3f..0.6f, 0f..1f) { options.rotationsActive }
+    val priorityMagnitudeCrosshairAlignment by floatRange("PrioMag-CrossAlign", 0.4f..0.7f, 0f..1f) { options.rotationsActive }
+    val priorityMagnitudeTargetVelocityWeight by floatRange("PrioMag-TargVelWeight", 0.1f..0.3f, 0f..1f) { options.rotationsActive }
+    val priorityMagnitudeWeaponReachFactor by floatRange("PrioMag-WeaponReach", 0.8f..1.2f, 0f..3f) { options.rotationsActive }
+
+    // === Delayed Rotation on Pass-through (穿过目标延迟转头) ===
+    val passThroughDelayEnabled by boolean("PassDelay-Enabled", true) { options.rotationsActive }
+    val passThroughDelayMs by intRange("PassDelay-DelayMs", 50..150, 0..500, "ms") { options.rotationsActive }
+    val passThroughDelayVariance by intRange("PassDelay-Variance", 10..50, 0..200, "ms") { options.rotationsActive }
+    val passThroughAngleThreshold by floatRange("PassDelay-AngleThresh", 5f..15f, 0f..90f) { options.rotationsActive }
+    val passThroughSpeedThreshold by floatRange("PassDelay-SpeedThresh", 0.5f..2f, 0f..10f) { options.rotationsActive }
+    val passThroughRecoverySpeed by floatRange("PassDelay-RecovSpeed", 0.3f..0.7f, 0.01f..2f) { options.rotationsActive }
+    val passThroughOvershootCompensation by floatRange("PassDelay-OvershootComp", 0.5f..0.9f, 0f..1f) { options.rotationsActive }
+    val passThroughSnapbackStrength by floatRange("PassDelay-SnapbackStr", 0.5f..1f, 0f..2f) { options.rotationsActive }
+    val passThroughEasingType by choices("PassDelay-EasingType", arrayOf("Linear", "Quad", "Cubic", "Expo", "Elastic", "Back", "Bounce"), "Cubic") { options.rotationsActive }
+    val passThroughEasingDuration by intRange("PassDelay-EasingDur", 50..200, 10..1000, "ms") { options.rotationsActive }
+    val passThroughMinDistance by floatRange("PassDelay-MinDist", 0.1f..0.5f, 0f..6f) { options.rotationsActive }
+    val passThroughMaxDistance by floatRange("PassDelay-MaxDist", 1f..3f, 0.5f..64f) { options.rotationsActive }
+    val passThroughPredictionTicks by intRange("PassDelay-PredTicks", 1..3, 0..10) { options.rotationsActive }
+    val passThroughVelocityBlend by floatRange("PassDelay-VelBlend", 0.3f..0.6f, 0f..1f) { options.rotationsActive }
+    val passThroughAccelerationBlend by floatRange("PassDelay-AccelBlend", 0.1f..0.3f, 0f..1f) { options.rotationsActive }
+    val passThroughJerkCompensation by floatRange("PassDelay-JerkComp", 0.05f..0.15f, 0f..0.5f) { options.rotationsActive }
+    val passThroughDampingRatio by floatRange("PassDelay-DampRatio", 0.5f..0.9f, 0.1f..2f) { options.rotationsActive }
+    val passThroughNaturalFrequency by floatRange("PassDelay-NatFreq", 5f..15f, 0.1f..50f) { options.rotationsActive }
+    val passThroughDeadZone by floatRange("PassDelay-DeadZone", 0.5f..2f, 0f..10f) { options.rotationsActive }
+    val passThroughHysteresis by floatRange("PassDelay-Hysteresis", 0.1f..0.5f, 0f..5f) { options.rotationsActive }
+    val passThroughYawDelayScale by floatRange("PassDelay-YawDelayScale", 0.8f..1.2f, 0f..3f) { options.rotationsActive }
+    val passThroughPitchDelayScale by floatRange("PassDelay-PitchDelayScale", 0.6f..1f, 0f..3f) { options.rotationsActive }
+    val passThroughAdaptiveDelay by boolean("PassDelay-AdaptiveDelay", true) { options.rotationsActive }
+    val passThroughAdaptiveScale by floatRange("PassDelay-AdaptiveScale", 0.5f..1.5f, 0f..5f) { options.rotationsActive }
+    val passThroughNoiseDuringDelay by floatRange("PassDelay-NoiseDuring", 0.1f..0.3f, 0f..1f) { options.rotationsActive }
+    val passThroughInterpolationSteps by intRange("PassDelay-InterpSteps", 3..8, 1..20) { options.rotationsActive }
+    val passThroughSplineTension by floatRange("PassDelay-SplineTension", 0f..0.5f, 0f..1f) { options.rotationsActive }
+
+    // === Priority Center Point (优先瞄准中心点) ===
+    val priorityCenterEnabled by boolean("PrioCenter-Enabled", true) { options.rotationsActive }
+    val priorityCenterWeight by floatRange("PrioCenter-Weight", 0.5f..0.8f, 0f..1f) { options.rotationsActive }
+    val priorityCenterRadius by floatRange("PrioCenter-Radius", 0.3f..0.6f, 0f..1f) { options.rotationsActive }
+    val priorityCenterFalloff by floatRange("PrioCenter-Falloff", 1f..2f, 0.1f..5f) { options.rotationsActive }
+    val priorityCenterBiasStrength by floatRange("PrioCenter-BiasStr", 0.3f..0.6f, 0f..1f) { options.rotationsActive }
+    val priorityCenterYawBias by floatRange("PrioCenter-YawBias", -2f..2f, -15f..15f) { options.rotationsActive }
+    val priorityCenterPitchBias by floatRange("PrioCenter-PitchBias", -1f..1f, -15f..15f) { options.rotationsActive }
+    val priorityCenterAdaptiveRate by floatRange("PrioCenter-AdaptRate", 0.01f..0.05f, 0f..0.5f) { options.rotationsActive }
+    val priorityCenterSmoothing by floatRange("PrioCenter-Smoothing", 0.3f..0.7f, 0f..1f) { options.rotationsActive }
+    val priorityCenterDistanceScale by floatRange("PrioCenter-DistScale", 0.8f..1.2f, 0f..3f) { options.rotationsActive }
+    val priorityCenterVelocityCompensation by floatRange("PrioCenter-VelComp", 0.3f..0.6f, 0f..2f) { options.rotationsActive }
+    val priorityCenterAccelerationCompensation by floatRange("PrioCenter-AccelComp", 0.1f..0.3f, 0f..1f) { options.rotationsActive }
+    val priorityCenterTickPrediction by intRange("PrioCenter-TickPred", 1..3, 0..10) { options.rotationsActive }
+    val priorityCenterPingCompensation by boolean("PrioCenter-PingComp", true) { options.rotationsActive }
+    val priorityCenterPingScale by floatRange("PrioCenter-PingScale", 0.8f..1.2f, 0f..3f) { options.rotationsActive }
+    val priorityCenterBodyPointWeight by floatRange("PrioCenter-BodyPtWeight", 0.5f..0.8f, 0f..1f) { options.rotationsActive }
+    val priorityCenterHitboxShrink by floatRange("PrioCenter-HitboxShrink", 0.1f..0.3f, 0f..0.9f) { options.rotationsActive }
+    val priorityCenterGaussianSigma by floatRange("PrioCenter-GaussSigma", 0.3f..0.6f, 0.01f..3f) { options.rotationsActive }
+    val priorityCenterEntropyWeight by floatRange("PrioCenter-EntropyWeight", 0.1f..0.3f, 0f..1f) { options.rotationsActive }
+    val priorityCenterHistoryBlend by floatRange("PrioCenter-HistBlend", 0.2f..0.4f, 0f..1f) { options.rotationsActive }
+    val priorityCenterHistoryLength by intRange("PrioCenter-HistLen", 5..20, 1..100) { options.rotationsActive }
+    val priorityCenterNoiseScale by floatRange("PrioCenter-NoiseScale", 0.05f..0.15f, 0f..1f) { options.rotationsActive }
+    val priorityCenterLockOnStrength by floatRange("PrioCenter-LockOnStr", 0.5f..0.9f, 0f..1f) { options.rotationsActive }
+    val priorityCenterLockOnDecay by floatRange("PrioCenter-LockOnDecay", 0.95f..0.99f, 0.5f..1f) { options.rotationsActive }
+    val priorityCenterVerticalCentering by floatRange("PrioCenter-VertCenter", 0.4f..0.6f, 0f..1f) { options.rotationsActive }
+    val priorityCenterHorizontalCentering by floatRange("PrioCenter-HorizCenter", 0.4f..0.6f, 0f..1f) { options.rotationsActive }
+    val priorityCenterAsymmetryYaw by floatRange("PrioCenter-AsymYaw", -0.1f..0.1f, -1f..1f) { options.rotationsActive }
+    val priorityCenterAsymmetryPitch by floatRange("PrioCenter-AsymPitch", -0.05f..0.05f, -1f..1f) { options.rotationsActive }
+
+    // === Priority Center Point Probability (优先瞄准中心点概率) ===
+    val priorityCenterProbEnabled by boolean("PrioCenterProb-Enabled", true) { options.rotationsActive }
+    val priorityCenterProbBase by floatRange("PrioCenterProb-Base", 0.6f..0.85f, 0f..1f) { options.rotationsActive }
+    val priorityCenterProbDistanceDecay by floatRange("PrioCenterProb-DistDecay", 0.1f..0.3f, 0f..1f) { options.rotationsActive }
+    val priorityCenterProbAngleDecay by floatRange("PrioCenterProb-AngleDecay", 0.05f..0.2f, 0f..1f) { options.rotationsActive }
+    val priorityCenterProbSpeedInfluence by floatRange("PrioCenterProb-SpeedInfl", 0.05f..0.15f, 0f..0.5f) { options.rotationsActive }
+    val priorityCenterProbHealthInfluence by floatRange("PrioCenterProb-HealthInfl", 0.02f..0.1f, 0f..0.5f) { options.rotationsActive }
+    val priorityCenterProbTimeInfluence by floatRange("PrioCenterProb-TimeInfl", 0.01f..0.05f, 0f..0.5f) { options.rotationsActive }
+    val priorityCenterProbMinProbability by floatRange("PrioCenterProb-MinProb", 0.1f..0.3f, 0f..1f) { options.rotationsActive }
+    val priorityCenterProbMaxProbability by floatRange("PrioCenterProb-MaxProb", 0.8f..1f, 0f..1f) { options.rotationsActive }
+    val priorityCenterProbAdaptationRate by floatRange("PrioCenterProb-AdaptRate", 0.01f..0.05f, 0f..0.5f) { options.rotationsActive }
+    val priorityCenterProbSuccessBonus by floatRange("PrioCenterProb-SuccessBonus", 0.02f..0.08f, 0f..0.5f) { options.rotationsActive }
+    val priorityCenterProbFailurePenalty by floatRange("PrioCenterProb-FailPenalty", 0.01f..0.05f, 0f..0.3f) { options.rotationsActive }
+    val priorityCenterProbDecayRate by floatRange("PrioCenterProb-DecayRate", 0.95f..0.99f, 0.5f..1f) { options.rotationsActive }
+    val priorityCenterProbNoiseAmplitude by floatRange("PrioCenterProb-NoiseAmp", 0.01f..0.05f, 0f..0.3f) { options.rotationsActive }
+    val priorityCenterProbNoiseFrequency by floatRange("PrioCenterProb-NoiseFreq", 0.5f..2f, 0f..10f) { options.rotationsActive }
+    val priorityCenterProbDistributionType by choices("PrioCenterProb-DistType", arrayOf("Uniform", "Gaussian", "Beta", "Logistic", "Gumbel", "Cauchy", "Exponential", "Bimodal", "Trimodal", "Mixture"), "Gaussian") { options.rotationsActive }
+    val priorityCenterProbGaussianSigma by floatRange("PrioCenterProb-GaussSigma", 0.2f..0.5f, 0.01f..3f) { options.rotationsActive }
+    val priorityCenterProbBetaAlpha by floatRange("PrioCenterProb-BetaAlpha", 2f..5f, 0.01f..20f) { options.rotationsActive }
+    val priorityCenterProbBetaBeta by floatRange("PrioCenterProb-BetaBeta", 2f..5f, 0.01f..20f) { options.rotationsActive }
+    val priorityCenterProbLogisticK by floatRange("PrioCenterProb-LogisticK", 5f..15f, 0.1f..50f) { options.rotationsActive }
+    val priorityCenterProbLogisticX0 by floatRange("PrioCenterProb-LogisticX0", 0.3f..0.7f, 0f..1f) { options.rotationsActive }
+    val priorityCenterProbTemporalCorrelation by floatRange("PrioCenterProb-TempCorr", 0.3f..0.7f, 0f..1f) { options.rotationsActive }
+    val priorityCenterProbHistoryWeight by floatRange("PrioCenterProb-HistWeight", 0.2f..0.5f, 0f..1f) { options.rotationsActive }
+    val priorityCenterProbHistoryLength by intRange("PrioCenterProb-HistLen", 5..20, 1..100) { options.rotationsActive }
+    val priorityCenterProbSwitchHysteresis by floatRange("PrioCenterProb-SwitchHyst", 0.05f..0.15f, 0f..0.5f) { options.rotationsActive }
+    val priorityCenterProbAttackCountScale by floatRange("PrioCenterProb-AtkCountScale", 0.01f..0.05f, 0f..0.5f) { options.rotationsActive }
+    val priorityCenterProbComboMultiplier by floatRange("PrioCenterProb-ComboMult", 1f..1.5f, 0.5f..3f) { options.rotationsActive }
+    val priorityCenterProbComboDecay by floatRange("PrioCenterProb-ComboDecay", 0.9f..0.98f, 0.5f..1f) { options.rotationsActive }
+    val priorityCenterProbStressModifier by floatRange("PrioCenterProb-StressMod", -0.1f..0.1f, -0.5f..0.5f) { options.rotationsActive }
+    val priorityCenterProbFatigueModifier by floatRange("PrioCenterProb-FatigueMod", -0.05f..0f, -0.3f..0f) { options.rotationsActive }
+    val priorityCenterProbExperienceModifier by floatRange("PrioCenterProb-ExpMod", 0f..0.1f, -0.3f..0.5f) { options.rotationsActive }
+    val priorityCenterProbCrosshairDistanceWeight by floatRange("PrioCenterProb-CrossDistW", 0.3f..0.6f, 0f..1f) { options.rotationsActive }
+    val priorityCenterProbTargetSizeWeight by floatRange("PrioCenterProb-TargSizeW", 0.1f..0.3f, 0f..1f) { options.rotationsActive }
+    val priorityCenterProbMovementPredictWeight by floatRange("PrioCenterProb-MovPredW", 0.2f..0.4f, 0f..1f) { options.rotationsActive }
+    val priorityCenterProbSampleCount by intRange("PrioCenterProb-SampleCount", 10..30, 1..100) { options.rotationsActive }
+    val priorityCenterProbConfidenceThreshold by floatRange("PrioCenterProb-ConfThresh", 0.5f..0.8f, 0f..1f) { options.rotationsActive }
 }

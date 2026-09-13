@@ -1,4 +1,4 @@
-﻿package net.ccbluex.liquidbounce.features.module.modules.rise
+package net.ccbluex.liquidbounce.features.module.modules.rise
 
 import net.ccbluex.liquidbounce.config.*
 import net.ccbluex.liquidbounce.event.*

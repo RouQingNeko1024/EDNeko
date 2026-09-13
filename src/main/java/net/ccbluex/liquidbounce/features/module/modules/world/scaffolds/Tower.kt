@@ -1,5 +1,5 @@
 /*
- * LiquidBounce Hacked Client
+ * FireBounce Hacked Client
  * A free open source mixin-based injection hacked client for Minecraft using Minecraft Forge.
  * https://github.com/CCBlueX/LiquidBounce/
  */
@@ -16,6 +16,7 @@ import net.ccbluex.liquidbounce.utils.client.MinecraftInstance
 import net.ccbluex.liquidbounce.utils.client.PacketUtils.sendPackets
 import net.ccbluex.liquidbounce.utils.extensions.isMoving
 import net.ccbluex.liquidbounce.utils.extensions.tryJump
+import net.ccbluex.liquidbounce.utils.movement.MovementUtils.isBlockUnder
 import net.ccbluex.liquidbounce.utils.inventory.InventoryUtils.blocksAmount
 import net.ccbluex.liquidbounce.utils.timing.TickTimer
 import net.minecraft.init.Blocks.air
@@ -33,6 +34,7 @@ object Tower : Configurable("Tower"), MinecraftInstance, Listenable {
             "Jump",
             "MotionJump",
             "Motion",
+            "Matrix",
             "ConstantMotion",
             "MotionTP",
             "Packet",
@@ -278,6 +280,13 @@ object Tower : Configurable("Tower"), MinecraftInstance, Listenable {
             } else if (player.ticksExisted % 4 == 0) {
                 player.motionY = -0.5
                 player.setPosition(player.posX + 0.035, player.posY, player.posZ)
+            }
+            
+            "matrix" -> {
+                if (mc.gameSettings.keyBindJump.isKeyDown && isBlockUnder() && player.motionY < 0.2) {
+                    player.motionY = 0.42
+                    player.onGround = true
+                }
             }
         }
     }

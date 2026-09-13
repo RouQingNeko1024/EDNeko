@@ -11,6 +11,9 @@ import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.Entity
 import net.minecraft.network.Packet
+import net.minecraft.network.play.client.C03PacketPlayer
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.*
 
 /**
@@ -237,6 +240,18 @@ class ModuleToggleEvent(val module: net.ccbluex.liquidbounce.features.module.Mod
 class BlockBreakEvent(val blockPos: BlockPos, val block: Block) : Event()
 
 class BlockPlaceEvent(val blockPos: BlockPos, val block: Block) : Event()
+
+val Packet<*>.isMovePacket: Boolean
+    get() = this is C03PacketPlayer
+
+val Packet<*>.isRotationPacket: Boolean
+    get() = this is C03PacketPlayer.C05PacketPlayerLook
+
+val Packet<*>.isServerLagPacket: Boolean
+    get() = this is S08PacketPlayerPosLook
+
+val Packet<*>.isPlaceBlockPacket: Boolean
+    get() = this is C08PacketPlayerBlockPlacement
 
 internal val ALL_EVENT_CLASSES = arrayOf(
     PlayerTickEvent::class.java,

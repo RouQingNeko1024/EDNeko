@@ -110,6 +110,8 @@ object LiquidBounce {
 
     var isStarting = true
 
+    private var configSavedByShutdown = false
+
     // Managers
     val moduleManager = ModuleManager
     val commandManager = CommandManager
@@ -286,6 +288,11 @@ object LiquidBounce {
             // Set is starting status
             isStarting = false
 
+            // Register JVM shutdown hook as fallback to save configs on force-close
+            Runtime.getRuntime().addShutdownHook(Thread({
+                stopClient()
+            }, "LiquidBounce-ShutdownHook"))
+
             if (!FileManager.firstStart && FileManager.backedup) {
                 SharedScopes.IO.launch {
                     MiscUtils.showMessageDialog("Warning: backup triggered", "Client update detected! Please check the config folder.")
@@ -301,6 +308,9 @@ object LiquidBounce {
      * Execute if client will be stopped
      */
     fun stopClient() {
+        if (configSavedByShutdown) return
+        configSavedByShutdown = true
+
         // Call client shutdown
         EventManager.call(ClientShutdownEvent)
 

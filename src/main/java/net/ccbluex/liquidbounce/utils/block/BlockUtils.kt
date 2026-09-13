@@ -184,4 +184,29 @@ object BlockUtils : MinecraftInstance {
             else -> ResourceLocation("minecraft:textures/blocks/stone.png")
         }
     }
+
+    fun checkGroundBelow(player: net.minecraft.entity.player.EntityPlayer, distance: Double): Boolean {
+        val world = mc.theWorld ?: return false
+
+        val startX = player.posX
+        val startY = player.posY - 0.1
+        val startZ = player.posZ
+
+        for (i in 1..distance.toInt()) {
+            val checkY = startY - i
+
+            val pos = net.minecraft.util.BlockPos(startX, checkY, startZ)
+
+            val blockState = world.getBlockState(pos)
+            val block = blockState.block
+
+            if (block != null && block !== net.minecraft.init.Blocks.air && !block.isReplaceable(world, pos) &&
+                block.isBlockSolid(world, pos, net.minecraft.util.EnumFacing.UP) &&
+                block.getCollisionBoundingBox(world, pos, blockState) != null) {
+                return true
+            }
+        }
+
+        return false
+    }
 }

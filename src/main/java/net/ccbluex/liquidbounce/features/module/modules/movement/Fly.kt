@@ -15,12 +15,15 @@ import net.ccbluex.liquidbounce.features.module.modules.movement.flymodes.blocks
 import net.ccbluex.liquidbounce.features.module.modules.movement.flymodes.hypixel.BoostHypixel
 import net.ccbluex.liquidbounce.features.module.modules.movement.flymodes.hypixel.FreeHypixel
 import net.ccbluex.liquidbounce.features.module.modules.movement.flymodes.hypixel.Hypixel
+import net.ccbluex.liquidbounce.features.module.modules.movement.flymodes.intave.IntaveFly
 import net.ccbluex.liquidbounce.features.module.modules.movement.flymodes.ncp.NCP
 import net.ccbluex.liquidbounce.features.module.modules.movement.flymodes.ncp.OldNCP
 import net.ccbluex.liquidbounce.features.module.modules.movement.flymodes.other.*
 import net.ccbluex.liquidbounce.features.module.modules.movement.flymodes.spartan.BugSpartan
 import net.ccbluex.liquidbounce.features.module.modules.movement.flymodes.spartan.Spartan
 import net.ccbluex.liquidbounce.features.module.modules.movement.flymodes.spartan.Spartan2
+import net.ccbluex.liquidbounce.features.module.modules.movement.flymodes.tatako.TatakoFly
+import net.ccbluex.liquidbounce.features.module.modules.movement.flymodes.tatako.Tatako0972Fly
 import net.ccbluex.liquidbounce.features.module.modules.movement.flymodes.vanilla.SmoothVanilla
 import net.ccbluex.liquidbounce.features.module.modules.movement.flymodes.vanilla.Vanilla
 import net.ccbluex.liquidbounce.features.module.modules.movement.flymodes.verus.Verus
@@ -48,7 +51,7 @@ object Fly : Module("Fly", Category.MOVEMENT, Keyboard.KEY_P) {
         NCP, OldNCP,
 
         // AAC
-        AAC1910, AAC305, AAC316, AAC3312, AAC3312Glide, AAC3313,
+        AAC1910, AAC305, AAC316, AAC3312, AAC3312Glide, AAC3313, AAC5, SpiterAntivoid,
 
         // CubeCraft
         CubeCraft,
@@ -72,7 +75,10 @@ object Fly : Module("Fly", Category.MOVEMENT, Keyboard.KEY_P) {
         MineSecure, HawkEye, HAC, WatchCat,
 
         // Other
-        Jetpack, KeepAlive, Collide, Jump, Flag, Fireball, Intave1493Lag
+        Jetpack, KeepAlive, Collide, Jump, Flag, Fireball, Intave1493Lag, IntaveFly,
+
+        // Tatako
+        TatakoFly, Tatako0972Fly
     )
 
     /**
@@ -89,7 +95,7 @@ object Fly : Module("Fly", Category.MOVEMENT, Keyboard.KEY_P) {
 
         NCP, OldNCP,
 
-        AAC1910, AAC305, AAC316, AAC3312, AAC3312Glide, AAC3313,
+        AAC1910, AAC305, AAC316, AAC3312, AAC3312Glide, AAC3313, AAC5, SpiterAntivoid,
 
         CubeCraft
     )
@@ -123,6 +129,11 @@ object Fly : Module("Fly", Category.MOVEMENT, Keyboard.KEY_P) {
     val aacFast by boolean("AAC3.0.5-Fast", true) { mode == "AAC3.0.5" }
     val aacMotion by float("AAC3.3.12-Motion", 10f, 0.1f..10f) { mode == "AAC3.3.12" }
     val aacMotion2 by float("AAC3.3.13-Motion", 10f, 0.1f..10f) { mode == "AAC3.3.13" }
+
+    // SpiterAntivoid
+    val spiterFallSpeedThreshold by float("Spiter-FallSpeedBPS", 40f, 1f..200f) { mode == "SpiterAntivoid" }
+    val spiterUpwardMotion by float("Spiter-UpwardMotion", 10f, 0.1f..50f) { mode == "SpiterAntivoid" }
+    val spiterTimerSpeed by float("Spiter-Timer", 0.5f, 0.1f..1f) { mode == "SpiterAntivoid" }
 
     // Hypixel
     val hypixelBoost by boolean("Hypixel-Boost", true) { mode == "Hypixel" }

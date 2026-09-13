@@ -159,6 +159,53 @@ class FloatValue(
     val maximum = range.endInclusive
 }
 
+class DoubleRangeValue(
+    name: String,
+    value: ClosedFloatingPointRange<Double>,
+    val range: ClosedFloatingPointRange<Double>,
+    suffix: String? = null,
+) : Value<ClosedFloatingPointRange<Double>>(name, value, suffix) {
+
+    override fun validate(newValue: ClosedFloatingPointRange<Double>): ClosedFloatingPointRange<Double> {
+        val newStart = newValue.start.coerceIn(range.start, range.endInclusive)
+        val newEnd = newValue.endInclusive.coerceIn(range.start, range.endInclusive)
+        return newStart..newEnd
+    }
+
+    var lastChosenSlider: RangeSlider? = null
+        get() {
+            if (!Mouse.isButtonDown(0)) field = null
+            return field
+        }
+
+    fun setFirst(newValue: Double, immediate: Boolean = true) = set(newValue..value.endInclusive, immediate)
+    fun setLast(newValue: Double, immediate: Boolean = true) = set(value.start..newValue, immediate)
+
+    override fun toJson(): JsonElement = jsonArray {
+        +JsonPrimitive(value.start)
+        +JsonPrimitive(value.endInclusive)
+    }
+
+    override fun fromJsonF(element: JsonElement): ClosedFloatingPointRange<Double>? {
+        val array = (element as? JsonArray)?.takeIf { it.size() == 2 } ?: return null
+        return array[0].asDouble..array[1].asDouble
+    }
+
+    override fun fromTextF(text: String): ClosedFloatingPointRange<Double>? {
+        val (first, last) = text.split("..").takeIf { it.size == 2 } ?: return null
+        return first.toDouble()..last.toDouble()
+    }
+
+    fun isMinimal() = value.start <= minimum
+    fun isMaximal() = value.endInclusive >= maximum
+
+    val minimum = range.start
+    val maximum = range.endInclusive
+
+    val random
+        get() = nextFloat(value.start.toFloat(), value.endInclusive.toFloat()).toDouble()
+}
+
 class FloatRangeValue(
     name: String,
     value: ClosedFloatingPointRange<Float>,

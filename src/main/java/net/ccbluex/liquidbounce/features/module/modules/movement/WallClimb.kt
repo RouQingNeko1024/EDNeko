@@ -18,12 +18,13 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 object WallClimb : Module("WallClimb", Category.MOVEMENT) {
-    private val mode by choices("Mode", arrayOf("Simple", "CheckerClimb", "Clip", "AAC3.3.12", "AACGlide"), "Simple")
+    private val mode by choices("Mode", arrayOf("Simple", "CheckerClimb", "Clip", "AAC3.3.12", "AACGlide", "Matrix", "Polar"), "Simple")
     private val clipMode by choices("ClipMode", arrayOf("Jump", "Fast"), "Fast") { mode == "Clip" }
     private val checkerClimbMotion by float("CheckerClimbMotion", 0f, 0f..1f) { mode == "CheckerClimb" }
 
     private var glitch = false
     private var waited = 0
+    private var airTicks = 0
 
     val onMove = handler<MoveEvent> { event ->
         val thePlayer = mc.thePlayer ?: return@handler
@@ -88,6 +89,25 @@ object WallClimb : Module("WallClimb", Category.MOVEMENT) {
                 if (!thePlayer.isCollidedHorizontally || thePlayer.isOnLadder) return@handler
                 thePlayer.motionY = -0.19
             }
+
+            "matrix" -> {
+                if (thePlayer.motionY < 0)
+                    glitch = true
+                if (thePlayer.isCollidedHorizontally) {
+                    if (thePlayer.onGround) {
+                        thePlayer.motionY = 0.42
+                        airTicks = 0
+                    } else {
+                        airTicks++
+                        if (thePlayer.motionY < 0 && airTicks >= 2)
+                            thePlayer.motionY = -0.3
+                    }
+                }
+            }
+
+            "polar" -> {
+                // Polar mode: no special update logic needed
+            }
         }
     }
 
@@ -111,12 +131,22 @@ object WallClimb : Module("WallClimb", Category.MOVEMENT) {
 
         when (mode.lowercase()) {
             "checkerclimb" -> if (event.y > thePlayer.posY) event.boundingBox = null
-            "clip" ->
+            "clip", "matrix" ->
                 if (event.block == Blocks.air && event.y < thePlayer.posY && thePlayer.isCollidedHorizontally
                     && !thePlayer.isOnLadder && !thePlayer.isInLiquid
                 )
                     event.boundingBox = AxisAlignedBB.fromBounds(0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
                         .offset(thePlayer.posX, thePlayer.posY.toInt() - 1.0, thePlayer.posZ)
+            "polar" -> {
+                event.boundingBox?.let { bb ->
+                    if (event.y >= mc.thePlayer.posY || (mc.thePlayer.isSneaking && mc.thePlayer.onGround)) {
+                        event.boundingBox = AxisAlignedBB(
+                            bb.minX + 0.0001, bb.minY, bb.minZ + 0.0001,
+                            bb.maxX - 0.0001, bb.maxY, bb.maxZ - 0.0001
+                        )
+                    }
+                }
+            }
         }
     }
 }

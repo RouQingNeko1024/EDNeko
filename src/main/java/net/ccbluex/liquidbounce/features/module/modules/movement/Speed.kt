@@ -13,6 +13,7 @@ import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.aac.
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.aac.AACHop5
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.aac.AACPortFDP
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.grim.Grim
+import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.grim.NewGrim
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.hypixel.HypixelHop
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.hypixel.HypixelLowHop
 import net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.intave.IntaveHop
@@ -82,6 +83,7 @@ object Speed : Module("Speed", Category.MOVEMENT, Keyboard.KEY_X) {
 
         // Grim
         Grim,
+        NewGrim,
 
         // Matrix
         OldMatrixHop,

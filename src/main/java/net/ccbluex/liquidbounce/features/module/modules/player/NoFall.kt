@@ -11,7 +11,14 @@ import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.aac.A
 import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.aac.AAC3311
 import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.aac.AAC3315
 import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.aac.LAAC
+import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.grim.Grim117
+import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.grim.OldGrim
 import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.matrix.Matrix
+import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.matrix.Matrix62x
+import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.matrix.Matrix62xPacket
+import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.matrix.Matrix663
+import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.matrix.Matrix6632
+import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.matrix.MatrixCollide
 import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.matrix.MatrixNew
 import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.matrix.MatrixSpoof
 import net.ccbluex.liquidbounce.features.module.modules.player.nofallmodes.other.*
@@ -31,6 +38,7 @@ object NoFall : Module("NoFall", Category.PLAYER) {
         SpoofGround,
         NoGround,
         Packet,
+        Packet2,
         Cancel,
         MLG,
         Blink,
@@ -41,6 +49,10 @@ object NoFall : Module("NoFall", Category.PLAYER) {
         LAAC,
         AAC3311,
         AAC3315,
+
+        // Grim
+        Grim117,
+        OldGrim,
 
         // Hypixel (Watchdog)
         Hypixel,
@@ -53,10 +65,16 @@ object NoFall : Module("NoFall", Category.PLAYER) {
         Matrix,
         MatrixNew,
         MatrixSpoof,
+        Matrix62x,
+        Matrix62xPacket,
+        Matrix663,
+        Matrix6632,
+        MatrixCollide,
 
         // Other Server
         Spartan,
         CubeCraft,
+        BlocksMC,
     )
 
     private val modes = noFallModes.map { it.modeName }.toTypedArray()

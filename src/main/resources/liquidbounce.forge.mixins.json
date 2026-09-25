@@ -1,6 +1,7 @@
 {
   "required": true,
   "package": "net.ccbluex.liquidbounce.injection.forge.mixins",
+  "plugin": "net.ccbluex.liquidbounce.injection.forge.MixinRefmapPlugin",
   "refmap": "liquidbounce.mixins.refmap.json",
   "compatibilityLevel": "JAVA_8",
   "minVersion": "0.7",

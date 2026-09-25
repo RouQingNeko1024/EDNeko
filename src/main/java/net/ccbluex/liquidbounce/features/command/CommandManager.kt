@@ -5,6 +5,7 @@
 package net.ccbluex.liquidbounce.features.command
 
 import net.ccbluex.liquidbounce.features.command.commands.*
+import net.ccbluex.liquidbounce.features.command.commands.ViaCommand
 import net.ccbluex.liquidbounce.features.command.shortcuts.Shortcut
 import net.ccbluex.liquidbounce.features.command.shortcuts.ShortcutParser
 import net.ccbluex.liquidbounce.features.command.special.*
@@ -42,6 +43,7 @@ object CommandManager {
         registerCommand(UsernameCommand)
         registerCommand(TargetCommand)
         registerCommand(TacoCommand)
+        registerCommand(ViaCommand)
         registerCommand(BindsCommand)
         registerCommand(HoloStandCommand)
         registerCommand(PanicCommand)

@@ -288,6 +288,9 @@ object LiquidBounce {
             // Set is starting status
             isStarting = false
 
+            // 启动每 10 秒自动保存 values.json
+            FileManager.startAutoSave()
+
             // Register JVM shutdown hook as fallback to save configs on force-close
             Runtime.getRuntime().addShutdownHook(Thread({
                 stopClient()

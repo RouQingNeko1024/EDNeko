@@ -98,6 +98,7 @@ object KillAura : Module("KillAura", Category.KILLAURA, Keyboard.KEY_R) {
         } else {
             CustomizableController.closeEditor()
             CustomizableController.disable()
+            RotationUtils.smoothResetRotation()
         }
     }
 
@@ -157,16 +158,8 @@ object KillAura : Module("KillAura", Category.KILLAURA, Keyboard.KEY_R) {
         KillAuraDebug.reset()
 
         // 处理 Customizable 模式
-        if (customizable.get()) {
-            if (state) {
-                CustomizableController.enable()
-            } else {
-                CustomizableController.disable()
-            }
-        } else {
-            if (!state) {
-                CustomizableController.disable()
-            }
+        if (customizable.get() && state) {
+            CustomizableController.enable()
         }
 
         if (KillAuraAutoBlock.blinkAutoBlock) {
@@ -187,7 +180,7 @@ object KillAura : Module("KillAura", Category.KILLAURA, Keyboard.KEY_R) {
         }
 
         if (!state) {
-            RotationUtils.resetRotation()
+            RotationUtils.smoothResetRotation()
         }
     }
 

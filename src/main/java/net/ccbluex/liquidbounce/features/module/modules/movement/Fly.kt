@@ -133,7 +133,9 @@ object Fly : Module("Fly", Category.MOVEMENT, Keyboard.KEY_P) {
     // SpiterAntivoid
     val spiterFallSpeedThreshold by float("Spiter-FallSpeedBPS", 40f, 1f..200f) { mode == "SpiterAntivoid" }
     val spiterUpwardMotion by float("Spiter-UpwardMotion", 10f, 0.1f..50f) { mode == "SpiterAntivoid" }
-    val spiterTimerSpeed by float("Spiter-Timer", 0.5f, 0.1f..1f) { mode == "SpiterAntivoid" }
+    val spiterTimerSpeed by float("Spiter-Timer", 0.5f, 0.1f..10f) { mode == "SpiterAntivoid" }
+    val spiterOnceTrigger by boolean("Spiter-OnceTrigger", false) { mode == "SpiterAntivoid" }
+    val spiterForwardMotion by float("Spiter-ForwardMotion", 0f, 0f..10f) { mode == "SpiterAntivoid" }
 
     // Hypixel
     val hypixelBoost by boolean("Hypixel-Boost", true) { mode == "Hypixel" }

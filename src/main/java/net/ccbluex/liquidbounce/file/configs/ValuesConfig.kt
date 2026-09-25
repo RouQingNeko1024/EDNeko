@@ -4,6 +4,7 @@
  */
 package net.ccbluex.liquidbounce.file.configs
 
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import net.ccbluex.liquidbounce.LiquidBounce
 import net.ccbluex.liquidbounce.LiquidBounce.commandManager
@@ -17,6 +18,7 @@ import net.ccbluex.liquidbounce.file.configs.models.ClientConfiguration
 import net.ccbluex.liquidbounce.ui.client.GuiMainMenu
 import net.ccbluex.liquidbounce.ui.client.altmanager.menus.altgenerator.GuiTheAltening.Companion.apiKey
 import net.ccbluex.liquidbounce.utils.attack.EntityUtils.Targets
+import net.ccbluex.liquidbounce.utils.client.ClientUtils.LOGGER
 import net.ccbluex.liquidbounce.utils.io.readJson
 import java.io.*
 
@@ -99,17 +101,27 @@ class ValuesConfig(file: File) : FileConfig(file) {
      *
      * @throws IOException
      */
-    @Throws(IOException::class)
     override fun saveConfig() {
+        println("[ValuesConfig] saveConfig() called for file: ${file.absolutePath}")
+
         val jsonObject = JsonObject()
-        jsonObject.run {
-            addProperty("CommandPrefix", commandManager.prefix)
-            addProperty("ClientVersion", LiquidBounce.clientVersionText)
+
+        jsonObject.addProperty("CommandPrefix", commandManager.prefix)
+        jsonObject.addProperty("ClientVersion", LiquidBounce.clientVersionText)
+
+        try {
+            jsonObject.add(Targets.name, Targets.toJson())
+        } catch (e: Exception) {
+            println("[ValuesConfig] FAILED to serialize Targets: ${e.message}")
+            LOGGER.error("[ValuesConfig] Failed to serialize Targets", e)
         }
 
-        jsonObject.add(Targets.name, Targets.toJson())
-
-        jsonObject.add(ClientFixes.name, ClientFixes.toJson())
+        try {
+            jsonObject.add(ClientFixes.name, ClientFixes.toJson())
+        } catch (e: Exception) {
+            println("[ValuesConfig] FAILED to serialize ClientFixes: ${e.message}")
+            LOGGER.error("[ValuesConfig] Failed to serialize ClientFixes", e)
+        }
 
         val theAlteningObject = JsonObject()
         theAlteningObject.addProperty("API-Key", apiKey)
@@ -119,20 +131,64 @@ class ValuesConfig(file: File) : FileConfig(file) {
         capeObject.addProperty("TransferCode", CapeService.knownToken)
         jsonObject.add("DonatorCape", capeObject)
 
-        jsonObject.add(ClientConfiguration.name, ClientConfiguration.toJson())
+        try {
+            jsonObject.add(ClientConfiguration.name, ClientConfiguration.toJson())
+        } catch (e: Exception) {
+            println("[ValuesConfig] FAILED to serialize ClientConfiguration: ${e.message}")
+            LOGGER.error("[ValuesConfig] Failed to serialize ClientConfiguration", e)
+        }
+
+        // Serialize all modules and their values
+        var moduleCount = 0
+        var valueCount = 0
+        var errorCount = 0
 
         for (module in moduleManager) {
             if (module.values.isEmpty()) continue
 
-            val jsonModule = JsonObject()
-            for (value in module.values) jsonModule.add(value.name, value.toJson())
-            jsonObject.add(module.name, jsonModule)
+            try {
+                val jsonModule = JsonObject()
+                for (value in module.values) {
+                    try {
+                        val jsonElement: JsonElement? = value.toJson()
+                        if (jsonElement != null) {
+                            jsonModule.add(value.name, jsonElement)
+                            valueCount++
+                        }
+                    } catch (e: Exception) {
+                        errorCount++
+                        println("[ValuesConfig] FAILED to serialize value '${value.name}' in module '${module.name}': ${e.message}")
+                        LOGGER.error("[ValuesConfig] Failed to serialize value '${value.name}' in module '${module.name}'", e)
+                    }
+                }
+                if (jsonModule.entrySet().isNotEmpty()) {
+                    jsonObject.add(module.name, jsonModule)
+                    moduleCount++
+                }
+            } catch (e: Exception) {
+                errorCount++
+                println("[ValuesConfig] FAILED to serialize module '${module.name}': ${e.message}")
+                LOGGER.error("[ValuesConfig] Failed to serialize module '${module.name}'", e)
+            }
         }
 
-        val popupData = JsonObject()
-        GuiMainMenu.lastWarningTime?.let { popupData.addProperty("lastWarningTime", it) }
-        jsonObject.add("popup", popupData)
+        try {
+            val popupData = JsonObject()
+            GuiMainMenu.lastWarningTime?.let { popupData.addProperty("lastWarningTime", it) }
+            jsonObject.add("popup", popupData)
+        } catch (e: Exception) {
+            println("[ValuesConfig] FAILED to serialize popup: ${e.message}")
+            LOGGER.error("[ValuesConfig] Failed to serialize popup", e)
+        }
 
-        file.writeText(PRETTY_GSON.toJson(jsonObject))
+        // Convert to JSON string
+        val jsonString = PRETTY_GSON.toJson(jsonObject)
+
+        println("[ValuesConfig] Serialized: $moduleCount modules, $valueCount values, $errorCount errors, ${jsonString.length} chars")
+
+        // Write to file
+        file.writeText(jsonString)
+
+        println("[ValuesConfig] Successfully saved ${file.name} (${file.length()} bytes on disk)")
     }
 }

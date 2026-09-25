@@ -406,7 +406,7 @@ class MultiListValue(
 
     override fun toJson(): JsonElement {
         val arr = JsonArray()
-        get().forEach { arr.add(it) }
+        get().forEach { arr.add(JsonPrimitive(it)) }
         return arr
     }
 

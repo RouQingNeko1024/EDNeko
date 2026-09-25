@@ -691,6 +691,7 @@ class NeverloseScreen : GuiScreen() {
         Category.EXPLOIT -> "◎"
         Category.FUN -> "★"
         Category.CLIENT -> "⚙"
+        Category.DEV -> "⚡"
         Category.RISE -> "R"
     }
 

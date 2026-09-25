@@ -28,6 +28,7 @@ import net.ccbluex.liquidbounce.features.module.modules.`fun`.DrugHallucination
 import net.ccbluex.liquidbounce.features.module.modules.`fun`.Myopia
 import net.ccbluex.liquidbounce.features.module.modules.misc.*
 import net.ccbluex.liquidbounce.features.module.modules.movement.*
+import net.ccbluex.liquidbounce.features.module.modules.dev.*
 import net.ccbluex.liquidbounce.features.module.modules.music.MusicPlayer
 import net.ccbluex.liquidbounce.features.module.modules.client.*
 import net.ccbluex.liquidbounce.features.module.modules.player.*
@@ -291,6 +292,7 @@ object ModuleManager : Listenable, Collection<Module> by MODULE_REGISTRY {
             Glint,
             FollowTargetHud,
             MotionBlur,
+            FakeF3,
             DrugHallucination,
             Myopia,
             SmartBlink,
@@ -302,6 +304,14 @@ object ModuleManager : Listenable, Collection<Module> by MODULE_REGISTRY {
             FireballTrajectory,
             AutoBlock,
             AntiKnockBack,
+
+            // Dev modules
+            Via,
+            IntaveRotationBypass,
+            IntaveClickBypass,
+            IntaveTimerBypass,
+            IntaveMovementBypass,
+            IntavePreAttackBypass,
 
             RiseComboOneHit,
             RiseCriticals,

@@ -19,6 +19,7 @@ enum class Category(val displayName: String) {
     EXPLOIT("漏洞"),
     FUN("娱乐"),
     CLIENT("客户端"),
+    DEV("开发"),
     RISE("Rise");
 
     companion object {

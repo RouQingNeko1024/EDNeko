@@ -14,7 +14,11 @@ import net.ccbluex.liquidbounce.file.configs.*
 import net.ccbluex.liquidbounce.utils.client.ClientUtils.LOGGER
 import net.ccbluex.liquidbounce.utils.client.MinecraftInstance
 import net.ccbluex.liquidbounce.utils.io.*
+import net.ccbluex.liquidbounce.utils.kotlin.SharedScopes
 import net.ccbluex.liquidbounce.utils.render.shader.Background
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import java.io.File
@@ -49,6 +53,8 @@ object FileManager : MinecraftInstance, Iterable<FileConfig> by FILE_CONFIGS {
         private set
 
     val PRETTY_GSON: Gson = GsonBuilder().setPrettyPrinting().create()
+
+    private var autoSaveJob: Job? = null
 
     /**
      * Constructor of file manager
@@ -167,13 +173,19 @@ object FileManager : MinecraftInstance, Iterable<FileConfig> by FILE_CONFIGS {
      * @param ignoreStarting check starting
      */
     fun saveConfig(config: FileConfig, ignoreStarting: Boolean = true) {
-        if (ignoreStarting && isStarting) return
+        if (ignoreStarting && isStarting) {
+            println("[FileManager] Skipped saving ${config.file.name}: isStarting=true")
+            LOGGER.debug("[FileManager] Skipped saving ${config.file.name}: isStarting=true")
+            return
+        }
 
         try {
             if (!config.hasConfig()) config.createConfig()
             config.saveConfig()
+            println("[FileManager] Saved config: ${config.file.name}")
             LOGGER.info("[FileManager] Saved config: ${config.file.name}.")
         } catch (t: Throwable) {
+            println("[FileManager] FAILED to save config ${config.file.name}: ${t.message}")
             LOGGER.error("[FileManager] Failed to save config file: ${config.file.name}.", t)
         }
     }
@@ -191,5 +203,29 @@ object FileManager : MinecraftInstance, Iterable<FileConfig> by FILE_CONFIGS {
         if (backgroundFile != null) {
             background = Background.fromFile(backgroundFile)
         }
+    }
+
+    /**
+     * 启动自动保存协程，每 10 秒自动保存 values.json
+     * 在客户端启动完成后调用
+     */
+    fun startAutoSave() {
+        autoSaveJob?.cancel()
+        println("[FileManager] Starting auto-save (every 10 seconds)")
+        autoSaveJob = SharedScopes.IO.launch {
+            while (true) {
+                delay(10000L) // 每 10 秒
+                if (!isStarting) {
+                    try {
+                        println("[FileManager] Auto-save triggered")
+                        saveConfig(valuesConfig, false)
+                    } catch (e: Exception) {
+                        println("[FileManager] Auto-save FAILED: ${e.message}")
+                        LOGGER.error("[FileManager] Auto-save failed", e)
+                    }
+                }
+            }
+        }
+        LOGGER.info("[FileManager] Auto-save started (every 10 seconds)")
     }
 }

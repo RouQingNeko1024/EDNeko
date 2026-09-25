@@ -110,6 +110,13 @@ object RotationUtils : MinecraftInstance, Listenable {
 
     var resetTicks = 0
 
+    /**
+     * Flag indicating that a [smoothResetRotation] is in progress,
+     * so [update] MUST fully clear the rotation system when [resetTicks] reaches 0.
+     * Prevents old module rotation settings from leaking into normal gameplay.
+     */
+    private var isSmoothResetting = false
+
     fun getRotationDifference(entity: Entity): Double {
         val rotation = toRotation(getCenter(entity.entityBoundingBox), true)
         return getRotationDifference(rotation, Rotation(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch))
@@ -986,6 +993,8 @@ object RotationUtils : MinecraftInstance, Listenable {
 
         resetTicks = if (!options.applyServerSide || !options.resetTicksValue.isSupported()) 1 else ticks
 
+        // 新的目标旋转设置清除平滑复位标志，防止被强制清理中断
+        isSmoothResetting = false
         activeSettings = options
 
         if (options.immediate) {
@@ -994,6 +1003,7 @@ object RotationUtils : MinecraftInstance, Listenable {
     }
     fun resetRotation() {
         resetTicks = 0
+        isSmoothResetting = false
         currentRotation?.let { (yaw, _) ->
             mc.thePlayer?.let {
                 it.rotationYaw = yaw + angleDifference(it.rotationYaw, yaw)
@@ -1003,6 +1013,32 @@ object RotationUtils : MinecraftInstance, Listenable {
         targetRotation = null
         currentRotation = null
         activeSettings = null
+    }
+
+    /**
+     * 平滑复位旋转 — 不是瞬间恢复，而是利用现有的角度限制系统
+     * (HorizontalAngleChange / VerticalAngleChange) 将视角平滑恢复到玩家实际视角。
+     * 适用于模块关闭时避免转头瞬间弹回。
+     */
+    fun smoothResetRotation() {
+        val player = mc.thePlayer ?: run {
+            resetRotation()
+            return
+        }
+
+        if (activeSettings != null) {
+            // 将目标旋转设置为玩家的实际视角方向（快照，后续不追踪鼠标移动）
+            targetRotation = Rotation(player.rotationYaw, player.rotationPitch)
+            // 使用 resetTicks = 5（约 0.25 秒）而非 0，使得 update() 先进入 targetRotation 追踪分支：
+            //   - applyServerSide=true:  只平滑 currentRotation（发包），玩家视角完全不受限
+            //   - applyServerSide=false: 通过 toPlayer() 平滑过渡玩家视角回到快照位置，仅持续 5 tick
+            resetTicks = 5
+            // 标记为平滑复位模式 — 5 tick 后强制彻底清理，防止旧模块速度限制泄漏
+            isSmoothResetting = true
+            // 保留 activeSettings，使 update() 中的平滑逻辑能继续工作
+        } else {
+            resetRotation()
+        }
     }
 
     /**
@@ -1066,7 +1102,8 @@ object RotationUtils : MinecraftInstance, Listenable {
         currentRotation?.let { patternPrediction.addRotationData(it.yaw, it.pitch) }
 
         if (resetTicks == 0) {
-            if (isDifferenceAcceptableForReset(serverRotation, playerRotation, settings)) {
+            // isSmoothResetting: 平滑复位结束时强制清理，防止旧模块速度限制泄漏
+            if (isSmoothResetting || isDifferenceAcceptableForReset(serverRotation, playerRotation, settings)) {
                 resetRotation()
                 return
             }

@@ -53,6 +53,7 @@ import kotlin.collections.set
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
+import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -66,19 +67,24 @@ object Velocity : Module("Velocity", Category.COMBAT) {
      */
     private val mode by choices(
         "Mode", arrayOf(
-            "Simple", "AAC", "AACPush", "AACZero", "AACv4",
+            "Simple", "Cancel", "AAC", "AACPush", "AACZero", "AACv4", "AAC5",
             "Reverse", "SmoothReverse", "Jump", "Glitch", "Legit",
-            "GhostBlock", "Vulcan", "S32Packet", "MatrixReduce",
-            "IntaveReduce", "Intave14", "Intave14.3.3", "IntaveStrong", "AttackReduce",
-            "Delay", "GrimC03", "Hypixel", "HypixelAir",
-            "Click", "BlocksMC", "Polar", "Intave/Polar-Flag", "Buffer", "Prediction",
+            "GhostBlock", "Vulcan", "S32Packet",
+            "MatrixReduce", "MatrixReduce2", "MatrixReduce3",
+            "IntaveReduce", "Intave14", "Intave14.3.3", "Intave14.1.2", "IntaveStrong", "IntaveTimer", "IntaveFlag",
+            "AttackReduce",
+            "Delay", "GrimC03", "Hypixel", "HypixelAir", "HypixelMoving",
+            "Click", "BlocksMC", "Polar", "PolarJump", "OldPolar", "Intave/Polar-Flag",
+            "Buffer", "BufferAbuse", "Prediction",
             "SmartJumpReset", "MatrixNoXZ", "Intave13KeepLow", "Intave13Reverse",
             "Intave13GommeZero", "AAC3.3.12", "AAC3.3.14", "Intave13Wall",
-            "Intave13Old", "Matrix6.6.1", "Vulcan2.0.1", "GrimCombat",
+            "Intave13Old", "Intave13.0.6", "Matrix6.6.1", "Vulcan2.0.1", "GrimCombat",
             "AAC4Reduce", "AAC5Reduce", "AAC5.2.0", "AAC5.2.0Combat",
-            "Grim", "Grim1.17", "GrimC07", "GrimDamage", "MatrixReverse",
+            "Grim", "Grim1.17", "GrimC07", "GrimDamage", "GrimVertical", "OldGrim", "MatrixReverse",
             "MatrixSimple", "HypixelBoost", "Minemen", "Phase", "SideStrafe",
-            "Spoof", "Tick", "Rise"
+            "Spoof", "Tick", "Rise",
+            "Kazer", "Hylex", "Dexland", "BuzzReverse",
+            "Karhu", "UniversoCraftOld"
         ), "Simple"
     )
 
@@ -154,6 +160,40 @@ object Velocity : Module("Velocity", Category.COMBAT) {
 
     // IntaveStrong
     private val intaveStrongFactor by float("IntaveStrong-Factor", 0.6f, 0.0f..1.0f) { mode == "IntaveStrong" }
+
+    // Dexland
+    private val dexlandHReduce by float("Dexland-HReduce", 0.3f, 0f..1f) { mode == "Dexland" }
+    private val dexlandTimes by int("Dexland-AttacksToWork", 4, 1..10) { mode == "Dexland" }
+
+    // BuzzReverse
+    private val buzzReverseNeedAttack by boolean("BuzzReverse-NeedAttack", false) { mode == "BuzzReverse" }
+
+    // OldGrim
+    private val oldGrimLegit by boolean("OldGrim-Legit", false) { mode == "OldGrim" }
+    private val oldGrimRayCast by boolean("OldGrim-RayCast", true) { mode == "OldGrim" }
+    private val oldGrimRayCastRange by float("OldGrim-RayCastRange", 3.0f, 1f..6f) { mode == "OldGrim" && oldGrimRayCast }
+    private val oldGrimOldValue by boolean("OldGrim-Old", false) { mode == "OldGrim" }
+    private val oldGrimWeb by boolean("OldGrim-WebCheck", false) { mode == "OldGrim" }
+    private val oldGrimLiquid by boolean("OldGrim-LiquidCheck", false) { mode == "OldGrim" }
+
+    // GrimVertical
+    private val grimVerticalMode by choices("GrimVerticalMode", arrayOf("Reduce", "1.17", "Vertical"), "Reduce") { mode == "GrimVertical" }
+    private val grimVerticalSmartVelo by boolean("GrimVertical-SmartVelo", true) { mode == "GrimVertical" && grimVerticalMode == "Vertical" }
+    private val grimVerticalSendC0F by boolean("GrimVertical-C0F", false) { mode == "GrimVertical" && grimVerticalMode == "Vertical" }
+    private val grimVerticalC0FAmount by int("GrimVertical-C0FPacketAmount", 0, 0..40) { mode == "GrimVertical" && grimVerticalMode == "Vertical" && grimVerticalSendC0F }
+    private val grimVerticalCallEvent by boolean("GrimVertical-CallEvent", true) { mode == "GrimVertical" && grimVerticalMode == "Vertical" }
+    private val grimVerticalVia by boolean("GrimVertical-Via", true) { mode == "GrimVertical" && grimVerticalMode == "Vertical" }
+
+    // MatrixReduce3
+    private val matrixReduce3Boost by boolean("MatrixReduce3-BoostAfterReduce", false) { mode == "MatrixReduce3" }
+    private val matrixReduce3BoostFactor by float("MatrixReduce3-BoostFactor", 0.33f, 0.0f..5.0f) { mode == "MatrixReduce3" && matrixReduce3Boost }
+    private val matrixReduce3BoostCooldown by int("MatrixReduce3-BoostCooldown", 0, 0..2000, "ms") { mode == "MatrixReduce3" && matrixReduce3Boost }
+
+    // BufferAbuse
+    private val bufferAbusePacket by int("BufferAbuse-Packet", 3, 1..5) { mode == "BufferAbuse" }
+    private val bufferAbuseHorizontal by float("BufferAbuse-Horizontal", 1.0f, 0.0f..1.0f) { mode == "BufferAbuse" }
+    private val bufferAbuseVertical by float("BufferAbuse-Vertical", 1.0f, 0.0f..1.0f) { mode == "BufferAbuse" }
+    private val bufferAbuseDebugger by boolean("BufferAbuse-Debugger", false) { mode == "BufferAbuse" }
 
     // AttackReduce
     private val attackReduceFactor by float("AttackReduce-Factor", 0.6f, -1.0f..1.0f) { mode == "AttackReduce" }
@@ -490,6 +530,31 @@ object Velocity : Module("Velocity", Category.COMBAT) {
     private val riseVulcanHeldPackets = mutableListOf<Packet<*>>()
     private var riseMMCReceivedVelocity = false
 
+    // PolarJump
+    private var polarJumpHurtTime = kotlin.random.Random.nextInt(7, 10)
+    private var polarJumpCount = 0
+
+    // Dexland
+    private var dexlandAttackCount = 0
+    private var dexlandLastAttackTime = 0L
+
+    // BufferAbuse
+    private var bufferAbuseAmount = 0
+
+    // MatrixReduce3
+    private val matrixReduce3BoostTimer = MSTimer()
+
+    // OldGrim
+    private var oldGrimVelocity = false
+    private var oldGrimAttacked = false
+    private var oldGrimVelocityPacket: S12PacketEntityVelocity? = null
+
+    // GrimVertical
+    private var grimVerticalAttack = false
+    private var grimVerticalMotionXZ = 0.0
+    private var grimVerticalCanCancel = false
+    private var grimVerticalCanSpoof = false
+
     // FDP modes
     private var aac520TemplateX = 0
     private var aac520TemplateY = 0
@@ -532,6 +597,18 @@ object Velocity : Module("Velocity", Category.COMBAT) {
         minemenCanCancel = false
         tickVelocityTicks = 0
         sideStrafePos = null
+        polarJumpHurtTime = kotlin.random.Random.nextInt(7, 10)
+        polarJumpCount = 0
+        dexlandAttackCount = 0
+        dexlandLastAttackTime = 0L
+        bufferAbuseAmount = 0
+        matrixReduce3BoostTimer.reset()
+        oldGrimVelocity = false
+        oldGrimAttacked = false
+        oldGrimVelocityPacket = null
+        grimVerticalAttack = false
+        grimVerticalCanCancel = false
+        grimVerticalCanSpoof = false
         if (mc.currentScreen == null) {
             mc.gameSettings.keyBindForward.pressed = net.minecraft.client.settings.GameSettings.isKeyDown(mc.gameSettings.keyBindForward)
             mc.gameSettings.keyBindBack.pressed = net.minecraft.client.settings.GameSettings.isKeyDown(mc.gameSettings.keyBindBack)
@@ -594,6 +671,63 @@ object Velocity : Module("Velocity", Category.COMBAT) {
                 if (thePlayer.hurtTime > 0) {
                     thePlayer.setSprinting(false)
                     speed = 0.05f
+                }
+            }
+
+            "aac5" -> {
+                if (thePlayer.hurtTime > 1) {
+                    thePlayer.motionX *= 0.81
+                    thePlayer.motionZ *= 0.81
+                }
+            }
+
+            "intavetimer" -> {
+                if (thePlayer.hurtTime >= 8) {
+                    mc.timer.timerSpeed = 0.3f
+                } else if (thePlayer.hurtTime > 2) {
+                    mc.timer.timerSpeed = 5.0f
+                } else if (thePlayer.hurtTime == 2) {
+                    mc.timer.timerSpeed = 1.0f
+                }
+            }
+
+            "polarjump" -> {
+                if (polarJumpHurtTime == thePlayer.hurtTime && thePlayer.onGround) {
+                    thePlayer.tryJump()
+                    polarJumpHurtTime = kotlin.random.Random.nextInt(7, 10)
+                }
+            }
+
+            "oldpolar" -> {
+                if (thePlayer.hurtTime > 0 && hasReceivedVelocity) {
+                    thePlayer.motionX *= 0.45
+                    thePlayer.motionZ *= 0.45
+                    thePlayer.setSprinting(false)
+                    hasReceivedVelocity = false
+                }
+            }
+
+            "matrixreduce2" -> {
+                if (hasReceivedVelocity && thePlayer.hurtTime >= 9) {
+                    if (thePlayer.isMoving && !(thePlayer.isBlocking || thePlayer.isSneaking || thePlayer.isEating || !thePlayer.onGround)) {
+                        thePlayer.motionX = 0.0
+                        thePlayer.motionZ = 0.0
+                    } else if (!thePlayer.isMoving || (thePlayer.isBlocking || thePlayer.isSneaking || thePlayer.isEating || !thePlayer.onGround)) {
+                        thePlayer.motionX *= 0.2
+                        thePlayer.motionZ *= 0.2
+                    }
+                    hasReceivedVelocity = false
+                }
+            }
+
+            "intave13.0.6" -> {
+                if (thePlayer.hurtTime == 9 && thePlayer.onGround) {
+                    thePlayer.setSprinting(false)
+                    thePlayer.motionX *= 0.0
+                    thePlayer.motionZ *= 0.0
+                } else if (thePlayer.hurtTime > 0 && thePlayer.hurtTime < 9) {
+                    thePlayer.motionX *= 0.6
+                    thePlayer.motionZ *= 0.6
                 }
             }
 
@@ -699,6 +833,58 @@ object Velocity : Module("Velocity", Category.COMBAT) {
                         velocityInput = false
                         attacked = false
                     }
+                }
+            }
+
+            "oldgrim" -> {
+                if (oldGrimVelocity && !oldGrimAttacked) {
+                    if (thePlayer.hurtTime == 0) {
+                        oldGrimVelocity = false
+                    }
+                }
+
+                if (oldGrimAttacked) {
+                    val packet = oldGrimVelocityPacket ?: return@handler
+                    if (oldGrimLegit) {
+                        thePlayer.motionX = packet.motionX / 8000.0
+                        thePlayer.motionZ = packet.motionZ / 8000.0
+
+                        if (thePlayer.onGround) {
+                            thePlayer.motionX *= 0.6
+                            thePlayer.motionZ *= 0.6
+                        }
+                    } else {
+                        thePlayer.motionX = packet.motionX / 8000.0
+                        thePlayer.motionZ = packet.motionZ / 8000.0
+                        thePlayer.motionX *= 0.5
+                        thePlayer.motionZ *= 0.5
+                    }
+                    oldGrimAttacked = false
+                    oldGrimVelocityPacket = null
+                }
+            }
+
+            "grimvertical" -> {
+                if (grimVerticalAttack) {
+                    val entityTarget = mc.objectMouseOver?.entityHit
+                    if (entityTarget != null) {
+                        if (grimVerticalVia) {
+                            sendPacket(C02PacketUseEntity(entityTarget, C02PacketUseEntity.Action.ATTACK))
+                            if (grimVerticalCallEvent) sendPacket(C0APacketAnimation())
+                        } else {
+                            if (grimVerticalCallEvent) sendPacket(C0APacketAnimation())
+                            sendPacket(C02PacketUseEntity(entityTarget, C02PacketUseEntity.Action.ATTACK))
+                        }
+
+                        if (grimVerticalSmartVelo && thePlayer.onGround) {
+                            thePlayer.motionX *= grimVerticalMotionXZ
+                            thePlayer.motionZ *= grimVerticalMotionXZ
+                        } else {
+                            thePlayer.motionX *= 0.07776
+                            thePlayer.motionZ *= 0.07776
+                        }
+                    }
+                    grimVerticalAttack = false
                 }
             }
         }
@@ -833,6 +1019,60 @@ object Velocity : Module("Velocity", Category.COMBAT) {
                         intave14FinalReverseTriggered = true
                         if (intave14Debug) chat("Intave14 FinalReverse")
                     }
+                }
+            }
+
+            "dexland" -> {
+                if (player.hurtTime > 0 && System.currentTimeMillis() - dexlandLastAttackTime <= 8000) {
+                    dexlandAttackCount++
+                    if (dexlandAttackCount >= dexlandTimes) {
+                        player.motionX *= dexlandHReduce
+                        player.motionZ *= dexlandHReduce
+                        dexlandAttackCount = 0
+                    }
+                }
+                dexlandLastAttackTime = System.currentTimeMillis()
+            }
+
+            "kazer" -> {
+                if (player.hurtTime in 9..10) {
+                    player.motionX *= 0.078
+                    player.motionZ *= 0.078
+                }
+            }
+
+            "hylex" -> {
+                when (player.hurtTime) {
+                    9 -> {
+                        player.motionX *= 0.8
+                        player.motionZ *= 0.8
+                    }
+                    8 -> {
+                        player.motionX *= 0.11
+                        player.motionZ *= 0.11
+                    }
+                    7 -> {
+                        player.motionX *= 0.4
+                        player.motionZ *= 0.4
+                    }
+                    4 -> {
+                        player.motionX *= 0.37
+                        player.motionZ *= 0.37
+                    }
+                }
+            }
+
+            "buzzreverse" -> {
+                if (buzzReverseNeedAttack && player.hurtTime == 7) {
+                    player.motionX *= -1.0
+                    player.motionZ *= -1.0
+                }
+            }
+
+            "oldgrim" -> {
+                if (oldGrimVelocity) {
+                    oldGrimAttacked = true
+                    oldGrimVelocity = false
                 }
             }
         }
@@ -1235,8 +1475,80 @@ object Velocity : Module("Velocity", Category.COMBAT) {
                     bufferedPackets.add(BufferedPacket(packet, bufferDelay))
                 }
 
+                "cancel" -> {
+                    event.cancelEvent()
+                }
+
+                "polarjump" -> {
+                    event.cancelEvent()
+                    hasReceivedVelocity = true
+                    thePlayer.motionY = 0.42
+                }
+
+                "intave14.1.2" -> {
+                    if (thePlayer.isSwingInProgress &&
+                        (thePlayer.moveForward != 0.0f || thePlayer.moveStrafing != 0.0f) &&
+                        thePlayer.onGround &&
+                        thePlayer.isSprinting
+                    ) {
+                        val yawRad = thePlayer.rotationYaw * Math.PI / 180.0
+                        thePlayer.addVelocity(
+                            -sin(yawRad) * 0.5,
+                            0.1,
+                            cos(yawRad) * 0.5
+                        )
+                    }
+                }
+
+                "intaveflag" -> {
+                    hasReceivedVelocity = true
+                    event.cancelEvent()
+                }
+
+                "karhu" -> {
+                    hasReceivedVelocity = true
+                    event.cancelEvent()
+                }
+
+                "universocraftold" -> {
+                    hasReceivedVelocity = true
+                    event.cancelEvent()
+                }
+
+                "hypixelmoving" -> {
+                    if (thePlayer.isMoving) {
+                        event.cancelEvent()
+                    }
+                }
+
+                "grimvertical" -> handleGrimVerticalPacket(event, packet, thePlayer)
+
+                "bufferabuse" -> handleBufferAbusePacket(event, packet, thePlayer)
+
+                "matrixreduce3" -> handleMatrixReduce3Packet(event, packet, thePlayer)
+
                 "rise" -> handleRisePacket(event, packet, thePlayer)
             }
+        }
+
+        // Handle new mode packet events that need to be outside the main velocity check
+        if (mode == "HypixelMoving" && (packet is C0FPacketConfirmTransaction || packet is S12PacketEntityVelocity) && thePlayer.isMoving) {
+            if (packet is S12PacketEntityVelocity && packet.entityID == thePlayer.entityId) {
+                event.cancelEvent()
+            }
+        }
+
+        if (mode == "OldGrim" && packet is S12PacketEntityVelocity) {
+            if (packet.entityID != thePlayer.entityId) return@handler
+            if ((thePlayer.isInWeb && oldGrimWeb) || ((thePlayer.isInWater || thePlayer.isInLava) && oldGrimLiquid)) {
+                return@handler
+            }
+            val horizontalStrength = sqrt((packet.motionX.toDouble() * packet.motionX.toDouble() + packet.motionZ.toDouble() * packet.motionZ.toDouble()))
+            if (horizontalStrength <= 1000) return@handler
+            oldGrimVelocity = true
+            oldGrimAttacked = false
+            oldGrimVelocityPacket = packet
+            event.cancelEvent()
         }
 
         if (mode == "BlocksMC" && hasReceivedVelocity) {
@@ -1347,6 +1659,19 @@ object Velocity : Module("Velocity", Category.COMBAT) {
         minemenCanCancel = false
         tickVelocityTicks = 0
         sideStrafePos = null
+        polarJumpHurtTime = kotlin.random.Random.nextInt(7, 10)
+        polarJumpCount = 0
+        dexlandAttackCount = 0
+        dexlandLastAttackTime = 0L
+        bufferAbuseAmount = 0
+        matrixReduce3BoostTimer.reset()
+        oldGrimVelocity = false
+        oldGrimAttacked = false
+        oldGrimVelocityPacket = null
+        grimVerticalAttack = false
+        grimVerticalCanCancel = false
+        grimVerticalCanSpoof = false
+        mc.timer.timerSpeed = 1.0f
         resetRiseState()
     }
 
@@ -2029,6 +2354,132 @@ object Velocity : Module("Velocity", Category.COMBAT) {
         } else if (player.hurtTime == 0) {
             hasReceivedVelocity = false
         }
+    }
+
+    private fun handleGrimVerticalPacket(event: PacketEvent, packet: Packet<*>, player: EntityPlayerSP) {
+        if (packet !is S12PacketEntityVelocity) return
+        if (packet.entityID != player.entityId) return
+
+        when (grimVerticalMode.lowercase()) {
+            "reduce" -> {
+                val velocityX = packet.motionX / 8000.0
+                val velocityZ = packet.motionZ / 8000.0
+                player.motionX = velocityX * 0.078
+                player.motionZ = velocityZ * 0.078
+            }
+            "1.17" -> {
+                grimVerticalCanCancel = true
+                grimVerticalCanSpoof = true
+            }
+            "vertical" -> {
+                if (packet.motionX == 0 && packet.motionZ == 0) return
+
+                grimVerticalAttack = true
+                grimVerticalMotionXZ = getMotionNoXZ(packet)
+
+                if (player.isSprinting && player.serverSprintState && player.isMoving) {
+                    for (i in 0 until grimVerticalC0FAmount) {
+                        if (grimVerticalSendC0F) {
+                            mc.netHandler.addToSendQueue(
+                                C0FPacketConfirmTransaction(
+                                    nextInt(102, 1000024123),
+                                    nextInt(102, 1000024123).toShort(),
+                                    true
+                                )
+                            )
+                        }
+                    }
+                    grimVerticalAttack = true
+                }
+            }
+        }
+    }
+
+    private fun handleBufferAbusePacket(event: PacketEvent, packet: Packet<*>, player: EntityPlayerSP) {
+        if (packet is S12PacketEntityVelocity && packet.entityID == player.entityId) {
+            if (bufferAbuseAmount < bufferAbusePacket) {
+                event.cancelEvent()
+                bufferAbuseAmount++
+                if (bufferAbuseDebugger) {
+                    chat("[BufferAbuse] Cancelled packet $bufferAbuseAmount/$bufferAbusePacket")
+                }
+                return
+            }
+            packet.motionX = (packet.motionX * bufferAbuseHorizontal).toInt()
+            packet.motionY = (packet.motionY * bufferAbuseVertical).toInt()
+            packet.motionZ = (packet.motionZ * bufferAbuseHorizontal).toInt()
+            bufferAbuseAmount = 0
+            if (bufferAbuseDebugger) {
+                chat("[BufferAbuse] Applied reduction: H=$bufferAbuseHorizontal, V=$bufferAbuseVertical")
+            }
+        } else if (packet is S27PacketExplosion) {
+            if (bufferAbuseAmount < bufferAbusePacket) {
+                event.cancelEvent()
+                bufferAbuseAmount++
+                if (bufferAbuseDebugger) {
+                    chat("[BufferAbuse] Cancelled explosion $bufferAbuseAmount/$bufferAbusePacket")
+                }
+                return
+            }
+            packet.field_149152_f *= bufferAbuseHorizontal
+            packet.field_149153_g *= bufferAbuseVertical
+            packet.field_149159_h *= bufferAbuseHorizontal
+            bufferAbuseAmount = 0
+            if (bufferAbuseDebugger) {
+                chat("[BufferAbuse] Applied explosion reduction")
+            }
+        }
+    }
+
+    private fun handleMatrixReduce3Packet(event: PacketEvent, packet: Packet<*>, player: EntityPlayerSP) {
+        if (packet !is S12PacketEntityVelocity || packet.entityID != player.entityId) return
+
+        event.cancelEvent()
+        if (abs(packet.realMotionY) >= 0.1f) {
+            player.motionY = (packet.motionY / 8000f).toDouble()
+
+            val currentSpeed = hypot(player.motionX, player.motionZ)
+            val knockbackX = packet.getMotionX() / 8000f
+            val knockbackZ = packet.getMotionZ() / 8000f
+            val knockbackSpeed = hypot(knockbackX, knockbackZ)
+
+            if (!player.isMoving) {
+                val reducedSpeed = max((knockbackSpeed * 0.1).toFloat(), currentSpeed.toFloat())
+                if (knockbackSpeed > 0) {
+                    player.motionX = (knockbackX / knockbackSpeed * reducedSpeed).toDouble()
+                    player.motionZ = (knockbackZ / knockbackSpeed * reducedSpeed).toDouble()
+                }
+            } else {
+                player.motionX = knockbackX.toDouble() * 0.6
+                player.motionZ = knockbackZ.toDouble() * 0.6
+            }
+
+            if (matrixReduce3Boost && matrixReduce3BoostTimer.hasTimePassed(matrixReduce3BoostCooldown.toLong())) {
+                if (currentSpeed < 0.1 && player.onGround) {
+                    MovementUtils.strafe(currentSpeed.toFloat() + matrixReduce3BoostFactor)
+                    matrixReduce3BoostTimer.reset()
+                }
+            }
+        }
+    }
+
+    private fun getMotionNoXZ(packetEntityVelocity: S12PacketEntityVelocity): Double {
+        val motionX = packetEntityVelocity.motionX.toDouble()
+        val motionY = packetEntityVelocity.motionY.toDouble()
+        val motionZ = packetEntityVelocity.motionZ.toDouble()
+        val strength = sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ)
+
+        return if (strength >= 20000.0) {
+            if (mc.thePlayer?.onGround == true) 0.06425 else 0.075
+        } else if (strength >= 5000.0) {
+            if (mc.thePlayer?.onGround == true) 0.02625 else 0.0552
+        } else {
+            0.0175
+        }
+    }
+
+    private fun Float.pow(exponent: Int): Float {
+        return Math.pow(this.toDouble(), exponent.toDouble()).toFloat()
     }
 
     private fun handleGrimCombatPacket(event: PacketEvent, packet: Packet<*>, player: EntityPlayerSP) {

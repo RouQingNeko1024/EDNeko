@@ -208,6 +208,7 @@ AirClient 是一个免费开源的 Minecraft 作弊客户端，基于 LiquidBoun
 180. OpenMyau-Plus
 181. PVPUtils
 182. DioxideLite
+183. VibeClient
 
 ### 许可证
 

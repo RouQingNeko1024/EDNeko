@@ -32,8 +32,13 @@ import kotlin.math.max
 import kotlin.math.min
 
 object HUD : Module("HUD", Category.RENDER, gameDetecting = false, defaultState = true, defaultHidden = true) {
-    init {
+
+    override fun onEnable() {
         MinecraftForge.EVENT_BUS.register(this)
+    }
+
+    override fun onDisable() {
+        MinecraftForge.EVENT_BUS.unregister(this)
     }
 
     private fun lerp(start: Float, end: Float, percent: Float): Float {

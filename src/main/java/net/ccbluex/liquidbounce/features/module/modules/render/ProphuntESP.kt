@@ -6,6 +6,7 @@ package net.ccbluex.liquidbounce.features.module.modules.render
 
 import net.ccbluex.liquidbounce.event.Render2DEvent
 import net.ccbluex.liquidbounce.event.Render3DEvent
+import net.ccbluex.liquidbounce.event.WorldEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
@@ -57,6 +58,10 @@ object ProphuntESP : Module("ProphuntESP", Category.RENDER, gameDetecting = fals
     }
 
     override fun onDisable() {
+        blocks.clear()
+    }
+
+    val onWorld = handler<WorldEvent> {
         blocks.clear()
     }
 

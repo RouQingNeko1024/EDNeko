@@ -11,6 +11,7 @@ import net.ccbluex.liquidbounce.features.module.modules.render.Animation;
 import net.ccbluex.liquidbounce.features.module.modules.render.Animations;
 import net.ccbluex.liquidbounce.features.module.modules.render.AntiBlind;
 import net.ccbluex.liquidbounce.features.module.modules.render.NoSwing;
+import net.ccbluex.liquidbounce.features.module.modules.render.ItemRotate;
 import net.ccbluex.liquidbounce.features.module.modules.render.SilentHotbarModule;
 import net.ccbluex.liquidbounce.utils.inventory.SilentHotbar;
 import net.minecraft.client.Minecraft;
@@ -92,6 +93,7 @@ public abstract class MixinItemRenderer {
         final NoSlow noSlow = NoSlow.INSTANCE;
         final Animations animations = Animations.INSTANCE;
         final NoSwing noSwing = NoSwing.INSTANCE;
+        final ItemRotate itemRotate = ItemRotate.INSTANCE;
 
         float f = noSwing.handleEvents() && noSwing.getClientSide() ? 0f : 1f - (prevEquippedProgress + (equippedProgress - prevEquippedProgress) * partialTicks);
         EntityPlayerSP abstractclientplayer = mc.thePlayer;
@@ -162,6 +164,10 @@ public abstract class MixinItemRenderer {
                 }
 
                 transformFirstPersonItem(f, f1);
+
+                if (itemRotate.shouldRotate()) {
+                    rotate(itemRotate.getRotation(), 0f, 1f, 0f);
+                }
             }
 
             renderItem(abstractclientplayer, itemToRender, ItemCameraTransforms.TransformType.FIRST_PERSON);

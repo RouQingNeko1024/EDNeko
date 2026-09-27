@@ -38,6 +38,18 @@ object RiseAntiBot : Module("RiseAntiBot", Category.RISE, forcedDescription = "R
     private val nameMap = mutableMapOf<String, MutableList<UUID>>()
     private val tickMap = mutableMapOf<UUID, Int>()
 
+    override fun onDisable() {
+        botList.clear()
+        nameMap.clear()
+        tickMap.clear()
+    }
+
+    val onWorld = handler<WorldEvent> {
+        botList.clear()
+        nameMap.clear()
+        tickMap.clear()
+    }
+
     fun isBot(entity: EntityLivingBase): Boolean {
         if (entity !is EntityPlayer) return false
         val uuid = entity.uniqueID
@@ -261,6 +273,14 @@ object RisePlayerNotifier : Module("RisePlayerNotifier", Category.RISE, forcedDe
     private val message by text("Message", "Player {name} joined!")
 
     private val knownPlayers = mutableSetOf<UUID>()
+
+    override fun onDisable() {
+        knownPlayers.clear()
+    }
+
+    val onWorld = handler<WorldEvent> {
+        knownPlayers.clear()
+    }
 
     val onUpdate = handler<UpdateEvent> {
         val world = mc.theWorld ?: return@handler

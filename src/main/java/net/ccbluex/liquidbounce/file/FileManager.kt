@@ -174,8 +174,6 @@ object FileManager : MinecraftInstance, Iterable<FileConfig> by FILE_CONFIGS {
      */
     fun saveConfig(config: FileConfig, ignoreStarting: Boolean = true) {
         if (ignoreStarting && isStarting) {
-            println("[FileManager] Skipped saving ${config.file.name}: isStarting=true")
-            LOGGER.debug("[FileManager] Skipped saving ${config.file.name}: isStarting=true")
             return
         }
 

@@ -5,6 +5,7 @@
 package net.ccbluex.liquidbounce.features.module.modules.render
 
 import net.ccbluex.liquidbounce.event.Render3DEvent
+import net.ccbluex.liquidbounce.event.WorldEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
@@ -237,6 +238,11 @@ object DeathAnimation : Module("DeathAnimation", Category.RENDER, gameDetecting 
     }
 
     override fun onDisable() {
+        deathEffects.clear()
+        deadEntities.clear()
+    }
+
+    val onWorld = handler<WorldEvent> {
         deathEffects.clear()
         deadEntities.clear()
     }

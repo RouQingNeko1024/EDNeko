@@ -10,7 +10,10 @@ import net.ccbluex.liquidbounce.event.UpdateEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
+import net.ccbluex.liquidbounce.features.module.ModuleManager
+import net.ccbluex.liquidbounce.features.module.modules.combat.KillAura
 import net.ccbluex.liquidbounce.features.module.modules.movement.Fly
+import net.ccbluex.liquidbounce.features.module.modules.movement.Speed
 import net.ccbluex.liquidbounce.utils.client.PacketUtils
 import net.ccbluex.liquidbounce.utils.client.PacketUtils.sendPackets
 import net.ccbluex.liquidbounce.utils.client.chat
@@ -20,7 +23,9 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
+import net.minecraft.network.play.client.C0APacketAnimation
 import net.minecraft.potion.Potion
+import kotlin.random.Random
 
 object Criticals : Module("Criticals", Category.COMBAT) {
 
@@ -59,6 +64,11 @@ object Criticals : Module("Criticals", Category.COMBAT) {
             "LegitHVH",
             "MatrixSemi",
             "MatrixSmart",
+            "MatrixV1",
+            "MatrixV2",
+            "MatrixDamage",
+            "AutoFreeze",
+            "AutoSpeed",
             "SemiPos",
             "Mid",
             "Timer",
@@ -90,11 +100,31 @@ object Criticals : Module("Criticals", Category.COMBAT) {
     private var attacked = 0
     private var matrixAttacks = 0
 
+    // AutoFreeze/AutoSpeed 模式相关变量
+    private var attacking = false
+    private var stuckEnabled = false
+    private var freezeX = 0.0
+    private var freezeY = 0.0
+    private var freezeZ = 0.0
+    private var freezeMotionX = 0.0
+    private var freezeMotionY = 0.0
+    private var freezeMotionZ = 0.0
+    private var isJumping = false
+
     override fun onEnable() {
         matrixAttacks = 0
         attacked = 0
         hitCounter = 0
         changedTimer = false
+        attacking = false
+        stuckEnabled = false
+        freezeX = 0.0
+        freezeY = 0.0
+        freezeZ = 0.0
+        freezeMotionX = 0.0
+        freezeMotionY = 0.0
+        freezeMotionZ = 0.0
+        isJumping = false
         if (mode == "NoGround" || mode == "ForceNoGround")
             mc.thePlayer.tryJump()
     }
@@ -112,17 +142,27 @@ object Criticals : Module("Criticals", Category.COMBAT) {
             val thePlayer = mc.thePlayer ?: return@handler
             val entity = event.targetEntity
 
-            if (thePlayer.isOnLadder || thePlayer.isInWeb || thePlayer.isInLiquid ||
-                thePlayer.ridingEntity != null || entity.hurtTime > hurtTime ||
-                Fly.handleEvents() || !msTimer.hasTimePassed(delay)
+            val isMatrixMode = mode.lowercase() in arrayOf(
+                "matrixv1", "matrixv2", "matrixdamage", "matrixsmart", "matrixsemi"
             )
+
+            if (!isMatrixMode && mode !in arrayOf("AutoFreeze", "AutoSpeed") &&
+                (thePlayer.isOnLadder || thePlayer.isInWeb || thePlayer.isInLiquid ||
+                    thePlayer.ridingEntity != null || entity.hurtTime > hurtTime ||
+                    Fly.handleEvents() || !msTimer.hasTimePassed(delay))
+            )
+                return@handler
+
+            if (isMatrixMode && (entity.hurtTime > hurtTime || !msTimer.hasTimePassed(delay)))
                 return@handler
 
             val (x, y, z) = thePlayer
 
-            if ("InAir" !in allowWorkTime && "OnGround" !in allowWorkTime) return@handler
-            if (mc.thePlayer.onGround && "InAir" in allowWorkTime && "OnGround" !in allowWorkTime) return@handler
-            if (!mc.thePlayer.onGround && "OnGround" in allowWorkTime && "InAir" !in allowWorkTime) return@handler
+            if (mode !in arrayOf("MatrixV1", "MatrixV2", "MatrixDamage", "MatrixSemi", "MatrixSmart", "AutoFreeze", "AutoSpeed")) {
+                if ("InAir" !in allowWorkTime && "OnGround" !in allowWorkTime) return@handler
+                if (mc.thePlayer.onGround && "InAir" in allowWorkTime && "OnGround" !in allowWorkTime) return@handler
+                if (!mc.thePlayer.onGround && "OnGround" in allowWorkTime && "InAir" !in allowWorkTime) return@handler
+            }
 
             when (mode.lowercase()) {
                 "edit" -> {
@@ -205,6 +245,73 @@ object Criticals : Module("Criticals", Category.COMBAT) {
                         sendCriticalPacket(ground = true)
                         matrixAttacks = 0
                         if (debugger) chat("Critical")
+                    }
+                }
+
+                "matrixv1" -> {
+                    sendPackets(
+                        C04PacketPlayerPosition(x, y - 1E-4, z, false),
+                        C04PacketPlayerPosition(x, y - 1E-4, z, false),
+                        C04PacketPlayerPosition(x, y - 1E-4, z, false),
+                        C04PacketPlayerPosition(x, y, z, true)
+                    )
+                    if (debugger) chat("Critical")
+                }
+
+                "matrixv2" -> {
+                    if (thePlayer.onGround) {
+                        sendPackets(
+                            C0APacketAnimation(),
+                            C04PacketPlayerPosition(x, y - 0.001, z, false),
+                            C0APacketAnimation()
+                        )
+                    } else if (thePlayer.fallDistance < 0.3f) {
+                        val fakeX = x + 1000 + Random.nextDouble() * 10000
+                        val fakeZ = z + 1000 + Random.nextDouble() * 10000
+                        sendPackets(
+                            C04PacketPlayerPosition(fakeX, y, fakeZ, false),
+                            C04PacketPlayerPosition(x, y - 0.06, z, false),
+                            C04PacketPlayerPosition(x, y, z, true)
+                        )
+                    }
+                    if (debugger) chat("Critical")
+                }
+
+                "matrixdamage" -> {
+                    if (thePlayer.onGround) {
+                        sendPackets(
+                            C04PacketPlayerPosition(x, y + 0.023, z, false),
+                            C04PacketPlayerPosition(x, y + 0.011, z, false)
+                        )
+                    } else {
+                        sendPackets(
+                            C04PacketPlayerPosition(x, y - 0.011, z, thePlayer.onGround)
+                        )
+                        thePlayer.motionY = -0.08
+                    }
+                    thePlayer.motionX = 0.0
+                    thePlayer.motionZ = 0.0
+                    if (debugger) chat("Critical")
+                }
+
+                "autofreeze" -> {
+                    attacking = true
+                    if (mc.thePlayer.onGround) {
+                        mc.thePlayer.jump()
+                        freezeX = mc.thePlayer.posX
+                        freezeY = mc.thePlayer.posY
+                        freezeZ = mc.thePlayer.posZ
+                        freezeMotionX = mc.thePlayer.motionX
+                        freezeMotionY = mc.thePlayer.motionY
+                        freezeMotionZ = mc.thePlayer.motionZ
+                        isJumping = true
+                    }
+                }
+
+                "autospeed" -> {
+                    attacking = true
+                    if (mc.thePlayer.onGround && !mc.thePlayer.isInWater && !mc.thePlayer.isInLava) {
+                        mc.thePlayer.jump()
                     }
                 }
 
@@ -447,6 +554,41 @@ object Criticals : Module("Criticals", Category.COMBAT) {
     }
 
     val onUpdate = handler<UpdateEvent> {
+        // AutoFreeze/AutoSpeed 特殊处理
+        if (mode in arrayOf("AutoFreeze", "AutoSpeed")) {
+            val killAura = ModuleManager["KillAura"] as? KillAura
+            when (mode.lowercase()) {
+                "autofreeze" -> {
+                    if (killAura?.target != null && mc.thePlayer.onGround) {
+                        mc.thePlayer.jump()
+                    }
+                    if (mc.thePlayer.fallDistance > 0f) {
+                        stuckEnabled = true
+                    }
+                    if (killAura?.target == null && stuckEnabled) {
+                        stuckEnabled = false
+                    }
+                }
+                "autospeed" -> {
+                    if (killAura?.target != null) {
+                        val speed = ModuleManager["Speed"] as? Speed
+                        if (speed?.state == false) {
+                            speed?.state = true
+                        }
+                        if (mc.thePlayer.onGround && !mc.thePlayer.isInWater && !mc.thePlayer.isInLava) {
+                            mc.thePlayer.jump()
+                        }
+                    } else {
+                        val speed = ModuleManager["Speed"] as? Speed
+                        if (speed?.state == true) {
+                            speed?.state = false
+                        }
+                    }
+                }
+            }
+            return@handler
+        }
+
         if ("InAir" !in allowWorkTime && "OnGround" !in allowWorkTime) return@handler
         if (mc.thePlayer.onGround && "InAir" in allowWorkTime && "OnGround" !in allowWorkTime) return@handler
         if (!mc.thePlayer.onGround && "OnGround" in allowWorkTime && "InAir" !in allowWorkTime) return@handler

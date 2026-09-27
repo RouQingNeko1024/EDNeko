@@ -69,11 +69,11 @@ open class Module(
         set(keyBind) {
             field = keyBind
 
-            saveConfig(modulesConfig)
+            if (!isStarting) saveConfig(modulesConfig)
         }
 
     var isHidden: Boolean by boolean("Hide", defaultHidden).subjective().onChanged {
-        saveConfig(modulesConfig)
+        if (!isStarting) saveConfig(modulesConfig)
     }
 
     private val resetValue = boolean("Reset", false).subjective().onChange { _, _ ->
@@ -146,8 +146,10 @@ open class Module(
                 field = false
             }
 
-            // Save module state
-            saveConfig(modulesConfig)
+            // Save module state (skip during startup to avoid N*340 spam)
+            if (!isStarting) {
+                saveConfig(modulesConfig)
+            }
         }
 
     // HUD

@@ -34,12 +34,23 @@ object Notifier : Module("Notifier", Category.MISC) {
     { onPlayerDeath || onHeldExplosive || onPlayerTool }
 
     private val recentlyWarned = ConcurrentHashMap<String, Long>()
+    private val maxWarnedEntries = 500
+
+    override fun onDisable() {
+        recentlyWarned.clear()
+    }
 
     val onUpdate = handler<UpdateEvent> {
         val player = mc.thePlayer ?: return@handler
         val world = mc.theWorld ?: return@handler
 
         val currentTime = System.currentTimeMillis()
+
+        // Evict stale entries to prevent memory leak
+        if (recentlyWarned.size > maxWarnedEntries) {
+            recentlyWarned.entries.removeAll { (_, time) -> currentTime - time > warnDelay * 2 }
+        }
+
         for (entity in world.playerEntities) {
             if (entity.gameProfile.id == player.uniqueID || isBot(entity)) continue
             val entityDistance = player.getDistanceToEntity(entity).roundToInt()

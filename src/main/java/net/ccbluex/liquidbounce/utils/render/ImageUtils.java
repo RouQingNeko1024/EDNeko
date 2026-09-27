@@ -8,6 +8,7 @@ package net.ccbluex.liquidbounce.utils.render;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
 public class ImageUtils {
@@ -22,7 +23,7 @@ public class ImageUtils {
         for(int rgb : rgbArray){
             byteBuffer.putInt(rgb << 8 | rgb >> 24 & 255);
         }
-        byteBuffer.flip();
+        ((Buffer) byteBuffer).flip();
 
         return byteBuffer;
     }

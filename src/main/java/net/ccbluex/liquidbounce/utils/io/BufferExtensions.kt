@@ -8,16 +8,9 @@ import java.nio.Buffer
 import java.nio.ByteBuffer
 
 /**
- * Prevents crashes when flip() is called from higher Java versions.
+ * Prevents crashes on Java 8 where ByteBuffer.flip() returns Buffer instead of ByteBuffer.
+ * Casting to Buffer first ensures compatibility across all Java versions.
  */
 fun ByteBuffer.flipSafely() {
-    try {
-        flip()
-    } catch (ex: Exception) {
-        try {
-            (this as Buffer).flip()
-        } catch (any: Exception) {
-            any.printStackTrace()
-        }
-    }
+    (this as Buffer).flip()
 }

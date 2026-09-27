@@ -146,7 +146,7 @@ object ClickGui : GuiScreen() {
         } ?: run {
             // Try load settings
             loadSettings(useCached = true) {
-                mc.addScheduledTask {
+                mc?.addScheduledTask {
                     setupSettingsPanel(xPos, yPos, width, height)
                 }
             }
@@ -174,7 +174,7 @@ object ClickGui : GuiScreen() {
                 panel.drawScreenAndClick(mouseX, mouseY)
             }
 
-            descriptions@ for (panel in panels.reversed()) {
+            descriptions@ for (panel in panels.toList().asReversed()) {
                 // Don't draw hover text when hovering over a panel header.
                 if (panel.isHovered(mouseX, mouseY)) break
 
@@ -199,7 +199,7 @@ object ClickGui : GuiScreen() {
                     var handledScroll = false
 
                     // Handle foremost panel.
-                    for (panel in panels.reversed()) {
+                    for (panel in panels.toList().asReversed()) {
                         if (panel.handleScroll(mouseX, mouseY, wheel)) {
                             handledScroll = true
                             break
@@ -245,7 +245,7 @@ object ClickGui : GuiScreen() {
         mouseX = (x / scale).roundToInt()
         mouseY = (y / scale).roundToInt()
 
-        panels.reversed().forEachIndexed { index, panel ->
+        panels.toList().asReversed().forEachIndexed { index, panel ->
             if (panel.mouseClicked(mouseX, mouseY, mouseButton)) return
 
             panel.drag = false

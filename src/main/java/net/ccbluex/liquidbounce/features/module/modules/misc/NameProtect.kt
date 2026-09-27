@@ -6,6 +6,7 @@ package net.ccbluex.liquidbounce.features.module.modules.misc
 
 import net.ccbluex.liquidbounce.LiquidBounce.CLIENT_NAME
 import net.ccbluex.liquidbounce.event.PacketEvent
+import net.ccbluex.liquidbounce.event.WorldEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
@@ -57,6 +58,10 @@ object NameProtect : Module("NameProtect", Category.MISC, subjective = true, gam
     }
 
     override fun onDisable() {
+        playerRandomNames.clear()
+    }
+
+    val onWorld = handler<WorldEvent> {
         playerRandomNames.clear()
     }
 

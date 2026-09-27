@@ -791,8 +791,21 @@ object RiseAimBacktrack : Module("RiseAimBacktrack", Category.RISE, forcedDescri
 
     private val positionHistory = mutableMapOf<Int, ArrayDeque<Triple<Double, Double, Double>>>()
 
+    override fun onDisable() {
+        positionHistory.clear()
+    }
+
+    val onWorld = handler<WorldEvent> {
+        positionHistory.clear()
+    }
+
     val onUpdate = handler<UpdateEvent> {
         val theWorld = mc.theWorld ?: return@handler
+        val currentEntityIds = theWorld.loadedEntityList.filterIsInstance<EntityLivingBase>().map { it.entityId }.toSet()
+
+        // Remove stale entries for entities no longer in the world
+        positionHistory.keys.removeAll { it !in currentEntityIds }
+
         for (entity in theWorld.loadedEntityList.filterIsInstance<EntityLivingBase>()) {
             val history = positionHistory.getOrPut(entity.entityId) { ArrayDeque(ticks + 1) }
             history.addFirst(Triple(entity.posX, entity.posY, entity.posZ))

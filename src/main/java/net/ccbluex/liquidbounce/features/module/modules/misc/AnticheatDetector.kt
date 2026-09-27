@@ -9,6 +9,7 @@ package net.ccbluex.liquidbounce.features.module.modules.misc
 import net.ccbluex.liquidbounce.LiquidBounce.hud
 import net.ccbluex.liquidbounce.event.GameTickEvent
 import net.ccbluex.liquidbounce.event.PacketEvent
+import net.ccbluex.liquidbounce.event.WorldEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
@@ -112,4 +113,10 @@ object AnticheatDetector : Module("AnticheatDetector", Category.MISC) {
     }
 
     override fun onEnable() = reset()
+
+    override fun onDisable() = reset()
+
+    val onWorld = handler<WorldEvent> {
+        reset()
+    }
 }

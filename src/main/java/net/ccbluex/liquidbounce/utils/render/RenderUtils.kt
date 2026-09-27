@@ -1688,6 +1688,26 @@ object RenderUtils : MinecraftInstance {
     data class ColorValueCache(val lastHue: Float, val cachedTextureID: Int)
 
     private val colorValueCache: MutableMap<ColorValue, MutableMap<Int, ColorValueCache>> = mutableMapOf()
+    private const val COLOR_CACHE_MAX_ENTRIES = 200
+
+    private fun evictOldCacheEntry() {
+        val outerSize = colorValueCache.values.sumOf { it.size }
+        if (outerSize <= COLOR_CACHE_MAX_ENTRIES) return
+
+        // Find and remove the oldest entry across all inner maps
+        var oldestKey: Pair<ColorValue, Int>? = null
+        var oldestTime = Long.MAX_VALUE
+
+        // We use insertion order from LinkedHashMap if available, but this is a regular map.
+        // Since ColorValue objects are limited (defined at module init), this cache won't grow much.
+        // Just delete one entry from the largest inner map as a safety measure.
+        val largestInner = colorValueCache.maxByOrNull { it.value.size } ?: return
+        val keyToRemove = largestInner.value.keys.firstOrNull() ?: return
+
+        largestInner.value.remove(keyToRemove)?.let { cached ->
+            glDeleteTextures(cached.cachedTextureID)
+        }
+    }
 
     fun ColorValue.updateTextureCache(
         id: Int,
@@ -1701,9 +1721,14 @@ object RenderUtils : MinecraftInstance {
         val lastHue = cached?.lastHue
 
         if (lastHue == null || lastHue != hue) {
+            if (lastHue != null) {
+                // Hue changed — delete old texture before replacing
+                cached?.cachedTextureID?.let { glDeleteTextures(it) }
+            }
             val image = createRGBImageDrawing(width, height) { img, graphics -> generateImage(img, graphics) }
             val texture = convertImageToTexture(image)
             colorValueCache.getOrPut(this, ::mutableMapOf)[id] = ColorValueCache(hue, texture)
+            evictOldCacheEntry()
         }
 
         colorValueCache[this]?.get(id)?.cachedTextureID?.let(drawAt)

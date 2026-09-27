@@ -13,15 +13,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.random.Random
 
 object FakeF3 : Module("FakeF3", Category.RENDER) {
-    init {
-        MinecraftForge.EVENT_BUS.register(this)
-    }
 
     // ==================== FPS 相关 ====================
     private val fpsEnabled by boolean("自定义FPS", false)
-    private val fpsMultiplier by float("FPS乘数", 1.5f, 0.1f..100000000000.0f) { fpsEnabled }
+    private val fpsMultiplier by float("FPS乘数", 1.5f, 0.1f..10000.0f) { fpsEnabled }
     private val fpsRandomization by float("FPS随机化范围", 0.2f, 0f..1.0f) { fpsEnabled }
-    private val lowFpsMultiplier by float("低帧乘数", 2.0f, 0.1f..100000000000.0f) { fpsEnabled }
+    private val lowFpsMultiplier by float("低帧乘数", 2.0f, 0.1f..100.0f) { fpsEnabled }
     private val lowFpsThreshold by int("低帧阈值", 30, 5..60) { fpsEnabled }
 
     // FPS 缓存 — 每 1000ms 才重新计算一次 FPS，避免闪烁过快
@@ -50,6 +47,15 @@ object FakeF3 : Module("FakeF3", Category.RENDER) {
 
     private val optifineEnabled by boolean("自定义Optifine版本", false)
     private val optifineVersion by text("Optifine版本", "HD U G5") { optifineEnabled }
+
+    override fun onEnable() {
+        MinecraftForge.EVENT_BUS.register(this)
+    }
+
+    override fun onDisable() {
+        MinecraftForge.EVENT_BUS.unregister(this)
+        cachedFakeFps.clear()
+    }
 
     @SubscribeEvent
     fun onTextEvent(event: RenderGameOverlayEvent.Text) {

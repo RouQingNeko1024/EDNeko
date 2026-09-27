@@ -26,7 +26,10 @@ object AAC5 : FlyMode("AAC5") {
     }
 
     override fun onDisable() {
-        if (mc.isSingleplayer) return
+        if (mc.isSingleplayer) {
+            aac5C03List.clear()
+            return
+        }
         sendAAC5Packets()
         mc.thePlayer.noClip = false
         mc.timer.timerSpeed = 1f
@@ -91,37 +94,40 @@ object AAC5 : FlyMode("AAC5") {
     }
 
     private fun sendAAC5Packets() {
-        var yaw = mc.thePlayer.rotationYaw
-        var pitch = mc.thePlayer.rotationPitch
-        for (pkt in aac5C03List) {
-            if (pkt.isMoving) {
-                PacketUtils.sendPacket(pkt, false)
-                if (pkt.getRotating()) {
-                    yaw = pkt.yaw
-                    pitch = pkt.pitch
-                }
-                PacketUtils.sendPacket(
-                    C03PacketPlayer.C06PacketPlayerPosLook(
-                        pkt.x,
-                        -1e+159,
-                        pkt.z + 10,
-                        yaw,
-                        pitch,
-                        true
-                    ), false
-                )
-                PacketUtils.sendPacket(
-                    C03PacketPlayer.C06PacketPlayerPosLook(
-                        pkt.x,
-                        pkt.y,
-                        pkt.z,
-                        yaw,
-                        pitch,
-                        true
+        try {
+            var yaw = mc.thePlayer.rotationYaw
+            var pitch = mc.thePlayer.rotationPitch
+            for (pkt in aac5C03List) {
+                if (pkt.isMoving) {
+                    PacketUtils.sendPacket(pkt, false)
+                    if (pkt.getRotating()) {
+                        yaw = pkt.yaw
+                        pitch = pkt.pitch
+                    }
+                    PacketUtils.sendPacket(
+                        C03PacketPlayer.C06PacketPlayerPosLook(
+                            pkt.x,
+                            -1e+159,
+                            pkt.z + 10,
+                            yaw,
+                            pitch,
+                            true
+                        ), false
                     )
-                )
+                    PacketUtils.sendPacket(
+                        C03PacketPlayer.C06PacketPlayerPosLook(
+                            pkt.x,
+                            pkt.y,
+                            pkt.z,
+                            yaw,
+                            pitch,
+                            true
+                        ), false
+                    )
+                }
             }
+        } finally {
+            aac5C03List.clear()
         }
-        aac5C03List.clear()
     }
 }

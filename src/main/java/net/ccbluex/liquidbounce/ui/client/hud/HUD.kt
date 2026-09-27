@@ -104,7 +104,7 @@ object HUD : MinecraftInstance {
         )
 
         if (button == 0) {
-            for (element in elements.reversed()) {
+            for (element in elements.toList().asReversed()) {
                 if (!element.isInBorder(
                         (mouseX / element.scale) - element.renderX, (mouseY / element.scale) - element.renderY
                     )

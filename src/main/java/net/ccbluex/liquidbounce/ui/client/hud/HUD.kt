@@ -28,6 +28,8 @@ object HUD : MinecraftInstance {
     private val ALL_ELEMENT_CLASSES = arrayOf(
         Armor::class.java,
         Arraylist::class.java,
+        Arraylist2::class.java,
+        Arraylist3::class.java,
         OpaiArrayList::class.java,
         Effects::class.java,
         Image::class.java,

@@ -76,6 +76,8 @@ object ModuleManager : Listenable, Collection<Module> by MODULE_REGISTRY {
             Velocity2,
             AbortBreaking,
             Aimbot,
+            CSGOFight,
+            GunHack,
             Ambience,
             Animations,
             AntiAFK,
@@ -310,13 +312,7 @@ object ModuleManager : Listenable, Collection<Module> by MODULE_REGISTRY {
             AntiKnockBack,
 
             // Dev modules
-            Via,
             ArmorBreak,
-            IntaveRotationBypass,
-            IntaveClickBypass,
-            IntaveTimerBypass,
-            IntaveMovementBypass,
-            IntavePreAttackBypass,
 
             RiseComboOneHit,
             RiseCriticals,

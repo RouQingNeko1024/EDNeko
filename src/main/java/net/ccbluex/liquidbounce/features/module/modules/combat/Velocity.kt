@@ -71,7 +71,7 @@ object Velocity : Module("Velocity", Category.COMBAT) {
             "Reverse", "SmoothReverse", "Jump", "Glitch", "Legit",
             "GhostBlock", "Vulcan", "S32Packet",
             "MatrixReduce", "MatrixReduce2", "MatrixReduce3",
-            "IntaveReduce", "Intave14", "Intave14.3.3", "Intave14.1.2", "IntaveStrong", "IntaveTimer", "IntaveFlag",
+            "IntaveReduce", "Intave14", "Intave14.3.3", "Intave14.1.2", "IntaveStrong", "IntaveTimer", "IntaveFlag", "IntaveFull",
             "AttackReduce",
             "Delay", "GrimC03", "Hypixel", "HypixelAir", "HypixelMoving",
             "Click", "BlocksMC", "Polar", "PolarJump", "OldPolar", "Intave/Polar-Flag",
@@ -538,6 +538,9 @@ object Velocity : Module("Velocity", Category.COMBAT) {
     private var dexlandAttackCount = 0
     private var dexlandLastAttackTime = 0L
 
+    // IntaveFull
+    private var intaveFullSneaking = false
+
     // BufferAbuse
     private var bufferAbuseAmount = 0
 
@@ -609,6 +612,7 @@ object Velocity : Module("Velocity", Category.COMBAT) {
         grimVerticalAttack = false
         grimVerticalCanCancel = false
         grimVerticalCanSpoof = false
+        intaveFullSneaking = false
         if (mc.currentScreen == null) {
             mc.gameSettings.keyBindForward.pressed = net.minecraft.client.settings.GameSettings.isKeyDown(mc.gameSettings.keyBindForward)
             mc.gameSettings.keyBindBack.pressed = net.minecraft.client.settings.GameSettings.isKeyDown(mc.gameSettings.keyBindBack)
@@ -688,6 +692,23 @@ object Velocity : Module("Velocity", Category.COMBAT) {
                     mc.timer.timerSpeed = 5.0f
                 } else if (thePlayer.hurtTime == 2) {
                     mc.timer.timerSpeed = 1.0f
+                }
+            }
+
+            "intavefull" -> {
+                if (!hasReceivedVelocity || thePlayer.hurtTime <= 0) return@handler
+                if (!thePlayer.isMoving) {
+                    if (!intaveFullSneaking) {
+                        mc.gameSettings.keyBindSneak.pressed = true
+                        sendPacket(C0BPacketEntityAction(thePlayer, START_SNEAKING))
+                        intaveFullSneaking = true
+                    }
+                } else {
+                    if (intaveFullSneaking) {
+                        mc.gameSettings.keyBindSneak.pressed = net.minecraft.client.settings.GameSettings.isKeyDown(mc.gameSettings.keyBindSneak)
+                        sendPacket(C0BPacketEntityAction(thePlayer, STOP_SNEAKING))
+                        intaveFullSneaking = false
+                    }
                 }
             }
 
@@ -1228,6 +1249,13 @@ object Velocity : Module("Velocity", Category.COMBAT) {
             when (mode.lowercase()) {
                 "simple" -> handleVelocity(event)
 
+                "intavefull" -> {
+                    hasReceivedVelocity = true
+                    if (!thePlayer.isMoving) {
+                        event.cancelEvent()
+                    }
+                }
+
                 "aac", "reverse", "smoothreverse", "aaczero", "ghostblock", "intavereduce" -> hasReceivedVelocity = true
 
                 "jump" -> {
@@ -1671,6 +1699,7 @@ object Velocity : Module("Velocity", Category.COMBAT) {
         grimVerticalAttack = false
         grimVerticalCanCancel = false
         grimVerticalCanSpoof = false
+        intaveFullSneaking = false
         mc.timer.timerSpeed = 1.0f
         resetRiseState()
     }

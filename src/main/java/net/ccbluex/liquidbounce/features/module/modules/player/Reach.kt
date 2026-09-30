@@ -15,4 +15,6 @@ object Reach : Module("Reach", Category.PLAYER) {
 
     val maxRange
         get() = max(combatReach, buildReach)
+
+    override fun handleEvents(): Boolean = state
 }

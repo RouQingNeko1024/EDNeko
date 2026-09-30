@@ -75,7 +75,7 @@ object Fly : Module("Fly", Category.MOVEMENT, Keyboard.KEY_P) {
         MineSecure, HawkEye, HAC, WatchCat,
 
         // Other
-        Jetpack, KeepAlive, Collide, Jump, Flag, Fireball, Intave1493Lag, IntaveFly,
+        Jetpack, KeepAlive, Collide, Jump, IntaveJump, GrimVertical, Flag, Fireball, Intave1493Lag, IntaveFly,
 
         // Tatako
         TatakoFly, Tatako0972Fly
@@ -187,6 +187,10 @@ object Fly : Module("Fly", Category.MOVEMENT, Keyboard.KEY_P) {
     val options = RotationSettings(this) { mode == "Fireball" }
 
     val autoJump by boolean("AutoJump", true) { mode == "Fireball" }
+
+    // GrimVertical
+    val grimVerticalTimer by float("GrimVerticalTimer", 1f, 0.1f..5f) { mode == "GrimVertical" }
+    val autoDisable by boolean("AutoDisable", true) { mode == "GrimVertical" }
 
     // Visuals
     private val mark by boolean("Mark", true).subjective()

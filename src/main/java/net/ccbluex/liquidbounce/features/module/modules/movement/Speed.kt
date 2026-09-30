@@ -131,6 +131,7 @@ object Speed : Module("Speed", Category.MOVEMENT, Keyboard.KEY_X) {
         RiseMineMenClub,
         RiseGrim,
         RiseGrim2,
+        Grim2Speed,
         RiseVerus,
         RiseVulcan,
         RiseWatchdog6Tick,
@@ -220,6 +221,10 @@ object Speed : Module("Speed", Category.MOVEMENT, Keyboard.KEY_X) {
     val riseGrim2Speed by float("RiseGrim2-Speed", 1f, 0f..1f) { mode.get() == "RiseGrim2" }
     val riseGrim2HighPing by boolean("RiseGrim2-HighPing", false) { mode.get() == "RiseGrim2" }
 
+    // Grim2 Speed
+    val grim2Speed by float("Grim2-Speed", 1f, 0f..1f) { mode.get() == "Grim2" }
+    val grim2HighPing by boolean("Grim2-HighPing", false) { mode.get() == "Grim2" }
+
     // Rise Verus
     val riseVerusMode by choices("RiseVerus-Mode", arrayOf("LowHop", "Hop", "yPort"), "LowHop") { mode.get() == "RiseVerus" }
 
@@ -306,6 +311,20 @@ object Speed : Module("Speed", Category.MOVEMENT, Keyboard.KEY_X) {
             thePlayer.isSprinting = true
 
         modeModule.onMotion(event)
+    }
+
+    val onPostMotion = handler<MotionEvent> { event ->
+        if (mc.thePlayer?.isSneaking == true || event.eventState != EventState.POST)
+            return@handler
+
+        modeModule.onPostMotion()
+    }
+
+    val onMoveInput = handler<MovementInputEvent> { event ->
+        if (mc.thePlayer?.isSneaking == true)
+            return@handler
+
+        modeModule.onMoveInput(event)
     }
 
     val onMove = handler<MoveEvent> { event ->

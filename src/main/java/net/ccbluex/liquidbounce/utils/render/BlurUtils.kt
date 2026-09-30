@@ -155,5 +155,36 @@ object BlurUtils : MinecraftInstance() {
         GlStateManager.disableBlend()
     }
 
+    /** 按屏幕坐标对整个矩形区域做一次圆角模糊；rects 不为空时逐个矩形做模板遮罩模糊。 */
+    @JvmStatic
+    fun drawOffsetBlur(
+        x: Float, y: Float, width: Float, height: Float,
+        samples: Int, strength: Float, radius: Float,
+        rects: List<FloatArray>? = null
+    ) {
+        if (!OpenGlHelper.isFramebufferEnabled()) return
+        if (width <= 0 || height <= 0) return
+
+        val blurStrength = if (samples > 0) samples.toFloat() else 5F
+        val safeRadius = radius.coerceIn(0f, 20f)
+
+        if (!rects.isNullOrEmpty()) {
+            // 逐块矩形遮罩模糊：只对实际有背景的区域做模糊
+            blur(x, y, x + width, y + height, blurStrength, true) {
+                GlStateManager.enableBlend()
+                GlStateManager.disableTexture2D()
+                GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+                for (r in rects) {
+                    if (r.size < 4) continue
+                    RenderUtils.drawRoundedRect(r[0], r[1], r[2], r[3], -0x1, safeRadius)
+                }
+                GlStateManager.enableTexture2D()
+                GlStateManager.disableBlend()
+            }
+        } else {
+            blurAreaRounded(x, y, x + width, y + height, safeRadius, blurStrength)
+        }
+    }
+
     fun sizeHasChanged(scaleFactor: Int, width: Int, height: Int): Boolean = (lastFactor != scaleFactor || lastWidth != width || lastHeight != height)
 }

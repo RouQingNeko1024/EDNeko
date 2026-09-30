@@ -127,6 +127,24 @@ object GlowUtils {
         GlStateManager.enableAlpha()
     }
 
+    /** 把多块矩形当作一整块画一次阴影，内部无接缝（上下方向不会互相污染）。 */
+    fun drawCompositeGlow(rects: List<FloatArray>, blurRadius: Int, color: Color, mask: Boolean) {
+        if (rects.isEmpty()) return
+        var minX = Float.MAX_VALUE
+        var minY = Float.MAX_VALUE
+        var maxX = -Float.MAX_VALUE
+        var maxY = -Float.MAX_VALUE
+        for (r in rects) {
+            if (r.size < 4) continue
+            if (r[0] < minX) minX = r[0]
+            if (r[1] < minY) minY = r[1]
+            if (r[2] > maxX) maxX = r[2]
+            if (r[3] > maxY) maxY = r[3]
+        }
+        if (maxX < minX || maxY < minY) return
+        drawGlow(minX, minY, maxX - minX, maxY - minY, blurRadius, color)
+    }
+
     fun clearCache() {
         for (texId in shadowCache.values) {
             GL11.glDeleteTextures(texId)

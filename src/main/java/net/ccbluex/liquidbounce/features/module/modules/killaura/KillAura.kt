@@ -37,6 +37,7 @@ import net.ccbluex.liquidbounce.utils.render.RenderUtils
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawCircle
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawEntityBox
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawPlatform
+import net.ccbluex.liquidbounce.utils.render.WorldToScreen
 import net.ccbluex.liquidbounce.utils.rotation.RandomizationSettings
 import net.ccbluex.liquidbounce.utils.rotation.RaycastUtils.raycastEntity
 import net.ccbluex.liquidbounce.utils.rotation.RaycastUtils.runWithModifiedRaycastResult
@@ -516,6 +517,133 @@ object KillAura : Module("KillAura", Category.KILLAURA, Keyboard.KEY_R) {
             if (KillAuraVisuals.markLies) renderLiesESP(event)
             if (KillAuraVisuals.markSims) renderSimsESP(event)
         }
+    }
+
+    val onRender2D = handler<Render2DEvent> { event ->
+        drawAimPoint2D()
+    }
+
+    private fun drawAimPoint2D() {
+        val worldPos = aimPointWorldPos ?: return
+
+        if (!KillAuraRenderAimPointBox.renderPointBoxAim) return
+
+        val shouldDrawLine = KillAuraRenderAimPointBox.aimPointLine
+        val shouldGlow = KillAuraRenderAimPointBox.aimPointGlow
+        if (!shouldDrawLine && !shouldGlow) return
+
+        val renderManager = mc.renderManager
+        val scaledRes = net.minecraft.client.gui.ScaledResolution(mc)
+        val scaleFactor = scaledRes.scaleFactor
+        val screenWidth = scaledRes.scaledWidth
+        val screenHeight = scaledRes.scaledHeight
+        val centerX = screenWidth / 2.0
+        val centerY = screenHeight / 2.0
+
+        val renderPos = worldPos - renderManager.renderPos
+
+        try {
+            mc.entityRenderer.setupCameraTransform(mc.timer.renderPartialTicks, 0)
+        } catch (e: Exception) {
+            return
+        }
+
+        val screenPos = WorldToScreen.worldToScreen(
+            org.lwjgl.util.vector.Vector3f(
+                renderPos.xCoord.toFloat(),
+                renderPos.yCoord.toFloat(),
+                renderPos.zCoord.toFloat()
+            )
+        ) ?: return
+
+        val pointX = screenPos.x.toDouble() / scaleFactor
+        val pointY = (mc.displayHeight - screenPos.y).toDouble() / scaleFactor
+
+        val glowIntensity = KillAuraRenderAimPointBox.aimPointGlowIntensity
+        val pointColor = KillAuraRenderAimPointBox.aimPointBoxColor
+        val lineColor = KillAuraRenderAimPointBox.aimPointLineColor
+        val lineWidth = KillAuraRenderAimPointBox.aimPointLineWidth
+        val pointSize = KillAuraRenderAimPointBox.aimPointBoxSize * 30f
+
+        GL11.glPushMatrix()
+        GL11.glDisable(GL11.GL_TEXTURE_2D)
+        GL11.glEnable(GL11.GL_BLEND)
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+        GL11.glDisable(GL11.GL_DEPTH_TEST)
+        GL11.glDepthMask(false)
+        GL11.glEnable(GL11.GL_LINE_SMOOTH)
+        GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_NICEST)
+
+        if (shouldGlow) {
+            for (i in 1..glowIntensity.toInt()) {
+                val alpha = (pointColor.alpha / 255f) * (1f - i.toFloat() / glowIntensity) * 0.5f
+                val expand = i.toFloat() * 1.5f
+
+                GL11.glColor4f(pointColor.red / 255f, pointColor.green / 255f, pointColor.blue / 255f, alpha)
+                when (KillAuraRenderAimPointBox.aimPointStyle) {
+                    "Circle", "Box" -> {
+                        GL11.glBegin(GL11.GL_TRIANGLE_FAN)
+                        GL11.glVertex2d(pointX, pointY)
+                        for (j in 0..360) {
+                            val rad = Math.toRadians(j.toDouble())
+                            GL11.glVertex2d(
+                                pointX + cos(rad) * (pointSize + expand),
+                                pointY + sin(rad) * (pointSize + expand)
+                            )
+                        }
+                        GL11.glEnd()
+                    }
+                    else -> {
+                        GL11.glBegin(GL11.GL_QUADS)
+                        GL11.glVertex2d(pointX - pointSize - expand, pointY - pointSize - expand)
+                        GL11.glVertex2d(pointX + pointSize + expand, pointY - pointSize - expand)
+                        GL11.glVertex2d(pointX + pointSize + expand, pointY + pointSize + expand)
+                        GL11.glVertex2d(pointX - pointSize - expand, pointY + pointSize + expand)
+                        GL11.glEnd()
+                    }
+                }
+            }
+        }
+
+        GL11.glColor4f(pointColor.red / 255f, pointColor.green / 255f, pointColor.blue / 255f, pointColor.alpha / 255f)
+        when (KillAuraRenderAimPointBox.aimPointStyle) {
+            "Circle", "Box" -> {
+                RenderUtils.drawFilledCircle(pointX.toFloat(), pointY.toFloat(), pointSize, pointColor)
+            }
+            "Square" -> {
+                GL11.glBegin(GL11.GL_QUADS)
+                GL11.glVertex2d(pointX - pointSize, pointY - pointSize)
+                GL11.glVertex2d(pointX + pointSize, pointY - pointSize)
+                GL11.glVertex2d(pointX + pointSize, pointY + pointSize)
+                GL11.glVertex2d(pointX - pointSize, pointY + pointSize)
+                GL11.glEnd()
+            }
+            "SquareOutline" -> {
+                GL11.glLineWidth(2f)
+                GL11.glBegin(GL11.GL_LINE_LOOP)
+                GL11.glVertex2d(pointX - pointSize, pointY - pointSize)
+                GL11.glVertex2d(pointX + pointSize, pointY - pointSize)
+                GL11.glVertex2d(pointX + pointSize, pointY + pointSize)
+                GL11.glVertex2d(pointX - pointSize, pointY + pointSize)
+                GL11.glEnd()
+            }
+        }
+
+        if (shouldDrawLine) {
+            GL11.glColor4f(lineColor.red / 255f, lineColor.green / 255f, lineColor.blue / 255f, lineColor.alpha / 255f)
+            GL11.glLineWidth(lineWidth)
+            GL11.glBegin(GL11.GL_LINES)
+            GL11.glVertex2d(centerX, centerY)
+            GL11.glVertex2d(pointX, pointY)
+            GL11.glEnd()
+        }
+
+        GL11.glDepthMask(true)
+        GL11.glEnable(GL11.GL_DEPTH_TEST)
+        GL11.glDisable(GL11.GL_LINE_SMOOTH)
+        GL11.glEnable(GL11.GL_TEXTURE_2D)
+        GL11.glDisable(GL11.GL_BLEND)
+        GL11.glPopMatrix()
     }
 
     private fun runAttack(isFirstClick: Boolean, isLastClick: Boolean) {
@@ -1141,18 +1269,21 @@ object KillAura : Module("KillAura", Category.KILLAURA, Keyboard.KEY_R) {
         }
     }
 
+    var aimPointWorldPos: Vec3? = null
+        private set
+
     private fun drawAimPointBox() {
         val player = mc.thePlayer ?: return
         val target = this.target ?: return
 
         if (!KillAuraRenderAimPointBox.renderPointBoxAim) {
+            aimPointWorldPos = null
             return
         }
 
         val f = KillAuraRenderAimPointBox.aimPointBoxSize.toDouble()
-
-        val box = AxisAlignedBB(0.0, 0.0, 0.0, f, f, f)
-
+        val color = KillAuraRenderAimPointBox.aimPointBoxColor
+        val style = KillAuraRenderAimPointBox.aimPointStyle
         val renderManager = mc.renderManager
 
         Backtrack.runWithSimulatedPosition(player, player.interpolatedPosition(player.prevPos)) {
@@ -1161,11 +1292,114 @@ object KillAura : Module("KillAura", Category.KILLAURA, Keyboard.KEY_R) {
                     serverRotation.lerpWith(currentRotation ?: player.rotation, mc.timer.renderPartialTicks)
                 ) * player.getDistanceToEntityBox(target).coerceAtMost(KillAuraRange.range.toDouble())
 
-                val offSetBox = box.offset(rotationVec - renderManager.renderPos)
+                aimPointWorldPos = rotationVec
 
-                RenderUtils.drawAxisAlignedBB(offSetBox, KillAuraRenderAimPointBox.aimPointBoxColor)
+                val renderPos = rotationVec - renderManager.renderPos
+
+                when (style) {
+                    "Box" -> {
+                        val box = AxisAlignedBB(0.0, 0.0, 0.0, f, f, f)
+                        val offSetBox = box.offset(renderPos)
+                        RenderUtils.drawAxisAlignedBB(offSetBox, color)
+                    }
+                    "Circle" -> {
+                        drawAimPointCircle(renderPos, f, color)
+                    }
+                    "Square" -> {
+                        drawAimPointSquare(renderPos, f, color, outline = false)
+                    }
+                    "SquareOutline" -> {
+                        drawAimPointSquare(renderPos, f, color, outline = true)
+                    }
+                }
             }
         }
+    }
+
+    private fun drawAimPointCircle(pos: Vec3, size: Double, color: Color) {
+        val x = pos.xCoord
+        val y = pos.yCoord
+        val z = pos.zCoord
+        val radius = size / 2.0
+
+        GL11.glPushMatrix()
+        GL11.glDisable(GL11.GL_TEXTURE_2D)
+        GL11.glEnable(GL11.GL_BLEND)
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+        GL11.glDisable(GL11.GL_DEPTH_TEST)
+        GL11.glDepthMask(false)
+        GL11.glEnable(GL11.GL_LINE_SMOOTH)
+        GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_NICEST)
+        GL11.glLineWidth(2f)
+        GL11.glColor4f(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)
+        GL11.glBegin(GL11.GL_LINE_STRIP)
+        for (i in 0..360) {
+            val rad = Math.toRadians(i.toDouble())
+            GL11.glVertex3d(x + cos(rad) * radius, y, z + sin(rad) * radius)
+        }
+        GL11.glEnd()
+        GL11.glDepthMask(true)
+        GL11.glEnable(GL11.GL_DEPTH_TEST)
+        GL11.glDisable(GL11.GL_LINE_SMOOTH)
+        GL11.glEnable(GL11.GL_TEXTURE_2D)
+        GL11.glDisable(GL11.GL_BLEND)
+        GL11.glPopMatrix()
+    }
+
+    private fun drawAimPointSquare(pos: Vec3, size: Double, color: Color, outline: Boolean) {
+        val x = pos.xCoord
+        val y = pos.yCoord
+        val z = pos.zCoord
+        val half = size / 2.0
+
+        GL11.glPushMatrix()
+        GL11.glDisable(GL11.GL_TEXTURE_2D)
+        GL11.glEnable(GL11.GL_BLEND)
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+        GL11.glDisable(GL11.GL_DEPTH_TEST)
+        GL11.glDepthMask(false)
+        GL11.glColor4f(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)
+
+        if (outline) {
+            GL11.glEnable(GL11.GL_LINE_SMOOTH)
+            GL11.glLineWidth(2f)
+            GL11.glBegin(GL11.GL_LINES)
+            GL11.glVertex3d(x - half, y - half, z - half)
+            GL11.glVertex3d(x + half, y - half, z - half)
+            GL11.glVertex3d(x + half, y - half, z - half)
+            GL11.glVertex3d(x + half, y - half, z + half)
+            GL11.glVertex3d(x + half, y - half, z + half)
+            GL11.glVertex3d(x - half, y - half, z + half)
+            GL11.glVertex3d(x - half, y - half, z + half)
+            GL11.glVertex3d(x - half, y - half, z - half)
+            GL11.glVertex3d(x - half, y + half, z - half)
+            GL11.glVertex3d(x + half, y + half, z - half)
+            GL11.glVertex3d(x + half, y + half, z - half)
+            GL11.glVertex3d(x + half, y + half, z + half)
+            GL11.glVertex3d(x + half, y + half, z + half)
+            GL11.glVertex3d(x - half, y + half, z + half)
+            GL11.glVertex3d(x - half, y + half, z + half)
+            GL11.glVertex3d(x - half, y + half, z - half)
+            GL11.glVertex3d(x - half, y - half, z - half)
+            GL11.glVertex3d(x - half, y + half, z - half)
+            GL11.glVertex3d(x + half, y - half, z - half)
+            GL11.glVertex3d(x + half, y + half, z - half)
+            GL11.glVertex3d(x + half, y - half, z + half)
+            GL11.glVertex3d(x + half, y + half, z + half)
+            GL11.glVertex3d(x - half, y - half, z + half)
+            GL11.glVertex3d(x - half, y + half, z + half)
+            GL11.glEnd()
+            GL11.glDisable(GL11.GL_LINE_SMOOTH)
+        } else {
+            val box = AxisAlignedBB(x - half, y - half, z - half, x + half, y + half, z + half)
+            RenderUtils.drawAxisAlignedBB(box, color)
+        }
+
+        GL11.glDepthMask(true)
+        GL11.glEnable(GL11.GL_DEPTH_TEST)
+        GL11.glEnable(GL11.GL_TEXTURE_2D)
+        GL11.glDisable(GL11.GL_BLEND)
+        GL11.glPopMatrix()
     }
 
     private val cancelRun

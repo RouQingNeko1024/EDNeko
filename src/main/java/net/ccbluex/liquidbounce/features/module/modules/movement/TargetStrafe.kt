@@ -28,6 +28,7 @@ object TargetStrafe : Module("TargetStrafe", Category.MOVEMENT) {
     private val radius by float("Radius", 0.5f, 0.1f..5.0f)
     private val onlyOnGround by boolean("OnlyOnGround", false)
     private val holdSpace by boolean("HoldSpace", false)
+    private val onlyOnSprintPress by boolean("OnlyOnSprintPress", false)
     private val onlySpeed by boolean("OnlySpeed", true)
     private val onlyFlight by boolean("OnlyFlight", true)
     private val onlyVisual by boolean("OnlyVisual", false)
@@ -256,6 +257,7 @@ object TargetStrafe : Module("TargetStrafe", Category.MOVEMENT) {
         targetEntity = if (KillAura.state) KillAura.target else null
         return state && targetEntity != null
                 && (!holdSpace || mc.gameSettings.keyBindJump.isKeyDown)
+                && (!onlyOnSprintPress || mc.gameSettings.keyBindSprint.isKeyDown)
                 && (!onlySpeed || LiquidBounce.moduleManager[Speed::class.java]?.state == true)
                 && (!onlyFlight || LiquidBounce.moduleManager[Fly::class.java]?.state == true)
     }

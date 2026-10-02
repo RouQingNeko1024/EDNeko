@@ -16,6 +16,28 @@ https://github.com/lmx0721/AirClient
 
 AirClient 是一个免费开源的 Minecraft 作弊客户端，基于 LiquidBounce legacy 代码库构建。本项目由 AI 全程编写 + skid 代码，拥有现代化的设计和丰富的自定义选项。
 
+### 配置需求
+- **最低配置**
+- cpu: 英特尔酷睿 i5-12400F AMD 锐龙 5 5600X
+- ram：32 GB
+- gpu：英伟达 RTX 3060 Ti 
+- 存储：至少预留50g NVMe SSD
+- 系统：Windows 10/11
+- **推荐配置**
+- cpu: 英特尔酷睿 U7-270K PLUS
+- ram：128 GB
+- gpu：英伟达 RTX 5090
+- 存储：至少预留50g NVMe SSD
+- 系统：Windows 10/11
+
+
+**注意**
+- 请确保你的PC或者Server满足最低配置，否则可能会导致客户端运行不正常
+- 使用AMD或者Intel的GPU可能会导致客户端渲染错误
+- RAM不够会导致莫名其妙崩溃不要提交报告
+
+
+
 ### 特色功能
 
 - **我不知道喵** - 我不知道有什么特色功能

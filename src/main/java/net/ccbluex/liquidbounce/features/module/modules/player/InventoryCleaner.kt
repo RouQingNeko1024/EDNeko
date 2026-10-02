@@ -6,6 +6,8 @@ package net.ccbluex.liquidbounce.features.module.modules.player
 
 import kotlinx.coroutines.delay
 import net.ccbluex.liquidbounce.config.ListValue
+import net.ccbluex.liquidbounce.event.UpdateEvent
+import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.features.module.modules.combat.AutoArmor
@@ -37,6 +39,8 @@ import net.minecraft.item.*
 import net.minecraft.potion.Potion
 
 object InventoryCleaner : Module("InventoryCleaner", Category.PLAYER) {
+    private val mode by choices("Mode", arrayOf("Normal", "Intave"), "Normal")
+
     private val drop by boolean("Drop", true).subjective()
     val sort by boolean("Sort", true).subjective()
 
@@ -1044,6 +1048,26 @@ object InventoryCleaner : Module("InventoryCleaner", Category.PLAYER) {
 
         new
     }.subjective() as ListValue
+
+    val onUpdate = handler<UpdateEvent> {
+        val player = mc.thePlayer ?: return@handler
+
+        if (mode == "Intave") {
+            val inGUI = mc.currentScreen is GuiInventory
+
+            if (inGUI) {
+                mc.gameSettings.keyBindSneak.pressed = true
+            } else {
+                mc.gameSettings.keyBindSneak.pressed = mc.gameSettings.keyBindSneak.isKeyDown
+            }
+        }
+    }
+
+    override fun onDisable() {
+        if (mode == "Intave") {
+            mc.gameSettings.keyBindSneak.pressed = mc.gameSettings.keyBindSneak.isKeyDown
+        }
+    }
 }
 
 private val ITEMS_WHITELIST = arrayOf(

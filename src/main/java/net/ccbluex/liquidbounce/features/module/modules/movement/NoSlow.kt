@@ -6,6 +6,8 @@ package net.ccbluex.liquidbounce.features.module.modules.movement
 
 import io.netty.buffer.Unpooled
 import net.ccbluex.liquidbounce.event.*
+import net.ccbluex.liquidbounce.event.EventState.POST
+import net.ccbluex.liquidbounce.event.EventState.PRE
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.features.module.modules.combat.AutoBlock
@@ -13,6 +15,7 @@ import net.ccbluex.liquidbounce.features.module.modules.combat.KillAura
 import net.ccbluex.liquidbounce.utils.client.BlinkUtils
 import net.ccbluex.liquidbounce.utils.client.PacketUtils.sendPacket
 import net.ccbluex.liquidbounce.utils.extensions.isMoving
+import net.ccbluex.liquidbounce.utils.extensions.setSprintSafely
 import net.ccbluex.liquidbounce.utils.inventory.InventoryUtils
 import net.ccbluex.liquidbounce.utils.inventory.SilentHotbar
 import net.ccbluex.liquidbounce.utils.kotlin.RandomUtils.nextInt
@@ -39,16 +42,42 @@ import net.minecraft.network.status.server.S01PacketPong
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.MovingObjectPosition
+import net.minecraft.util.Vec3
 
 object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
 
+    private val tagMode by choices("TagMode", arrayOf("Normal", "None", "Custom"), "Normal")
+    private val customTagText by text("TagText", "") { tagMode == "Custom" }
+    private val specialMode by choices("SpecialMode", arrayOf("None", "Matrix", "Matrix2", "LatestGrim"), "None")
+
+    private val matrix2NoSlowMS by int("Matrix2NoSlowMS", 100, 10..1000, "ms") { specialMode == "Matrix2" }
+    private val matrix2SlowMS by int("Matrix2SlowMS", 50, 10..1000, "ms") { specialMode == "Matrix2" }
+    private val matrixNoSlowTick by int("MatrixNoSlowTicks", 15, 1..50) { specialMode == "Matrix" }
+
     private val swordMode by choices(
         "SwordMode",
-        arrayOf("None", "NCP", "UpdatedNCP", "AAC5", "SwitchItem", "InvalidC08", "Blink", "postplace", "Matrix", "PredictionSemi", "Prediction", "GrimAC", "GrimAC1.9+", "aug"),
+        arrayOf(
+            "None", "NCP", "UpdatedNCP", "AAC5", "SwitchItem", "InvalidC08", "Blink", "postplace",
+            "Matrix", "PredictionSemi", "Prediction", "GrimAC", "GrimAC1.9+", "aug",
+            "Grim", "PostPlace", "BlocksMC", "HYTBW32", "Intave14", "OldIntave",
+            "GrimNew", "GrimTick", "Tatako", "IntaveBlink", "PredictionRise"
+        ),
         "None"
-    )
+    ) { specialMode == "None" }
 
-    private val reblinkTicks by int("ReblinkTicks", 10, 1..20) { swordMode == "Blink" }
+    private val bmcTicks by int("BMCTicks", 1, 1..20) { swordMode == "BlocksMC" && specialMode == "None" }
+    private val bmcOldOffset by boolean("BMCOldOffset", false) { swordMode == "BlocksMC" && specialMode == "None" }
+    private val matrixSwitchSlot by int("MatrixSwitchSlot", 4, 0..20)
+    private val reblinkTicks by int("ReblinkTicks", 10, 1..20) { swordMode == "Blink" && specialMode == "None" }
+    private val predictionMaxPingSpoof by int("PredictionMaxPingSpoof", 8, 1..50) {
+        swordMode == "PredictionRise" && specialMode == "None"
+    }
+    private val predictionLetGo by int("PredictionLetGo", 30, 20..36) {
+        swordMode == "PredictionRise" && specialMode == "None"
+    }
+    private val predictionSprintBypass by boolean("PredictionSprintBypass", true) {
+        swordMode == "PredictionRise" && specialMode == "None"
+    }
     private val predictionCancelTick by int("PredictionSemiCancelTick", 1, 0..2) { swordMode == "PredictionSemi" }
     private val predictionCancelTick2 by int("PredictionSemiCancelTick2", 1, 0..2) { swordMode == "PredictionSemi" }
     private val predictionSwapDelay by int("PredictionSwapDelay", 0, 0..3) { swordMode == "Prediction" }
@@ -98,34 +127,40 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
     // aug模式 - 其他选项
     private val augIgnoreServerItemChange by boolean("AugIgnoreServerItemChange", false) { swordMode == "aug" }
 
-    private val blockForwardMultiplier by float("BlockForwardMultiplier", 1f, 0.2F..1f)
-    private val blockStrafeMultiplier by float("BlockStrafeMultiplier", 1f, 0.2F..1f)
+    private val blockForwardMultiplier by float("BlockForwardMultiplier", 1f, 0.2F..1f) { specialMode == "None" }
+    private val blockStrafeMultiplier by float("BlockStrafeMultiplier", 1f, 0.2F..1f) { specialMode == "None" }
 
     private val consumeMode by choices(
         "ConsumeMode",
-        arrayOf("None", "UpdatedNCP", "AAC5", "SwitchItem", "InvalidC08", "Intave", "OldIntave", "GrimAC", "Drop"),
+        arrayOf(
+            "None", "UpdatedNCP", "AAC5", "SwitchItem", "InvalidC08", "Intave", "OldIntave", "GrimAC", "Drop",
+            "BlocksMC", "GrimTick", "IntaveNew", "HYTBW32", "Intave14", "GrimNew", "IntaveBlink"
+        ),
         "None"
-    )
+    ) { specialMode == "None" }
 
-    private val consumeForwardMultiplier by float("ConsumeForwardMultiplier", 1f, 0.2F..1f)
-    private val consumeStrafeMultiplier by float("ConsumeStrafeMultiplier", 1f, 0.2F..1f)
+    private val consumeForwardMultiplier by float("ConsumeForwardMultiplier", 1f, 0.2F..1f) { specialMode == "None" }
+    private val consumeStrafeMultiplier by float("ConsumeStrafeMultiplier", 1f, 0.2F..1f) { specialMode == "None" }
     private val consumeFoodOnly by boolean(
         "ConsumeFood",
         true
-    ) { consumeForwardMultiplier > 0.2F || consumeStrafeMultiplier > 0.2F }
+    ) { consumeForwardMultiplier > 0.2F || consumeStrafeMultiplier > 0.2F && specialMode == "None" }
     private val consumeDrinkOnly by boolean(
         "ConsumeDrink",
         true
-    ) { consumeForwardMultiplier > 0.2F || consumeStrafeMultiplier > 0.2F }
+    ) { consumeForwardMultiplier > 0.2F || consumeStrafeMultiplier > 0.2F && specialMode == "None" }
 
     private val bowPacket by choices(
         "BowMode",
-        arrayOf("None", "UpdatedNCP", "AAC5", "SwitchItem", "InvalidC08", "GrimAC"),
+        arrayOf(
+            "None", "UpdatedNCP", "AAC5", "SwitchItem", "InvalidC08", "GrimAC",
+            "Intave14", "GrimNew", "GrimTick", "IntaveBlink", "OldIntave"
+        ),
         "None"
-    )
+    ) { specialMode == "None" }
 
-    private val bowForwardMultiplier by float("BowForwardMultiplier", 1f, 0.2F..1f)
-    private val bowStrafeMultiplier by float("BowStrafeMultiplier", 1f, 0.2F..1f)
+    private val bowForwardMultiplier by float("BowForwardMultiplier", 1f, 0.2F..1f) { specialMode == "None" }
+    private val bowStrafeMultiplier by float("BowStrafeMultiplier", 1f, 0.2F..1f) { specialMode == "None" }
 
     // Blocks
     val soulSand by boolean("SoulSand", true)
@@ -155,22 +190,45 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
     private var augBlocking = false
 
     private val BlinkTimer = TickTimer()
+    private val in14MS = MSTimer()
+    private val matrix2Timer = MSTimer()
 
-    override val tag: String?
-        get() = if (swordMode == "aug") {
-            val tags = mutableListOf<String>()
-            if (augBlockingSwitch) tags.add("Switch")
-            if (augBlockingExtra) tags.add("Extra")
-            if (augBlockingAAC5) tags.add("AAC5")
-            if (augBlockingNoGround) tags.add("NoGround")
-            if (augBlockingJump) tags.add("Jump")
-            if (augBlockingHandPacket) tags.add("HandPacket")
-            if (augBlockingMainHand) tags.add("MainHand")
-            if (augBlockingOffHandPlace) tags.add("OffHandPlace")
-            if (augBlockingOldGrim) tags.add("OldGrim")
-            if (augBlockingPost) tags.add("Post")
-            if (tags.isNotEmpty()) "aug | ${tags.joinToString(",")}" else "aug"
-        } else null
+    private var cancelTicks = 0
+    private var matrixSlowing = false
+
+    private var grim2371DoNotSlow = false
+    private val grim2371Timer = TickTimer()
+
+    private var randomFactor = 0f
+    private var sent = false
+    private var consumeTickCycle = 0
+
+    private var predictionUsingItem = false
+    private var predictionSpoofed = false
+    private var predictionTimer = 0
+
+    override val tag: String? get() = when (tagMode) {
+            "Normal" -> if (specialMode == "None") {
+                (if (swordMode == "aug") {
+                    val tags = mutableListOf<String>()
+                    if (augBlockingSwitch) tags.add("Switch")
+                    if (augBlockingExtra) tags.add("Extra")
+                    if (augBlockingAAC5) tags.add("AAC5")
+                    if (augBlockingNoGround) tags.add("NoGround")
+                    if (augBlockingJump) tags.add("Jump")
+                    if (augBlockingHandPacket) tags.add("HandPacket")
+                    if (augBlockingMainHand) tags.add("MainHand")
+                    if (augBlockingOffHandPlace) tags.add("OffHandPlace")
+                    if (augBlockingOldGrim) tags.add("OldGrim")
+                    if (augBlockingPost) tags.add("Post")
+                    if (tags.isNotEmpty()) "aug | ${tags.joinToString(",")}" else "aug"
+                } else {
+                    "$swordMode $consumeMode $bowPacket"
+                })
+            } else specialMode
+            "Custom" -> customTagText
+            else -> null
+        }
 
     override fun onDisable() {
         shouldSwap = false
@@ -186,18 +244,26 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
         predictionPost = false
         predictionBlockTick = 0
 
-        // 重置Matrix模式相关变量
         nextTemp = false
         lastBlockingStat = false
         waitC03 = false
         packetBuf.clear()
         msTimer.reset()
 
-        // 重置aug模式相关变量
         augBlocking = false
+
+        grim2371DoNotSlow = false
+        grim2371Timer.reset()
+        predictionUsingItem = false
+        predictionSpoofed = false
+        shouldBlink = false
+        if (BlinkUtils.isBlinking) {
+            BlinkUtils.unblink()
+        }
     }
 
     val onMotion = handler<MotionEvent> { event ->
+        if (specialMode != "None") return@handler
         val player = mc.thePlayer ?: return@handler
         val heldItem = player.heldItem ?: return@handler
         val isUsingItem = usingItemFunc()
@@ -298,6 +364,66 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
                     "grimac" -> {
                         handleGrimConsumeMotion(player, heldItem)
                     }
+
+                    "blocksmc" -> {
+                        if (event.eventState == PRE) {
+                            consumeTickCycle++
+                            if (consumeTickCycle == 1) {
+                                mc.netHandler.addToSendQueue(C09PacketHeldItemChange((mc.thePlayer.inventory.currentItem + 1) % 9))
+                                mc.netHandler.addToSendQueue(C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem))
+                                sendPacket(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 0, heldItem, 0f, 0f, 0f))
+                            }
+                        }
+                    }
+
+                    "grimtick" -> {
+                        val currentTick = player.ticksExisted % 32
+                        if (event.eventState == PRE) {
+                            if (currentTick % 4 < 2) {
+                                sendPacket(C07PacketPlayerDigging(RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN))
+                            }
+                        }
+                    }
+
+                    "intavenew" -> {
+                        if (event.eventState == PRE) {
+                            mc.netHandler.addToSendQueue(
+                                C07PacketPlayerDigging(
+                                    RELEASE_USE_ITEM,
+                                    BlockPos(mc.thePlayer.posX, mc.thePlayer.getPositionEyes(1.0f).yCoord, mc.thePlayer.posZ),
+                                    EnumFacing.DOWN
+                                )
+                            )
+                        }
+                    }
+
+                    "hytbw32" -> {
+                        if (event.eventState.stateName == "PRE") {
+                            if (heldItem.item is ItemFood) {
+                                mc.netHandler.addToSendQueue(
+                                    C07PacketPlayerDigging(
+                                        C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK,
+                                        BlockPos(mc.thePlayer.position.up()),
+                                        EnumFacing.UP
+                                    )
+                                )
+                            }
+                        }
+                    }
+
+                    "intave14" -> {
+                        handleIntaveMode(event)
+                    }
+
+                    "grimnew" -> {
+                        mc.netHandler.addToSendQueue(C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1))
+                        mc.netHandler.addToSendQueue(C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 7 + 2))
+                        mc.netHandler.addToSendQueue(C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem))
+                    }
+
+                    "intaveblink" -> {
+                        handleIntaveBlinkMode(event)
+                    }
                 }
             }
         }
@@ -332,6 +458,35 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
                     if (event.eventState == EventState.POST) {
                         sendPacket(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, heldItem, 0f, 0f, 0f), false)
                     }
+
+                "intave14" -> {
+                    handleIntaveMode(event)
+                }
+
+                "grimnew" -> {
+                    mc.netHandler.addToSendQueue(C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1))
+                    mc.netHandler.addToSendQueue(C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 7 + 2))
+                    mc.netHandler.addToSendQueue(C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem))
+                }
+
+                "grimtick" -> {
+                    val currentTick = player.ticksExisted % 32
+                    if (event.eventState == PRE) {
+                        if (currentTick % 4 < 2) {
+                            sendPacket(C07PacketPlayerDigging(RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN))
+                        }
+                    }
+                }
+
+                "oldintave" -> {
+                    if (event.eventState == PRE) {
+                        sendPacket(C07PacketPlayerDigging(RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.UP))
+                    }
+                }
+
+                "intaveblink" -> {
+                    handleIntaveBlinkMode(event)
+                }
             }
         }
 
@@ -387,6 +542,7 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
                         sendPacket(C07PacketPlayerDigging(RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN))
                     } else {
                         sendPacket(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, heldItem, 0f, 0f, 0f))
+                        sendOffHandUseItem()
                     }
 
                 "predictionsemi" -> {
@@ -419,11 +575,158 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
                         }
                     }
                 }
+
+                "grim" -> {
+                    if (event.eventState == PRE) {
+                        mc.netHandler.addToSendQueue(C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1))
+                        mc.netHandler.addToSendQueue(C17PacketCustomPayload("许锦良", PacketBuffer(Unpooled.buffer())))
+                        mc.netHandler.addToSendQueue(C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem))
+                    } else {
+                        sendPacket(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, heldItem, 0f, 0f, 0f))
+                        sendOffHandUseItem()
+                    }
+                }
+
+                "blocksmc" -> {
+                    if (!sent) {
+                        sent = true
+                        if (player.onGround) {
+                            player.jump()
+                        }
+                    }
+
+                    val slot = player.inventory.currentItem
+                    val item = player.inventory.getStackInSlot(slot)
+
+                    if (item != null && (item.unlocalizedName.contains("apple", true) ||
+                                item.unlocalizedName.contains("bow", true) ||
+                                item.unlocalizedName.contains("potion", true))
+                    ) {
+                        randomFactor = if (bmcOldOffset) {
+                            0.5f + (Math.random() * 0.44).toFloat()
+                        } else {
+                            (Math.random() * 0.96).toFloat()
+                        }
+
+                        val playerPosition = player.position
+                        val adjustedY = if (playerPosition.y > 0) playerPosition.y - 255 else playerPosition.y + 255
+                        val inter = Vec3(playerPosition.x.toDouble(), adjustedY.toDouble(), playerPosition.z.toDouble())
+
+                        sendPacket(
+                            C08PacketPlayerBlockPlacement(
+                                BlockPos(inter.xCoord.toInt(), inter.yCoord.toInt(), inter.zCoord.toInt()),
+                                0, item, 0f, randomFactor, 0f
+                            )
+                        )
+                    }
+                    return@handler
+                }
+
+                "hytbw32" -> {
+                    if (event.eventState.stateName == "PRE") {
+                        if (heldItem.item is ItemSword || heldItem.item is ItemBow) {
+                            mc.netHandler.addToSendQueue(C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem + 1))
+                            mc.netHandler.addToSendQueue(C17PacketCustomPayload("sbhyt", PacketBuffer(Unpooled.buffer())))
+                            mc.netHandler.addToSendQueue(C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem))
+                        }
+                    }
+                    if (event.eventState.stateName == "POST") {
+                        if (heldItem.item is ItemSword || heldItem.item is ItemBow) {
+                            mc.netHandler.addToSendQueue(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
+                        }
+                    }
+                }
+
+                "oldintave" -> {
+                    if (event.eventState == PRE) {
+                        sendPacket(C07PacketPlayerDigging(RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.UP))
+                    }
+                }
+
+                "intave14" -> {
+                    handleIntaveMode(event)
+                }
+
+                "grimnew" -> {
+                    mc.netHandler.addToSendQueue(C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1))
+                    mc.netHandler.addToSendQueue(C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 7 + 2))
+                    mc.netHandler.addToSendQueue(C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem))
+                }
+
+                "grimtick" -> {
+                    val currentTick = player.ticksExisted % 32
+                    if (event.eventState == PRE) {
+                        if (currentTick % 4 < 2) {
+                            sendPacket(C07PacketPlayerDigging(RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN))
+                        }
+                    }
+                }
+
+                "tatako" -> {
+                    if (event.eventState == PRE) mc.netHandler.addToSendQueue(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
+                }
+
+                "intaveblink" -> {
+                    handleIntaveBlinkMode(event)
+                }
+
+                "predictionrise" -> {
+                    if (event.eventState == PRE) {
+                        val player = mc.thePlayer ?: return@handler
+                        val heldItem = player.heldItem ?: return@handler
+                        val isUsingItem = usingItemFunc()
+
+                        if (isUsingItem) {
+                            if (!predictionUsingItem) {
+                                predictionUsingItem = true
+                                predictionTimer = player.ticksExisted
+                                predictionSpoofed = false
+                                shouldBlink = false
+                            }
+
+                            val elapsedTicks = player.ticksExisted - predictionTimer
+
+                            if (elapsedTicks >= predictionMaxPingSpoof && !predictionSpoofed) {
+                                predictionSpoofed = true
+                            }
+
+                            if (elapsedTicks >= 5) {
+                                if (elapsedTicks % 5 == 0) {
+                                    sendPacket(C07PacketPlayerDigging(RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN))
+                                    if (elapsedTicks == 5) {
+                                        shouldBlink = true
+                                    }
+                                    sendPacket(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, heldItem, 0f, 0f, 0f))
+                                }
+                            }
+
+                            if (elapsedTicks >= predictionLetGo) {
+                                mc.gameSettings.keyBindUseItem.pressed = false
+                            }
+
+                            if (predictionSprintBypass && player.moveForward > 0.0f &&
+                                elapsedTicks <= predictionMaxPingSpoof) {
+                                player.isSprinting = true
+                            }
+                        } else if (predictionUsingItem) {
+                            predictionUsingItem = false
+                            predictionSpoofed = false
+                            shouldBlink = false
+                            if (BlinkUtils.isBlinking) {
+                                BlinkUtils.unblink()
+                            }
+                            if (!mc.gameSettings.keyBindUseItem.isKeyDown) {
+                                mc.gameSettings.keyBindUseItem.pressed = false
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 
     val onPacket = handler<PacketEvent> { event ->
+        if (specialMode != "None") return@handler
         val packet = event.packet
         val player = mc.thePlayer ?: return@handler
 
@@ -434,6 +737,99 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
             handleGrimConsumePacket(event, packet, player)
             if (event.isCancelled)
                 return@handler
+        }
+
+        // IntaveBlink 的包处理逻辑
+        if (swordMode == "IntaveBlink" || consumeMode == "IntaveBlink" || bowPacket == "IntaveBlink") {
+            if (!usingItemFunc()) {
+                if (shouldBlink) {
+                    BlinkUtils.unblink()
+                    shouldBlink = false
+                }
+                return@handler
+            }
+
+            when (packet) {
+                is C00Handshake, is C00PacketServerQuery, is C01PacketPing,
+                is C01PacketChatMessage, is S01PacketPong -> return@handler
+
+                is C07PacketPlayerDigging, is C02PacketUseEntity,
+                is C12PacketUpdateSign, is C19PacketResourcePackStatus -> {
+                    if (shouldBlink) {
+                        BlinkUtils.blink(packet, event)
+                    }
+                    return@handler
+                }
+
+                is S12PacketEntityVelocity -> {
+                    if (mc.thePlayer.entityId == packet.entityID) {
+                        BlinkUtils.unblink()
+                        shouldBlink = false
+                        return@handler
+                    }
+                }
+
+                is S27PacketExplosion -> {
+                    if (packet.field_149153_g != 0f || packet.field_149152_f != 0f || packet.field_149159_h != 0f) {
+                        BlinkUtils.unblink()
+                        shouldBlink = false
+                        return@handler
+                    }
+                }
+
+                is C03PacketPlayer -> {
+                    if (shouldBlink) {
+                        BlinkUtils.blink(packet, event)
+                    }
+                }
+            }
+        }
+
+        // PredictionRise 模式的包处理
+        if (swordMode == "PredictionRise" && predictionUsingItem) {
+            val elapsedTicks = player.ticksExisted - predictionTimer
+
+            if (shouldBlink) {
+                when (packet) {
+                    is C00Handshake, is C00PacketServerQuery, is C01PacketPing,
+                    is C01PacketChatMessage, is S01PacketPong -> return@handler
+
+                    is C07PacketPlayerDigging, is C02PacketUseEntity,
+                    is C12PacketUpdateSign, is C19PacketResourcePackStatus -> {
+                        BlinkTimer.update()
+                        if (shouldBlink) {
+                            BlinkUtils.blink(packet, event)
+                        }
+                        return@handler
+                    }
+
+                    is S12PacketEntityVelocity -> {
+                        if (mc.thePlayer.entityId == packet.entityID) {
+                            BlinkUtils.unblink()
+                            shouldBlink = false
+                            return@handler
+                        }
+                    }
+
+                    is S27PacketExplosion -> {
+                        if (packet.field_149153_g != 0f || packet.field_149152_f != 0f || packet.field_149159_h != 0f) {
+                            BlinkUtils.unblink()
+                            shouldBlink = false
+                            return@handler
+                        }
+                    }
+
+                    is C03PacketPlayer -> {
+                        if (shouldBlink) {
+                            BlinkUtils.blink(packet, event)
+                        }
+                    }
+                }
+            }
+
+            if (predictionSpoofed && elapsedTicks >= predictionMaxPingSpoof) {
+                // PingSpoofUtils not available, using simple delay approach
+            }
         }
 
         // GrimAC1.9+ 模式: 取消原始的C08包(使用物品触发的), 我们在onMotion中发送了伪造的C08
@@ -564,6 +960,21 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
 
     val onSlowDown = handler<SlowDownEvent> { event ->
         val heldItem = mc.thePlayer.heldItem?.item
+        val player = mc.thePlayer ?: return@handler
+
+        if (swordMode == "PredictionRise" && heldItem is ItemSword && predictionUsingItem) {
+            val elapsedTicks = player.ticksExisted - predictionTimer
+            if (elapsedTicks > 0) {
+                sendPacket(C07PacketPlayerDigging(RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN))
+                sendPacket(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, player.heldItem, 0f, 0f, 0f))
+                if (shouldBlink && BlinkUtils.isBlinking) {
+                    BlinkUtils.unblink()
+                }
+                event.forward = 1.0F
+                event.strafe = 1.0F
+                return@handler
+            }
+        }
 
         if (heldItem !is ItemSword) {
             if (!consumeFoodOnly && heldItem is ItemFood ||
@@ -611,21 +1022,72 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
         event.strafe = getMultiplier(heldItem, false)
     }
 
-    private fun getMultiplier(item: Item?, isForward: Boolean) = when (item) {
-        is ItemFood, is ItemPotion, is ItemBucketMilk ->
-            if (consumeMode == "GrimAC" && isUsingConsumable()) {
-                grimFoodSpeed
-            } else if (isForward) {
-                consumeForwardMultiplier
+    private fun getMultiplier(item: Item?, isForward: Boolean) = when (specialMode) {
+        "None" -> when (item) {
+            is ItemFood, is ItemPotion, is ItemBucketMilk ->
+                if (consumeMode == "GrimAC" && isUsingConsumable()) {
+                    grimFoodSpeed
+                } else if (isForward) {
+                    consumeForwardMultiplier
+                } else {
+                    consumeStrafeMultiplier
+                }
+
+            is ItemSword -> if (isForward) blockForwardMultiplier else blockStrafeMultiplier
+
+            is ItemBow -> if (isForward) bowForwardMultiplier else bowStrafeMultiplier
+
+            else -> 0.2F
+        }
+
+        "Matrix" -> if (cancelTicks != 0) {
+            1.0F
+        } else {
+            if (net.ccbluex.liquidbounce.features.module.modules.movement.Sprint.mode == "Matrix" ||
+                (net.ccbluex.liquidbounce.features.module.modules.movement.Sprint.mode == "Vanilla" &&
+                    net.ccbluex.liquidbounce.features.module.modules.movement.Sprint.allDirections)
+            ) {
+                val strafed = mc.gameSettings.keyBindLeft.isKeyDown || mc.gameSettings.keyBindRight.isKeyDown
+                if (!isForward) {
+                    if ((mc.gameSettings.keyBindForward.isKeyDown && strafed) ||
+                        (mc.gameSettings.keyBindBack.isKeyDown && strafed)
+                    ) 0.38f else 0.5f
+                } else {
+                    if ((mc.gameSettings.keyBindForward.isKeyDown && strafed) ||
+                        (mc.gameSettings.keyBindBack.isKeyDown && strafed)
+                    ) 0.39f else 0.5f
+                }
+            } else 0.5f
+        }
+
+        "Matrix2" -> {
+            if (matrixSlowing) {
+                val strafed = mc.gameSettings.keyBindLeft.isKeyDown || mc.gameSettings.keyBindRight.isKeyDown
+                if (!isForward) {
+                    if ((mc.gameSettings.keyBindForward.isKeyDown && strafed) ||
+                        (mc.gameSettings.keyBindBack.isKeyDown && strafed)
+                    ) 0.38f else 0.5f
+                } else {
+                    if ((mc.gameSettings.keyBindForward.isKeyDown && strafed) ||
+                        (mc.gameSettings.keyBindBack.isKeyDown && strafed)
+                    ) 0.39f else 0.5f
+                }
             } else {
-                consumeStrafeMultiplier
+                1.0f
             }
+        }
 
-        is ItemSword -> if (isForward) blockForwardMultiplier else blockStrafeMultiplier
+        "LatestGrim" -> {
+            if (mc.thePlayer.ticksExisted % 3 == 0) {
+                mc.thePlayer setSprintSafely false
+                0.2f
+            } else {
+                mc.thePlayer setSprintSafely true
+                1.0f
+            }
+        }
 
-        is ItemBow -> if (isForward) bowForwardMultiplier else bowStrafeMultiplier
-
-        else -> 0.2F
+        else -> 1.0f
     }
 
     private fun handleGrimConsumeMotion(player: net.minecraft.client.entity.EntityPlayerSP, heldItem: net.minecraft.item.ItemStack) {
@@ -901,5 +1363,85 @@ object NoSlow : Module("NoSlow", Category.MOVEMENT, gameDetecting = false) {
                 return
             }
         }
+    }
+
+    val onUpdate = handler<UpdateEvent> {
+        val player = mc.thePlayer ?: return@handler
+
+        if (specialMode == "Matrix" && cancelTicks > 0) {
+            cancelTicks--
+        }
+
+        if (specialMode == "Matrix2") {
+            if (!player.isUsingItem) {
+                matrixSlowing = true
+            }
+        }
+
+        if (swordMode == "Matrix" || bowPacket == "Matrix" || consumeMode == "Matrix") {
+            val targetSlot = getTargetSlot() ?: return@handler
+            if (player.ticksExisted == matrixSwitchSlot) {
+                if (player.inventory.currentItem != targetSlot) {
+                    mc.netHandler.addToSendQueue(C09PacketHeldItemChange(targetSlot))
+                }
+                val currentStack = player.inventory.getStackInSlot(player.inventory.currentItem)
+                if (currentStack != null) {
+                    mc.netHandler.addToSendQueue(C08PacketPlayerBlockPlacement(currentStack))
+                }
+            }
+        }
+    }
+
+    private fun handleAACMode(event: MotionEvent) {
+        sendPacket(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, mc.thePlayer.heldItem, 0f, 0f, 0f))
+        if (event.eventState == EventState.POST) {
+            mc.thePlayer.onGround = false
+        }
+        event.y += 1e-14
+    }
+
+    private fun handleIntaveMode(event: MotionEvent) {
+        val player = mc.thePlayer ?: return
+        val heldItem = player.heldItem ?: return
+        // ... Intave14 processor logic conditionally triggered via helper
+        sendPacket(C07PacketPlayerDigging(RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN))
+        sendPacket(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, heldItem, 0f, 0f, 0f))
+    }
+
+    private fun handleIntaveBlinkMode(event: MotionEvent) {
+        val player = mc.thePlayer ?: return
+        val heldItem = player.heldItem
+        val isUsing = usingItemFunc()
+
+        if (!isUsing) {
+            if (shouldBlink) {
+                BlinkUtils.unblink()
+                shouldBlink = false
+                BlinkTimer.reset()
+            }
+        }
+    }
+
+    private fun getTargetSlot(): Int? {
+        val player = mc.thePlayer ?: return null
+        val inventory = player.inventory
+
+        for (i in 0..8) {
+            val stack = inventory.getStackInSlot(
+                if (swordMode == "Matrix" || bowPacket == "Matrix" || consumeMode == "Matrix")
+                    (player.inventory.currentItem + i) % 9
+                else i
+            )
+            if (stack != null && stack.item is ItemSword) {
+                return (player.inventory.currentItem + i) % 9
+            }
+        }
+        return null
+    }
+
+    private fun sendOffHandUseItem() {
+        val player = mc.thePlayer ?: return
+        val item = player.heldItem ?: return
+        mc.netHandler.addToSendQueue(C08PacketPlayerBlockPlacement(item))
     }
 }

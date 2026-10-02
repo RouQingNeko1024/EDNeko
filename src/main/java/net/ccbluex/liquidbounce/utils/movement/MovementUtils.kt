@@ -7,9 +7,13 @@ package net.ccbluex.liquidbounce.utils.movement
 import net.ccbluex.liquidbounce.event.*
 import net.ccbluex.liquidbounce.utils.client.MinecraftInstance
 import net.ccbluex.liquidbounce.utils.extensions.*
+import net.ccbluex.liquidbounce.utils.rotation.RotationUtils
+import net.minecraft.entity.EntityLivingBase
 import net.minecraft.network.play.client.C03PacketPlayer
+import net.minecraft.potion.Potion
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
+import kotlin.math.asin
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -89,6 +93,28 @@ object MovementUtils : MinecraftInstance, Listenable {
             setPosition(posX - sin(yaw) * distance, posY, posZ + cos(yaw) * distance)
         }
 
+    fun getBaseMoveSpeed(): Double {
+        var baseSpeed = mc.thePlayer.capabilities.walkSpeed * 2.873
+
+        mc.thePlayer.getActivePotionEffect(Potion.moveSlowdown)?.let { effect ->
+            baseSpeed /= 1.0 + 0.2 * (effect.amplifier + 1)
+        }
+
+        mc.thePlayer.getActivePotionEffect(Potion.moveSpeed)?.let { effect ->
+            baseSpeed *= 1.0 + 0.2 * (effect.amplifier + 1)
+        }
+
+        return baseSpeed
+    }
+
+    fun setSpeed(speed: Double, movingCheck: Boolean) {
+        if (!mc.thePlayer.isMoving && movingCheck) return
+
+        val yaw = direction
+        mc.thePlayer.motionX = -sin(yaw) * speed
+        mc.thePlayer.motionZ = cos(yaw) * speed
+    }
+
     val direction
         get() = mc.thePlayer?.run {
             var yaw = rotationYaw
@@ -144,5 +170,64 @@ object MovementUtils : MinecraftInstance, Listenable {
             }
         }
         return false
+    }
+
+    fun doTargetStrafe(
+        curTarget: EntityLivingBase,
+        direction_: Double,
+        radius: Double,
+        moveEvent: MoveEvent,
+        mathRadius: Int
+    ) {
+        var forward_ = 1.0
+        var strafe_ = 0.0
+        var speed_ = sqrt(
+            moveEvent.x * moveEvent.x + moveEvent.z * moveEvent.z
+        )
+        var _direction = 0.0
+        if (direction_ > 0.001) {
+            _direction = 1.0
+        } else if (direction_ < -0.001) {
+            _direction = -1.0
+        }
+        var curDistance: Float
+        if (mathRadius == 1) {
+            curDistance = mc.thePlayer.getDistanceToEntity(curTarget)
+        } else {
+            curDistance =
+                sqrt(
+                    (mc.thePlayer.posX - curTarget.posX) * (mc.thePlayer.posX - curTarget.posX) +
+                    (mc.thePlayer.posZ - curTarget.posZ) * (mc.thePlayer.posZ - curTarget.posZ)
+                ).toFloat()
+        }
+        if (curDistance < radius - speed_) {
+            forward_ = -1.0
+        } else if (curDistance > radius + speed_) {
+            forward_ = 1.0
+        } else {
+            forward_ = (curDistance - radius) / speed_
+        }
+        if (curDistance < radius + speed_ * 2 && curDistance > radius - speed_ * 2) {
+            strafe_ = 1.0
+        }
+        strafe_ *= _direction
+        var strafeYaw = RotationUtils.getRotationsEntity(curTarget).yaw.toDouble()
+        val covert_ = sqrt(forward_ * forward_ + strafe_ * strafe_)
+
+        forward_ /= covert_
+        strafe_ /= covert_
+        var turnAngle = Math.toDegrees(asin(strafe_))
+        if (turnAngle > 0) {
+            if (forward_ < 0)
+                turnAngle = 180.0 - turnAngle
+        } else {
+            if (forward_ < 0)
+                turnAngle = -180.0 - turnAngle
+        }
+        strafeYaw = Math.toRadians(strafeYaw + turnAngle)
+        moveEvent.x = -sin(strafeYaw) * speed_
+        moveEvent.z = cos(strafeYaw) * speed_
+        mc.thePlayer.motionX = moveEvent.x
+        mc.thePlayer.motionZ = moveEvent.z
     }
 }

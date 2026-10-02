@@ -108,7 +108,7 @@ class Arraylist(
         this, "Background-Gradient"
     ) { backgroundMode == "Gradient" && it <= maxBackgroundGradientColors }
 
-    private val enableGlow by boolean("EnableGlow", false)
+    private val enableGlow by boolean("EnableGlow", true)
     private val glowMode by choices("GlowMode", arrayOf("Text", "Background", "Both"), "Text") { enableGlow }
     private val glowColorMode by choices("GlowColorMode", arrayOf("Custom", "Fade", "Random", "Rainbow", "Gradient", "Theme"), "Custom") { enableGlow }
     private val glowColors = ColorSettingsInteger(this, "GlowColor", applyMax = true) { enableGlow && glowColorMode == "Custom" }.with(0, 111, 255, 100)
@@ -416,12 +416,39 @@ class Arraylist(
                         }
 
                         when (glowMode) {
-                            "Background", "Both" -> {
+                            "Background" -> {
                                 drawGlowEffect(
                                     xPos - if (rectMode == "Right") 5 else 2,
                                     yPos,
                                     (if (rectMode == "Right") -3F else -1F) - (xPos - if (rectMode == "Right") 5 else 2),
                                     textSpacer,
+                                    index
+                                )
+                            }
+                            "Text" -> {
+                                val textStartX = xPos + 1 - if (rectMode == "Right") 3 else 0
+                                drawGlowEffect(
+                                    textStartX,
+                                    yPos + textY - 1,
+                                    displayStringWidth.toFloat(),
+                                    font.FONT_HEIGHT.toFloat() + 2,
+                                    index
+                                )
+                            }
+                            "Both" -> {
+                                drawGlowEffect(
+                                    xPos - if (rectMode == "Right") 5 else 2,
+                                    yPos,
+                                    (if (rectMode == "Right") -3F else -1F) - (xPos - if (rectMode == "Right") 5 else 2),
+                                    textSpacer,
+                                    index
+                                )
+                                val textStartX = xPos + 1 - if (rectMode == "Right") 3 else 0
+                                drawGlowEffect(
+                                    textStartX,
+                                    yPos + textY - 1,
+                                    displayStringWidth.toFloat(),
+                                    font.FONT_HEIGHT.toFloat() + 2,
                                     index
                                 )
                             }
@@ -657,12 +684,39 @@ class Arraylist(
                         }
 
                         when (glowMode) {
-                            "Background", "Both" -> {
+                            "Background" -> {
                                 drawGlowEffect(
                                     if (rectMode == "Left") 1f else 0f,
                                     yPos,
                                     (xPos + textWidth + if (rectMode == "Right") 4 else 1) - (if (rectMode == "Left") 1f else 0f),
                                     textSpacer,
+                                    index
+                                )
+                            }
+                            "Text" -> {
+                                val textStartX = xPos - 1
+                                drawGlowEffect(
+                                    textStartX,
+                                    yPos + textY - 1,
+                                    displayStringWidth.toFloat(),
+                                    font.FONT_HEIGHT.toFloat() + 2,
+                                    index
+                                )
+                            }
+                            "Both" -> {
+                                drawGlowEffect(
+                                    if (rectMode == "Left") 1f else 0f,
+                                    yPos,
+                                    (xPos + textWidth + if (rectMode == "Right") 4 else 1) - (if (rectMode == "Left") 1f else 0f),
+                                    textSpacer,
+                                    index
+                                )
+                                val textStartX = xPos - 1
+                                drawGlowEffect(
+                                    textStartX,
+                                    yPos + textY - 1,
+                                    displayStringWidth.toFloat(),
+                                    font.FONT_HEIGHT.toFloat() + 2,
                                     index
                                 )
                             }

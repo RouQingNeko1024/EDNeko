@@ -44,7 +44,12 @@ public abstract class MixinSplashProgressRunnable {
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         int tex;
         try {
-            tex = RenderUtils2.loadGlTexture(ImageIO.read(this.getClass().getResourceAsStream("/assets/minecraft/edneko/splash.png")));
+            java.io.InputStream splashStream = this.getClass().getResourceAsStream("/assets/minecraft/edneko/watermark_images/start.png");
+            if (splashStream != null) {
+                tex = RenderUtils2.loadGlTexture(ImageIO.read(splashStream));
+            } else {
+                tex = 0;
+            }
         } catch (IOException e) {
             tex = 0;
         }
@@ -68,19 +73,21 @@ public abstract class MixinSplashProgressRunnable {
             GL11.glColor4f(1f, 1f, 1f, 1f);
 
             // draw splash background
-            GL11.glEnable(GL11.GL_TEXTURE_2D);
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, tex);
-            GL11.glBegin(GL11.GL_QUADS);
-            GL11.glTexCoord2f(0.0f, 0.0f);
-            GL11.glVertex2f(0.0f, 0.0f);
-            GL11.glTexCoord2f(1.0f, 0.0f);
-            GL11.glVertex2f(width, 0.0f);
-            GL11.glTexCoord2f(1.0f, 1.0f);
-            GL11.glVertex2f(width, height);
-            GL11.glTexCoord2f(0.0f, 1.0f);
-            GL11.glVertex2f(0.0f, height);
-            GL11.glEnd();
-            GL11.glDisable(GL11.GL_TEXTURE_2D);
+            if (tex != 0) {
+                GL11.glEnable(GL11.GL_TEXTURE_2D);
+                GL11.glBindTexture(GL11.GL_TEXTURE_2D, tex);
+                GL11.glBegin(GL11.GL_QUADS);
+                GL11.glTexCoord2f(0.0f, 0.0f);
+                GL11.glVertex2f(0.0f, 0.0f);
+                GL11.glTexCoord2f(1.0f, 0.0f);
+                GL11.glVertex2f(width, 0.0f);
+                GL11.glTexCoord2f(1.0f, 1.0f);
+                GL11.glVertex2f(width, height);
+                GL11.glTexCoord2f(0.0f, 1.0f);
+                GL11.glVertex2f(0.0f, height);
+                GL11.glEnd();
+                GL11.glDisable(GL11.GL_TEXTURE_2D);
+            }
 
             // draw progress bar
             float rectX = width * 0.2f;
@@ -110,7 +117,9 @@ public abstract class MixinSplashProgressRunnable {
             Display.sync(60);
         }
 
-        GL11.glDeleteTextures(tex);
+        if (tex != 0) {
+            GL11.glDeleteTextures(tex);
+        }
         this.clearGL();
     }
 

@@ -10,6 +10,7 @@ import kotlinx.coroutines.delay
 import net.ccbluex.liquidbounce.LiquidBounce.hud
 import net.ccbluex.liquidbounce.event.PacketEvent
 import net.ccbluex.liquidbounce.event.Render2DEvent
+import net.ccbluex.liquidbounce.event.UpdateEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
@@ -48,6 +49,8 @@ import java.awt.Color
 import kotlin.math.sqrt
 
 object ChestStealer : Module("ChestStealer", Category.WORLD) {
+
+    private val mode by choices("Mode", arrayOf("Normal", "Intave"), "Normal")
 
     private val smartDelay by boolean("SmartDelay", false)
     private val multiplier by int("DelayMultiplier", 120, 0..500) { smartDelay }
@@ -429,6 +432,26 @@ object ChestStealer : Module("ChestStealer", Category.WORLD) {
         when (chestDebug.lowercase()) {
             "text" -> chat(message)
             "notification" -> hud.addNotification(Notification.informative(this, message, 500L))
+        }
+    }
+
+    val onUpdate = handler<UpdateEvent> {
+        val player = mc.thePlayer ?: return@handler
+
+        if (mode == "Intave") {
+            val inChest = mc.currentScreen is GuiChest
+
+            if (inChest) {
+                mc.gameSettings.keyBindSneak.pressed = true
+            } else {
+                mc.gameSettings.keyBindSneak.pressed = mc.gameSettings.keyBindSneak.isKeyDown
+            }
+        }
+    }
+
+    override fun onDisable() {
+        if (mode == "Intave") {
+            mc.gameSettings.keyBindSneak.pressed = mc.gameSettings.keyBindSneak.isKeyDown
         }
     }
 }

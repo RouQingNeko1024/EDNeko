@@ -45,7 +45,7 @@ AirClient 是一个免费开源的 Minecraft 作弊客户端，基于 LiquidBoun
 17. Augustus (V4.20)
 18. Augustus-X B2.6
 19. Bedezu
-20. BMWCliwnt
+20. BMWclient
 21. Boze
 22. Burrow
 23. CatBounce
@@ -213,6 +213,7 @@ AirClient 是一个免费开源的 Minecraft 作弊客户端，基于 LiquidBoun
 185. XEN
 186. Exhibobo
 187. Pen
+188. Vacuum
 
 ### 许可证
 

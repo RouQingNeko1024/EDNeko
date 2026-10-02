@@ -1,0 +1,1200 @@
+﻿
+> Configure project :
+Found an AccessTransformer: liquidbounce_at.cfg
+Version string 'b16' does not match SemVer specification 
+You should try SemVer : http://semver.org/
+
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :deobfCompileDummyTask
+> Task :deobfProvidedDummyTask
+> Task :compileApiKotlin NO-SOURCE
+> Task :getVersionJson
+> Task :extractUserdev UP-TO-DATE
+> Task :downloadClient SKIPPED
+> Task :downloadServer SKIPPED
+> Task :splitServerJar SKIPPED
+> Task :mergeJars SKIPPED
+> Task :applyBinaryPatches SKIPPED
+> Task :extractDependencyATs SKIPPED
+> Task :extractMcpData SKIPPED
+> Task :extractMcpMappings SKIPPED
+> Task :genSrgs SKIPPED
+> Task :deobfMcMCP SKIPPED
+> Task :sourceApiJava UP-TO-DATE
+> Task :compileApiJava NO-SOURCE
+> Task :processApiResources NO-SOURCE
+> Task :apiClasses UP-TO-DATE
+
+> Task :compileKotlin FAILED
+w: Flag is not supported by this version of the compiler: -Xno-call-exceptions
+w: Argument -Xopt-in is deprecated. Please use -opt-in instead
+.\gradlew : e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/Speed.k
+t:233:71 Argument type mismatch: actual type is 'kotlin.Array<T>', but 'kotlin.collections.Set<kotlin.String>' was expe
+cted.
+所在位置 行:1 字符: 22
++ cd D:\mc\ide\EDNeko; .\gradlew compileKotlin 2>&1 | Out-File -FilePat ...
++                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (e: file:///D:/m...' was expected.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/SpeedMod
+e.kt:9:46 Unresolved reference 'MinecraftInstance'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+Infinite.kt:11:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+Infinite.kt:12:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+Infinite.kt:14:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+Infinite.kt:14:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+Infinite.kt:17:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+Infinite.kt:30:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+LagHop.kt:14:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+LagHop.kt:16:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+LagHop.kt:18:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+LagHop.kt:18:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+LagHop.kt:21:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+LagHop.kt:23:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+LagHop.kt:28:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+LagHop.kt:29:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+LagHop.kt:30:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+LagHop2.kt:8:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+LagHop2.kt:9:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+LagHop2.kt:11:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+LagHop2.kt:11:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+LagHop2.kt:14:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+LagHop2.kt:15:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+LagHop2.kt:16:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AAC5
+LagHop2.kt:25:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op3313.kt:23:25 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op3313.kt:25:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op3313.kt:42:23 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op3313.kt:43:23 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op3313.kt:51:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op350.kt:17:9 'onMotion' hides member of supertype 'SpeedMode' and needs an 'override' modifier.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op350.kt:18:25 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op350.kt:20:100 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op350.kt:25:31 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op350.kt:26:31 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op350.kt:29:31 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op350.kt:30:31 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op350.kt:37:25 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op350.kt:46:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op4.kt:15:25 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op4.kt:17:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op4.kt:19:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op4.kt:26:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op4.kt:28:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op4.kt:30:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op5.kt:15:25 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op5.kt:17:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op5.kt:22:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op5.kt:29:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op5.kt:30:28 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/aac/AACH
+op5.kt:31:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/grim/Gri
+mCollide.kt:14:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/grim/Gri
+mCollide.kt:15:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/grim/Gri
+mCollide.kt:25:30 Method 'iterator()' is ambiguous for this expression. Applicable candidates:
+fun <T> Enumeration<T>.iterator(): Iterator<T>
+fun <T> Iterator<T>.iterator(): Iterator<T>
+fun <K, V> Map<out K, V>.iterator(): Iterator<Map.Entry<K, V>>
+fun <K, V> MutableMap<K, V>.iterator(): MutableIterator<MutableMap.MutableEntry<K, V>>
+fun CharSequence.iterator(): CharIterator
+fun BufferedInputStream.iterator(): ByteIterator
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/grim/Gri
+mCollide.kt:42:19 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/grim/New
+Grim.kt:12:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/grim/New
+Grim.kt:14:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/grim/New
+Grim.kt:17:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/grim/New
+Grim.kt:32:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/grim/New
+Grim.kt:33:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/grim/New
+Grim.kt:33:42 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/grim/New
+Grim.kt:33:69 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/grim/New
+Grim.kt:33:95 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/hypixel/
+HypixelHop.kt:16:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/hypixel/
+HypixelLowHop.kt:26:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/hypixel/
+HypixelLowHop.kt:28:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/hypixel/
+HypixelLowHop.kt:42:29 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/hypixel/
+HypixelLowHop.kt:43:40 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/hypixel/
+HypixelLowHop.kt:57:32 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/hypixel/
+HypixelLowHop.kt:58:32 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/hypixel/
+HypixelLowHop.kt:66:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/hypixel/
+HypixelLowHop.kt:67:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave1255.kt:12:62 Unresolved reference 'getBaseMoveSpeed'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave1255.kt:17:9 'onMotion' hides member of supertype 'SpeedMode' and needs an 'override' modifier.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave1255.kt:20:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave1255.kt:22:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave1255.kt:23:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave1255.kt:28:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave1255.kt:34:25 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave1255.kt:35:39 Unresolved reference 'setSpeed'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave1255.kt:36:29 Unresolved reference 'getBaseMoveSpeed'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave1255.kt:40:25 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave1255.kt:44:25 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave1309.kt:8:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave1309.kt:8:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave1309.kt:12:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave1309.kt:13:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave1309.kt:14:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave140xA.kt:8:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave140xA.kt:8:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave140xA.kt:12:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave140xA.kt:12:38 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave140xA.kt:13:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave140xA.kt:14:15 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave140xB.kt:9:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave140xB.kt:9:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave140xB.kt:13:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave140xB.kt:14:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave140xB.kt:15:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave140xB.kt:18:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave140xB.kt:20:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave141x.kt:9:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave141x.kt:9:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave141x.kt:9:39 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave141x.kt:9:65 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave141x.kt:9:90 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave141x.kt:9:114 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave141x.kt:13:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave141x.kt:14:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave141x.kt:17:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave141x.kt:17:45 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave14New.kt:15:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave14New.kt:15:38 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave14New.kt:15:61 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave14New.kt:29:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave14New.kt:30:16 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave14New.kt:33:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave14New.kt:33:22 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave14New.kt:34:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave14New.kt:34:22 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave2.kt:10:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave2.kt:11:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave2.kt:12:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave2.kt:14:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave2.kt:16:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave2.kt:17:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave2.kt:17:30 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave2.kt:18:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave2.kt:18:30 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave2.kt:19:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave3.kt:8:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave3.kt:9:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave3.kt:10:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave3.kt:12:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave3.kt:12:53 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave3.kt:13:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave3.kt:13:52 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave3.kt:13:87 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave3.kt:14:18 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave3.kt:14:43 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntave3.kt:14:79 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveHop14.kt:24:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveHop14.kt:26:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveHop14.kt:33:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveHop14.kt:35:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveHop14.kt:39:20 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveHop14.kt:40:20 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveNew.kt:6:64 Unresolved reference 'safeJump'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveNew.kt:12:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveNew.kt:12:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveNew.kt:13:30 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveNew.kt:13:61 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveNew.kt:13:93 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveNew.kt:17:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveNew.kt:17:39 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveNew.kt:18:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveNew.kt:22:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveTimer.kt:8:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveTimer.kt:8:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveTimer.kt:12:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveTimer.kt:13:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveTimer.kt:15:20 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveTimer.kt:16:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveTimer.kt:19:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveTimer.kt:20:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/intave/I
+ntaveTimer.kt:22:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/karhu/Ka
+rhu.kt:5:50 Unresolved reference 'getBlock'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/karhu/Ka
+rhu.kt:13:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/karhu/Ka
+rhu.kt:14:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/karhu/Ka
+rhu.kt:15:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/karhu/Ka
+rhu.kt:15:40 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/karhu/Ka
+rhu.kt:18:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/karhu/Ka
+rhu.kt:24:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/karhu/Ka
+rhu.kt:28:30 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/karhu/Ka
+rhu2.kt:8:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/karhu/Ka
+rhu2.kt:8:38 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/karhu/Ka
+rhu2.kt:9:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/karhu/Ka
+rhu2.kt:10:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix2.kt:9:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix2.kt:10:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix2.kt:10:44 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix2.kt:11:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix2.kt:15:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix2.kt:17:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix2.kt:18:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix2.kt:19:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix2.kt:20:24 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix2.kt:21:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix2.kt:22:16 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix3.kt:9:62 Unresolved reference 'setSpeed'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix3.kt:16:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix3.kt:20:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix3.kt:21:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix3.kt:23:40 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix3.kt:25:30 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix3.kt:25:60 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix3.kt:26:32 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix3.kt:27:17 Unresolved reference 'setSpeed'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix3.kt:29:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrix3.kt:30:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrixHop.kt:24:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrixSlowHop.kt:23:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrixSlowHop.kt:28:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrixSlowHop.kt:34:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrixSlowHop.kt:37:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/M
+atrixSlowHop.kt:46:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/O
+ldMatrixHop.kt:17:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/O
+ldMatrixHop.kt:24:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/matrix/O
+ldMatrixHop.kt:29:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/Boos
+t.kt:15:25 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/Boos
+t.kt:21:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/Boos
+t.kt:49:31 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/Boos
+t.kt:50:31 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/Boos
+t.kt:54:31 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/Boos
+t.kt:55:31 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/Boos
+t.kt:72:10 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/Boos
+t.kt:72:36 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/Boos
+t.kt:72:64 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/Boos
+t.kt:72:91 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/Fram
+e.kt:19:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/Fram
+e.kt:21:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/Fram
+e.kt:22:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/Fram
+e.kt:26:25 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/Fram
+e.kt:27:25 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/Fram
+e.kt:33:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/Fram
+e.kt:33:30 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/Fram
+e.kt:34:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/Fram
+e.kt:34:30 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/Fram
+e.kt:37:18 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/MiJu
+mp.kt:15:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/MiJu
+mp.kt:15:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/MiJu
+mp.kt:16:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/MiJu
+mp.kt:16:39 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/MiJu
+mp.kt:17:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/MiJu
+mp.kt:19:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/MiJu
+mp.kt:19:26 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/MiJu
+mp.kt:20:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/MiJu
+mp.kt:20:26 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/MiJu
+mp.kt:24:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/MiJu
+mp.kt:24:40 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/MiJu
+mp.kt:24:76 None of the following candidates is applicable:
+fun BigDecimal.times(other: BigDecimal): BigDecimal
+fun BigInteger.times(other: BigInteger): BigInteger
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/MiJu
+mp.kt:25:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/MiJu
+mp.kt:25:40 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/MiJu
+mp.kt:25:76 None of the following candidates is applicable:
+fun BigDecimal.times(other: BigDecimal): BigDecimal
+fun BigInteger.times(other: BigInteger): BigInteger
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:26:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:27:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:28:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:29:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:29:60 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:30:27 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:35:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:41:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:41:41 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:42:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:42:41 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:52:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:54:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:54:40 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:55:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:56:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:57:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:57:30 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:58:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:58:30 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:61:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:61:38 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:62:19 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:62:39 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:63:29 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:69:27 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:74:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:82:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:83:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:84:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:84:64 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:85:35 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:90:29 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:93:19 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:114:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:116:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:116:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:122:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:122:90 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPB
+Hop.kt:124:26 Overload resolution ambiguity between candidates:
+fun String?.plus(other: Any?): String
+fun <T> Array<T>.plus(element: T): Array<T>
+fun ByteArray.plus(element: Byte): ByteArray
+fun ShortArray.plus(element: Short): ShortArray
+fun IntArray.plus(element: Int): IntArray
+fun LongArray.plus(element: Long): LongArray
+fun <T> Iterable<T>.plus(element: T): List<T>
+fun <T> Collection<T>.plus(element: T): List<T>
+fun <T> Set<T>.plus(element: T): Set<T>
+fun <T> Sequence<T>.plus(element: T): Sequence<T>
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPF
+Hop.kt:15:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPF
+Hop.kt:20:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPF
+Hop.kt:21:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPF
+Hop.kt:26:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPF
+Hop.kt:27:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPF
+Hop.kt:28:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPF
+Hop.kt:29:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPF
+Hop.kt:29:30 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPF
+Hop.kt:30:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPF
+Hop.kt:30:30 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPF
+Hop.kt:31:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPF
+Hop.kt:33:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPF
+Hop.kt:36:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPF
+Hop.kt:37:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPH
+op.kt:15:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPH
+op.kt:20:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPH
+op.kt:21:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPH
+op.kt:26:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPH
+op.kt:27:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPH
+op.kt:28:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPH
+op.kt:29:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPH
+op.kt:33:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPH
+op.kt:34:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPY
+Port.kt:19:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPY
+Port.kt:19:40 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPY
+Port.kt:19:67 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPY
+Port.kt:19:91 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPY
+Port.kt:19:92 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPY
+Port.kt:19:117 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPY
+Port.kt:20:27 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPY
+Port.kt:21:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPY
+Port.kt:22:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPY
+Port.kt:23:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPY
+Port.kt:24:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPY
+Port.kt:25:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/NCPY
+Port.kt:27:32 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/OnGr
+ound.kt:13:25 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/OnGr
+ound.kt:15:34 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/OnGr
+ound.kt:15:45 None of the following candidates is applicable:
+val MovementInput.isMoving: Boolean
+val EntityLivingBase?.isMoving: Boolean
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/OnGr
+ound.kt:18:23 Unresolved reference 'fallDistance'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/OnGr
+ound.kt:20:23 Unresolved reference 'isInWater'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/OnGr
+ound.kt:20:46 Unresolved reference 'isOnLadder'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/OnGr
+ound.kt:20:70 Unresolved reference 'isCollidedHorizontally'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/OnGr
+ound.kt:23:19 Unresolved reference 'posY'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/OnGr
+ound.kt:24:19 Unresolved reference 'motionY'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/OnGr
+ound.kt:25:19 Unresolved reference 'cameraPitch'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/OnGr
+ound.kt:26:19 Unresolved reference 'distanceWalkedModified'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/OnGr
+ound.kt:27:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/OnGr
+ound.kt:29:23 Unresolved reference 'onGround'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/OnGr
+ound.kt:30:23 Unresolved reference 'posY'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/OnGr
+ound.kt:31:23 Unresolved reference 'motionY'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/OnGr
+ound.kt:32:23 Unresolved reference 'distanceWalkedOnStepModified'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/OnGr
+ound.kt:33:23 Unresolved reference 'motionX'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/OnGr
+ound.kt:34:23 Unresolved reference 'motionZ'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/OnGr
+ound.kt:35:23 Unresolved reference 'cameraPitch'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/OnGr
+ound.kt:36:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:25:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:32:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:38:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:38:41 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:39:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:39:41 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:49:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:51:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:51:40 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:52:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:53:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:54:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:54:30 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:55:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:55:30 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:58:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:58:38 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:59:19 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:59:39 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:60:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:62:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:64:27 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:69:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:81:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:82:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:83:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:83:64 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:84:35 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:90:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:91:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:92:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:92:64 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:93:35 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:104:29 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:107:19 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:127:39 None of the following candidates is applicable:
+fun BigDecimal.times(other: BigDecimal): BigDecimal
+fun BigInteger.times(other: BigInteger): BigInteger
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:127:66 None of the following candidates is applicable:
+fun BigDecimal.times(other: BigDecimal): BigDecimal
+fun BigInteger.times(other: BigInteger): BigInteger
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:128:39 None of the following candidates is applicable:
+fun BigDecimal.times(other: BigDecimal): BigDecimal
+fun BigInteger.times(other: BigInteger): BigInteger
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:128:66 None of the following candidates is applicable:
+fun BigDecimal.times(other: BigDecimal): BigDecimal
+fun BigInteger.times(other: BigInteger): BigInteger
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:129:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:131:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:131:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:137:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/SNCP
+BHop.kt:137:90 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/UNCP
+Hop.kt:20:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/UNCP
+Hop.kt:36:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/UNCP
+Hop.kt:43:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/UNCP
+Hop.kt:46:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/UNCP
+Hop.kt:49:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/UNCP
+Hop.kt:54:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/UNCP
+HopNew.kt:32:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/UNCP
+HopNew.kt:35:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/UNCP
+HopNew.kt:35:43 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/UNCP
+HopNew.kt:39:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/UNCP
+HopNew.kt:70:26 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/UNCP
+HopNew.kt:71:26 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/UNCP
+HopNew.kt:72:26 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/UNCP
+HopNew.kt:75:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/UNCP
+HopNew.kt:80:20 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/UNCP
+HopNew.kt:81:20 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/ncp/UNCP
+HopNew.kt:90:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Al
+lAC.kt:11:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Al
+lAC.kt:12:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Al
+lAC.kt:14:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Al
+lAC.kt:14:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Al
+lAC.kt:17:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Al
+lAC.kt:32:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Bl
+ocksMCHop.kt:25:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Bl
+ocksMCHop.kt:41:28 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Bl
+ocksMCHop.kt:42:28 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Cu
+stomSpeed.kt:32:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Cu
+stomSpeed.kt:45:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Cu
+stomSpeed.kt:55:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Cu
+stomSpeed.kt:63:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Cu
+stomSpeed.kt:65:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Cu
+stomSpeed.kt:72:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Do
+ubleJump.kt:8:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Do
+ubleJump.kt:8:38 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Do
+ubleJump.kt:9:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Do
+ubleJump.kt:10:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Do
+ubleJump.kt:11:16 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Gr
+oundTimerBoost.kt:15:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Gr
+oundTimerBoost.kt:16:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Gr
+oundTimerBoost.kt:18:20 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Gr
+oundTimerBoost.kt:19:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Gr
+oundTimerBoost.kt:24:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Le
+git.kt:14:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Le
+git.kt:16:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Le
+git.kt:22:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Lo
+wHop.kt:12:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Lo
+wHop.kt:13:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Lo
+wHop.kt:17:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Lo
+wHop.kt:17:26 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Lo
+wHop.kt:23:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Lo
+wHop.kt:24:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Lo
+wHop.kt:24:26 Unresolved reference 'thePlayer'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Lo
+wHop.kt:29:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Mi
+neBlaze.kt:7:64 Unresolved reference 'isInBadEnvironment'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Mi
+neBlaze.kt:13:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Mi
+neBlaze.kt:15:32 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Mi
+neBlaze.kt:15:58 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Mi
+neBlaze.kt:18:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Mi
+neBlaze.kt:22:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Mi
+neBlazeTimer.kt:8:25 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Mi
+neBlazeTimer.kt:10:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Mi
+neBlazeTimer.kt:12:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Mi
+neBlazeTimer.kt:12:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Mi
+neBlazeTimer.kt:19:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Mi
+neBlazeTimer.kt:21:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Mi
+neBlazeTimer.kt:23:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Mi
+nemenHop.kt:8:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Mi
+nemenHop.kt:9:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Mi
+nemenHop.kt:10:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Mi
+nemenHop.kt:11:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Mi
+nemenHop.kt:12:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Mi
+nemenHop.kt:13:20 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pr
+edictionTimer.kt:16:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pr
+edictionTimer.kt:33:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pr
+edictionTimer.kt:39:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pr
+edictionTimer.kt:42:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pr
+edictionTimer.kt:46:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pr
+edictionTimer.kt:52:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pr
+edictionTimer2.kt:12:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pr
+edictionTimer2.kt:16:20 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pr
+edictionTimer2.kt:21:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pr
+edictionTimer2.kt:24:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pr
+edictionTimer2.kt:26:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pr
+edictionTimer2.kt:33:9 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pu
+lldown.kt:17:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pu
+lldown.kt:20:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pu
+lldown.kt:21:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pu
+lldown.kt:26:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pu
+lldown.kt:27:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pu
+lldown.kt:30:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pu
+lldown.kt:32:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pu
+lldown.kt:38:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pu
+lldown.kt:40:44 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Pu
+lldown.kt:43:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Ro
+tationExploit.kt:16:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Ro
+tationExploit.kt:18:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Ro
+tationExploit.kt:23:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Ro
+tationExploit.kt:25:37 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Ro
+tationExploit.kt:29:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Ro
+tationExploit.kt:29:78 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Ro
+tationExploit.kt:33:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Si
+mpleBoost.kt:22:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Si
+mpleBoost.kt:22:39 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Si
+mpleBoost.kt:22:80 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Si
+mpleBoost.kt:23:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Si
+mpleBoost.kt:27:43 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Si
+mpleBoost.kt:38:45 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Sk
+ipTick.kt:16:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Sk
+ipTick.kt:16:38 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Sk
+ipTick.kt:24:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Sk
+ipTick.kt:26:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Sk
+ipTick.kt:26:48 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Sk
+ipTick.kt:28:20 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Sl
+owHop.kt:16:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Te
+leportCubeCraft.kt:20:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/other/Te
+leportCubeCraft.kt:20:38 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/polar/Po
+lar.kt:8:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/polar/Po
+lar.kt:11:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/polar/Po
+lar.kt:13:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/polar/Po
+lar.kt:15:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spartan/
+SpartanYPort.kt:15:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spartan/
+SpartanYPort.kt:16:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spartan/
+SpartanYPort.kt:17:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spartan/
+SpartanYPort.kt:20:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spartan/
+SpartanYPort.kt:21:36 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spartan/
+SpartanYPort.kt:23:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spartan/
+SpartanYPort.kt:24:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreBHop.kt:14:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreBHop.kt:14:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreBHop.kt:14:39 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreBHop.kt:15:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreBHop.kt:17:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreLowHop.kt:14:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreLowHop.kt:14:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreLowHop.kt:14:39 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreLowHop.kt:15:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreLowHop.kt:17:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreOnGround.kt:18:13 Unresolved reference 'not' for operator '!'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreOnGround.kt:18:14 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreOnGround.kt:18:39 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreOnGround.kt:20:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreOnGround.kt:21:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreOnGround.kt:22:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreOnGround.kt:27:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreOnGround.kt:27:38 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreOnGround.kt:28:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreOnGround.kt:29:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreOnGround.kt:30:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreOnGround.kt:31:23 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/spectre/
+SpectreOnGround.kt:33:23 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/verus/Ve
+rusFHop.kt:14:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/verus/Ve
+rusHop.kt:20:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/verus/Ve
+rusLowHop.kt:21:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/verus/Ve
+rusLowHopNew.kt:21:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/verus/Ve
+rusLowHopNew.kt:49:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/vulcan/V
+ulcanGround288.kt:19:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/vulcan/V
+ulcanGround288.kt:24:72 Unresolved reference 'amplifier'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/vulcan/V
+ulcanGround288.kt:47:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/vulcan/V
+ulcanGround288.kt:48:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/vulcan/V
+ulcanHop.kt:16:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/vulcan/V
+ulcanHop.kt:21:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/vulcan/V
+ulcanHop.kt:28:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/vulcan/V
+ulcanHop.kt:33:21 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/vulcan/V
+ulcanHop.kt:37:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/vulcan/V
+ulcanLowHop.kt:16:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/vulcan/V
+ulcanLowHop.kt:21:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/vulcan/V
+ulcanLowHop.kt:29:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/vulcan/V
+ulcanLowHop.kt:36:17 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/vulcan/V
+ulcanLowHop.kt:40:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/vulcan/V
+ulcanPredictionExploit.kt:14:22 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/vulcan/V
+ulcanPredictionExploit.kt:16:13 Unresolved reference 'mc'.
+e: file:///D:/mc/ide/EDNeko/src/main/java/net/ccbluex/liquidbounce/features/module/modules/movement/speedmodes/vulcan/V
+ulcanPredictionExploit.kt:22:22 Unresolved reference 'mc'.
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCo
+mpilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+Run with --stacktrace option to get the stack trace. Run with --info or --debug option to get more log output. Run with
+ --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 7.0.
+Use '--warning-mode all' to show the individual deprecation warnings.
+See https://docs.gradle.org/6.9.4/userguide/command_line_interface.html#sec:command_line_warnings
+
+BUILD FAILED in 5s
+6 actionable tasks: 4 executed, 2 up-to-date

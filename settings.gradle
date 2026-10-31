@@ -1,9 +1,22 @@
 pluginManagement {
     repositories {
         mavenLocal()
+        // 国内 jitpack 镜像（优先，避免官方 jitpack 慢/401）
+        maven {
+            url = "https://jitpack-ccbluex.bestmc.cn/"
+            content { includeGroupByRegex "com\\.github\\.(ccbluex|xcfrg)\\..*" }
+        }
+        maven {
+            url = "https://mirrors.cloud.tencent.com/nexus/repository/jitpack/"
+            content { includeGroupByRegex "com\\.github\\.(ccbluex|xcfrg)\\..*" }
+        }
+        maven {
+            url = "https://maven.aliyun.com/repository/jitpack/"
+            content { includeGroupByRegex "com\\.github\\.(ccbluex|xcfrg)\\..*" }
+        }
         maven {
             url = "https://jitpack.io/"
-            content { includeGroupByRegex "com\\.github\\..*" }
+            content { includeGroupByRegex "com\\.github\\.(ccbluex|xcfrg)\\..*" }
         }
         maven { url = "https://maven.minecraftforge.net/" }
         maven { url = "https://repo.spongepowered.org/repository/maven-public/" }

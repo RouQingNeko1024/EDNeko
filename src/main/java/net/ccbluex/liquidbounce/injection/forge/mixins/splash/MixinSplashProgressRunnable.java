@@ -44,7 +44,7 @@ public abstract class MixinSplashProgressRunnable {
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         int tex;
         try {
-            java.io.InputStream splashStream = this.getClass().getResourceAsStream("/assets/minecraft/edneko/watermark_images/start.png");
+            java.io.InputStream splashStream = this.getClass().getResourceAsStream("/assets/minecraft/edneko/backgrounds/background.jpg");
             if (splashStream != null) {
                 tex = RenderUtils2.loadGlTexture(ImageIO.read(splashStream));
             } else {

@@ -28,6 +28,8 @@ import net.ccbluex.liquidbounce.features.module.modules.`fun`.DrugHallucination
 import net.ccbluex.liquidbounce.features.module.modules.`fun`.Myopia
 import net.ccbluex.liquidbounce.features.module.modules.misc.*
 import net.ccbluex.liquidbounce.features.module.modules.movement.*
+import net.ccbluex.liquidbounce.features.module.modules.movement.velocitys.LoftilyVelocity
+import net.ccbluex.liquidbounce.features.module.modules.exploit.disablers.LoftilyDisabler
 import net.ccbluex.liquidbounce.features.module.modules.dev.*
 import net.ccbluex.liquidbounce.features.module.modules.music.MusicPlayer
 import net.ccbluex.liquidbounce.features.module.modules.client.*
@@ -272,6 +274,7 @@ object ModuleManager : Listenable, Collection<Module> by MODULE_REGISTRY {
             TrueSight,
             VehicleOneHit,
             Velocity,
+            LoftilyVelocity,
             WallClimb,
             XRay,
             Zoot,
@@ -281,6 +284,8 @@ object ModuleManager : Listenable, Collection<Module> by MODULE_REGISTRY {
             WTap,
             TPAura,
             Disabler,
+            LoftilyDisabler,
+            net.ccbluex.liquidbounce.features.module.modules.movement.loftilyflys.LoftilyFly,
             OverrideRaycast,
             TickBase,
             RotationRecorder,

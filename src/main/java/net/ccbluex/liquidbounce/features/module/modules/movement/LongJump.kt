@@ -4,8 +4,11 @@
  */
 package net.ccbluex.liquidbounce.features.module.modules.movement
 
+import net.ccbluex.liquidbounce.event.EventState
 import net.ccbluex.liquidbounce.event.JumpEvent
+import net.ccbluex.liquidbounce.event.MotionEvent
 import net.ccbluex.liquidbounce.event.MoveEvent
+import net.ccbluex.liquidbounce.event.PacketEvent
 import net.ccbluex.liquidbounce.event.UpdateEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
@@ -13,6 +16,11 @@ import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.aac.AACv1
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.aac.AACv2
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.aac.AACv3
+import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.loftily.BoostLongJump
+import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.loftily.GrimLongJump
+import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.loftily.MatrixLongJump
+import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.loftily.MatrixNewLongJump
+import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.loftily.VanillaLongJump
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.ncp.NCP
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.other.Boat
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjumpmodes.other.Buzz
@@ -34,7 +42,10 @@ object LongJump : Module("LongJump", Category.MOVEMENT) {
         AACv1, AACv2, AACv3,
 
         // Other
-        Redesky, Hycraft, Buzz, VerusDamage, Boat, KkcraftBW
+        Redesky, Hycraft, Buzz, VerusDamage, Boat, KkcraftBW,
+
+        // Loftily
+        VanillaLongJump, BoostLongJump, GrimLongJump, MatrixLongJump, MatrixNewLongJump
     )
 
     private val modes = longJumpModes.map { it.modeName }.toTypedArray()
@@ -109,6 +120,24 @@ object LongJump : Module("LongJump", Category.MOVEMENT) {
 
         if (handleEvents()) {
             modeModule.onJump(event)
+        }
+    }
+
+    val onMotion = handler<MotionEvent> { event ->
+        if (handleEvents()) {
+            modeModule.onMotion(event)
+        }
+    }
+
+    val onPacketSend = handler<PacketEvent> { event ->
+        if (event.eventType == net.ccbluex.liquidbounce.event.EventState.SEND && handleEvents()) {
+            modeModule.onPacketSend(event)
+        }
+    }
+
+    val onPacketReceive = handler<PacketEvent> { event ->
+        if (event.eventType == net.ccbluex.liquidbounce.event.EventState.RECEIVE && handleEvents()) {
+            modeModule.onPacketReceive(event)
         }
     }
 

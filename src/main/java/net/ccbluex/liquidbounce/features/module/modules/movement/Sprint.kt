@@ -31,13 +31,13 @@ object Sprint : Module("Sprint", Category.MOVEMENT, gameDetecting = false) {
     val onlyOnSprintPress by boolean("OnlyOnSprintPress", false)
     private val alwaysCorrect by boolean("AlwaysCorrectSprint", false)
 
-    val allDirections by boolean("AllDirections", true) { mode == "Vanilla" }
-    val jumpDirections by boolean("JumpDirections", false) { mode == "Vanilla" && allDirections }
+    val allDirections by boolean("AllDirections", true)
+    val jumpDirections by boolean("JumpDirections", false) { allDirections }
 
     private val allDirectionsLimitSpeed by float("AllDirectionsLimitSpeed", 1f, 0.75f..1f)
-    { mode == "Vanilla" && allDirections }
+    { allDirections }
     private val allDirectionsLimitSpeedGround by boolean("AllDirectionsLimitSpeedOnlyGround", true)
-    { mode == "Vanilla" && allDirections }
+    { allDirections }
 
     private val blindness by boolean("Blindness", true) { mode == "Vanilla" }
     private val usingItem by boolean("UsingItem", false) { mode == "Vanilla" }
@@ -73,6 +73,12 @@ object Sprint : Module("Sprint", Category.MOVEMENT, gameDetecting = false) {
             } else if (Scaffold.sprint && Scaffold.eagle == "Normal" && player.isMoving && player.onGround && Scaffold.eagleSneaking && Scaffold.eagleSprint) {
                 player setSprintSafely true
                 isSprinting = true
+                if (Scaffold.sprintAllDirections) {
+                    if (!allDirectionsLimitSpeedGround || player.onGround) {
+                        player.motionX *= allDirectionsLimitSpeed
+                        player.motionZ *= allDirectionsLimitSpeed
+                    }
+                }
                 return
             }
         }
@@ -81,7 +87,7 @@ object Sprint : Module("Sprint", Category.MOVEMENT, gameDetecting = false) {
             player setSprintSafely !shouldStopSprinting(movementInput, isUsingItem)
             isSprinting = player.isSprinting
 
-            if (player.isSprinting && allDirections && mode != "Legit") {
+            if (player.isSprinting && allDirections) {
                 if (!allDirectionsLimitSpeedGround || player.onGround) {
                     player.motionX *= allDirectionsLimitSpeed
                     player.motionZ *= allDirectionsLimitSpeed
@@ -105,6 +111,10 @@ object Sprint : Module("Sprint", Category.MOVEMENT, gameDetecting = false) {
             return true
         }
 
+        if (player.isSneaking) {
+            return true
+        }
+
         if (player.isCollidedHorizontally) {
             return true
         }
@@ -125,11 +135,11 @@ object Sprint : Module("Sprint", Category.MOVEMENT, gameDetecting = false) {
             return true
         }
 
-        if (isLegitModeActive) {
+        if (isLegitModeActive && !allDirections && !(Scaffold.handleEvents() && Scaffold.sprintAllDirections)) {
             return modifiedForward < 0.8
         }
 
-        if (allDirections) {
+        if (allDirections || (Scaffold.handleEvents() && Scaffold.sprintAllDirections)) {
             return false
         }
 

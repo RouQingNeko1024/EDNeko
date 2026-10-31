@@ -95,6 +95,7 @@ object Scaffold : Module("Scaffold", Category.WORLD) {
 
     val sprint by boolean("Sprint", false)
     val SprintControl by choices("SprintControl",arrayOf("InAir","OnGround","Always","OnFalling","OnUpping","Vanilla","Stop","Matrix"),"Vanilla") { sprint }
+    val sprintAllDirections by boolean("SprintAllDirections", false) { sprint }
     private val swing by boolean("Swing", true).subjective()
     private val down by boolean("Down", true) { !sameY && scaffoldMode !in arrayOf("GodBridge", "Telly") }
 

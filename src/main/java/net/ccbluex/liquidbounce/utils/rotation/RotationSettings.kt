@@ -18,6 +18,8 @@ import kotlin.math.abs
 import kotlin.random.Random
 
 open class RotationSettings(owner: Module, generalApply: () -> Boolean = { true }) : Configurable("RotationSettings") {
+    private val modOwner = owner
+
     var failRotationActiveTicks: Float = 0F
     var currentFailedRotation: Rotation? = null
     open val rotationsValue = boolean("Rotations", true) { generalApply() }
@@ -33,7 +35,7 @@ open class RotationSettings(owner: Module, generalApply: () -> Boolean = { true 
         rotationsActive && applyServerSide && generalApply()
     }
 
-    open val rotationMode by choices(
+    open val rotationMode by multiChoices(
         "RotationMode",
         arrayOf(
             "Standard",
@@ -44,57 +46,57 @@ open class RotationSettings(owner: Module, generalApply: () -> Boolean = { true 
             "PatternPrediction",
             "DynamicRotation"
         ),
-        "Standard"
+        setOf("Standard")
     ) { rotationsActive && generalApply() }
-    open val dynamicEffectTypes = choices(
+    open val dynamicEffectTypes = multiChoices(
         "DynamicRotation/EffectTypes",
         arrayOf("SpeedBoost", "SpeedReduction", "Jitter", "Smooth"),
-        "SpeedBoost"
-    ) { rotationMode == "DynamicRotation" && rotationsActive && generalApply() }
+        setOf("SpeedBoost", "SpeedReduction")
+    ) { "DynamicRotation" in rotationMode && rotationsActive && generalApply() }
 
     var currentDynamicEffect = "SpeedBoost"
 
     open val dynamicDuration = intRange("DynamicRotation/Duration", 3..10, 1..50, "ticks") {
-        rotationMode == "DynamicRotation" && rotationsActive && generalApply()
+        "DynamicRotation" in rotationMode && rotationsActive && generalApply()
     }
 
     open val dynamicUpdateInterval = int("DynamicRotation/UpdateInterval", 20, 5..100, "ticks") {
-        rotationMode == "DynamicRotation" && rotationsActive && generalApply()
+        "DynamicRotation" in rotationMode && rotationsActive && generalApply()
     }
 
     open val dynamicSpeedBoostMultiplier = floatRange("DynamicRotation/SpeedBoostMultiplier", 1.5f..2.5f, 0.5f..5.0f) {
-        rotationMode == "DynamicRotation" && rotationsActive && generalApply()
+        "DynamicRotation" in rotationMode && rotationsActive && generalApply()
     }
 
     open val dynamicSpeedReductionMultiplier = floatRange("DynamicRotation/SpeedReductionMultiplier", 0.3f..0.7f, 0.1f..1.0f) {
-        rotationMode == "DynamicRotation" && rotationsActive && generalApply()
+        "DynamicRotation" in rotationMode && rotationsActive && generalApply()
     }
 
     open val dynamicJitterStrength = floatRange("DynamicRotation/JitterStrength", 0.2f..0.5f, 0.0f..1.0f) {
-        rotationMode == "DynamicRotation" && rotationsActive && generalApply()
+        "DynamicRotation" in rotationMode && rotationsActive && generalApply()
     }
 
     open val dynamicSmoothMultiplier = floatRange("DynamicRotation/SmoothMultiplier", 0.8f..1.2f, 0.1f..2.0f) {
-        rotationMode == "DynamicRotation" && rotationsActive && generalApply()
+        "DynamicRotation" in rotationMode && rotationsActive && generalApply()
     }
 
     open val dynamicSmoothFactor = floatRange("DynamicRotation/SmoothFactor", 0.3f..0.7f, 0.1f..1.0f) {
-        rotationMode == "DynamicRotation" && rotationsActive && generalApply()
+        "DynamicRotation" in rotationMode && rotationsActive && generalApply()
     }
 
     open val dynamicMinMultiplier = float("DynamicRotation/MinMultiplier", 0.2f, 0.1f..1.0f) {
-        rotationMode == "DynamicRotation" && rotationsActive && generalApply()
+        "DynamicRotation" in rotationMode && rotationsActive && generalApply()
     }
 
     open val dynamicMaxMultiplier = float("DynamicRotation/MaxMultiplier", 3.0f, 1.0f..5.0f) {
-        rotationMode == "DynamicRotation" && rotationsActive && generalApply()
+        "DynamicRotation" in rotationMode && rotationsActive && generalApply()
     }
 
 
 
-    open val mlPredictionWeight = float("PredictionWeight", 0.3f, 0f..1f) { rotationMode == "PatternPrediction" && generalApply() }
+    open val mlPredictionWeight = float("PredictionWeight", 0.3f, 0f..1f) { "PatternPrediction" in rotationMode && generalApply() }
     open val neuralNetworkEnabled = boolean("NeuralNetwork", false) {
-        rotationMode == "PatternPrediction" && rotationsActive && generalApply()
+        "PatternPrediction" in rotationMode && rotationsActive && generalApply()
     }
 
     open val nnTrainingEnabled = boolean("NeuralNetwork/Training", false) {
@@ -142,152 +144,152 @@ open class RotationSettings(owner: Module, generalApply: () -> Boolean = { true 
     }
     // Yaw parameters
     open val yawSpeedBase by float("YawSpeedBase", 180F, 0F..180F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val yawSpeedUpRange by float("YawSpeedUpRange", 0F, 0F..90F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val yawSpeedDownRange by float("YawSpeedDownRange", 0F, 0F..90F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val yawSpeedUpChangeMax by float("YawSpeedUpChangeMax", 180F, 0F..180F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val yawSpeedDownChangeMax by float("YawSpeedDownChangeMax", 180F, 0F..180F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val yawSpeedRandomizationTypeLayer1 by choices("YawSpeedRandomizationLayer1", arrayOf("Noise", "Sinus"), "Noise") {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val yawSpeedRandomizationRateLayer1 by float("YawSpeedRandomizationLayer1Rate", 1F, 0F..1F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
 
     open val yawSpeedBaseLargeRotation by float("YawSpeedBaseAtLargeRotation", 180F, 0F..180F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val yawSpeedUpRangeLargeRotation by float("YawSpeedUpRangeAtLargeRotation", 0F, 0F..90F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val yawSpeedDownRangeLargeRotation by float("YawSpeedDownRangeAtLargeRotation", 0F, 0F..90F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val yawSpeedUpChangeMaxLargeRotation by float("YawSpeedUpChangeMaxAtLargeRotation", 180F, 0F..180F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val yawSpeedDownChangeMaxLargeRotation by float("YawSpeedDownChangeMaxAtLargeRotation", 180F, 0F..180F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val yawSpeedRandomizationTypeLayer2 by choices("YawSpeedRandomizationLayer2", arrayOf("Noise", "Sinus"), "Noise") {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val yawSpeedRandomizationRateLayer2 by float("YawSpeedRandomizationLayer2Rate", 1F, 0F..1F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
 
     open val yawDecelerationFactorMax by float("YawDecelerationFactorMax", 0.9F, 0.0F..1.0F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val yawDecelerationFactorMin by float("YawDecelerationFactorMin", 0.9F, 0.0F..1.0F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val yawDecelerationFactorMaxLargeRotation by float("YawDecelerationFactorMaxAtLargeRotation", 0.7F, 0.0F..1.0F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val yawDecelerationFactorMinLargeRotation by float("YawDecelerationFactorMinAtLargeRotation", 0.7F, 0.0F..1.0F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
 
     open val yawDeltaThresholdForLargeRotation by float("YawDeltaThresholdForLargeRotation", 90F, 0F..180F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val yawOvershotRate by float("YawOvershotRate", 0F, 0F..1F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
 
     // Pitch parameters
     open val pitchSpeedBase by float("PitchSpeedBase", 180F, 0F..180F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val pitchSpeedUpRange by float("PitchSpeedUpRange", 0F, 0F..90F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val pitchSpeedDownRange by float("PitchSpeedDownRange", 0F, 0F..90F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val pitchSpeedUpChangeMax by float("PitchSpeedUpChangeMax", 180F, 0F..180F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val pitchSpeedDownChangeMax by float("PitchSpeedDownChangeMax", 180F, 0F..180F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val pitchSpeedRandomizationTypeLayer1 by choices("PitchSpeedRandomizationLayer1", arrayOf("Noise", "Sinus"), "Noise") {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val pitchSpeedRandomizationRateLayer1 by float("PitchSpeedRandomizationLayer1Rate", 1F, 0F..1F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
 
     open val pitchSpeedBaseLargeRotation by float("PitchSpeedBaseAtLargeRotation", 180F, 0F..180F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val pitchSpeedUpRangeLargeRotation by float("PitchSpeedUpRangeAtLargeRotation", 0F, 0F..90F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val pitchSpeedDownRangeLargeRotation by float("PitchSpeedDownRangeAtLargeRotation", 0F, 0F..90F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val pitchSpeedUpChangeMaxLargeRotation by float("PitchSpeedUpChangeMaxAtLargeRotation", 180F, 0F..180F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val pitchSpeedDownChangeMaxLargeRotation by float("PitchSpeedDownChangeMaxAtLargeRotation", 180F, 0F..180F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val pitchSpeedRandomizationTypeLayer2 by choices("PitchSpeedRandomizationLayer2", arrayOf("Noise", "Sinus"), "Noise") {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val pitchSpeedRandomizationRateLayer2 by float("PitchSpeedRandomizationLayer2Rate", 1F, 0F..1F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
 
     open val pitchDecelerationFactorMax by float("PitchDecelerationFactorMax", 0.9F, 0.0F..1.0F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val pitchDecelerationFactorMin by float("PitchDecelerationFactorMin", 0.9F, 0.0F..1.0F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val pitchDecelerationFactorMaxLargeRotation by float("PitchDecelerationFactorMaxAtLargeRotation", 0.7F, 0.0F..1.0F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val pitchDecelerationFactorMinLargeRotation by float("PitchDecelerationFactorMinAtLargeRotation", 0.7F, 0.0F..1.0F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
 
     open val pitchDeltaThresholdForLargeRotation by float("PitchDeltaThresholdForLargeRotation", 90F, 0F..180F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
     open val pitchOvershotRate by float("PitchOvershotRate", 0F, 0F..1F) {
-        rotationMode == "AdvancedRotationSpeed" && rotationsActive && generalApply()
+        "AdvancedRotationSpeed" in rotationMode && rotationsActive && generalApply()
     }
 
     open val entropyTarget by float("Entropy/Target", 0.55f, 0.0f..1.0f) {
-        rotationMode == "EntropyControlled" && rotationsActive && generalApply()
+        "EntropyControlled" in rotationMode && rotationsActive && generalApply()
     }
 
     open val entropyTolerance by float("Entropy/Tolerance", 0.15f, 0.05f..0.3f) {
-        rotationMode == "EntropyControlled" && rotationsActive && generalApply()
+        "EntropyControlled" in rotationMode && rotationsActive && generalApply()
     }
 
     open val entropyAdjustmentSpeed by float("Entropy/AdjustSpeed", 0.1f, 0.01f..0.5f) {
-        rotationMode == "EntropyControlled" && rotationsActive && generalApply()
+        "EntropyControlled" in rotationMode && rotationsActive && generalApply()
     }
 
     open val entropySmoothingStrength by floatRange("Entropy/SmoothingStrength", 0.3f..0.8f, 0.1f..1.0f) {
-        rotationMode == "EntropyControlled" && rotationsActive && generalApply()
+        "EntropyControlled" in rotationMode && rotationsActive && generalApply()
     }
 
     open val entropyRandomnessStrength by floatRange("Entropy/RandomnessStrength", 0.2f..0.6f, 0.1f..1.0f) {
-        rotationMode == "EntropyControlled" && rotationsActive && generalApply()
+        "EntropyControlled" in rotationMode && rotationsActive && generalApply()
     }
 
     // 熵状态变量
@@ -297,45 +299,45 @@ open class RotationSettings(owner: Module, generalApply: () -> Boolean = { true 
     // ========== SlowPursuit Parameters ==========
     open val slowPursuitSpeed by floatRange(
         "SlowPursuit/Speed", 30f..50f, 0f..360f
-    ) { rotationMode == "SlowPursuit" && rotationsActive && generalApply() }
+    ) { "SlowPursuit" in rotationMode && rotationsActive && generalApply() }
 
     open val slowPursuitDelay by intRange(
         "SlowPursuit/Delay", 3..5, 1..20
-    ) { rotationMode == "SlowPursuit" && rotationsActive && generalApply() }
+    ) { "SlowPursuit" in rotationMode && rotationsActive && generalApply() }
 
     open val slowPursuitRandomness by floatRange(
         "SlowPursuit/Randomness", 0.1f..0.3f, 0f..1f
-    ) { rotationMode == "SlowPursuit" && rotationsActive && generalApply() }
+    ) { "SlowPursuit" in rotationMode && rotationsActive && generalApply() }
     var slowPursuitLastAttackTime: Long? = null
     var slowPursuitActive: Boolean = false
     // ========== Acceleration Mode Parameters ==========
     open val accelerationSpeed by floatRange(
         "Acceleration/Speed", 100f..200f, 10f..500f,
-    ) { rotationMode == "Acceleration" && rotationsActive && generalApply() }
+    ) { "Acceleration" in rotationMode && rotationsActive && generalApply() }
 
     open val accelerationMaxSpeed by floatRange(
         "Acceleration/MaxSpeed", 2.0f..3.0f, 1.0f..5.0f, "x"
-    ) { rotationMode == "Acceleration" && rotationsActive && generalApply() }
+    ) { "Acceleration" in rotationMode && rotationsActive && generalApply() }
 
     open val accelerationSmoothFactor by floatRange(
         "Acceleration/SmoothFactor", 0.8f..1.0f, 0.1f..1.0f
-    ) { rotationMode == "Acceleration" && rotationsActive && generalApply() }
+    ) { "Acceleration" in rotationMode && rotationsActive && generalApply() }
 
     open val accelerationSmartDeceleration by boolean(
         "Acceleration/SmartDeceleration", true
-    ) { rotationMode == "Acceleration" && rotationsActive && generalApply() }
+    ) { "Acceleration" in rotationMode && rotationsActive && generalApply() }
 
     open val accelerationDecelerationRate by floatRange(
         "Acceleration/DecelerationRate", 0.6f..0.8f, 0.1f..1.0f
-    ) { rotationMode == "Acceleration" && accelerationSmartDeceleration && generalApply() }
+    ) { "Acceleration" in rotationMode && accelerationSmartDeceleration && generalApply() }
 
 
     var accelerationCurrentSpeedYaw: Float = 0f
     var accelerationCurrentSpeedPitch: Float = 0f
     var accelerationLastUpdateTime: Long = System.currentTimeMillis()
-    open val instantRotation by boolean("InstantRotation",false) {rotationsActive && generalApply() && rotationMode == "Center"}
+    open val instantRotation by boolean("InstantRotation",false) {rotationsActive && generalApply() && "Center" in rotationMode}
 
-    open val slowPursuitDurationTime by int("SlowPursuit/DurationTime",500,0..2000,"ms") { rotationMode == "SlowPursuit" && rotationsActive && generalApply() }
+    open val slowPursuitDurationTime by int("SlowPursuit/DurationTime",500,0..2000,"ms") { "SlowPursuit" in rotationMode && rotationsActive && generalApply() }
 
     // ========== Original Settings ==========
     open val manualRotationMixEnabled = boolean("ManualRotationMix", false) {
@@ -363,16 +365,26 @@ open class RotationSettings(owner: Module, generalApply: () -> Boolean = { true 
     }
 
     open val cancelRotationInBorder = boolean("CancelRotationInBorder", false) { rotationsActive && generalApply() }
-    open val legitimizeValue = boolean("Legitimize", false) { rotationsActive && generalApply() }
-    open val legitimizeFactor = floatRange("LegitFactor", 0.9f..1.1f, 0.0f..2f) { rotationsActive && generalApply() && legitimize }
+
+    // ─── Randomization Mode Selector ───
+    open val randomizationModeValue = choices(
+        "RandomizationMode",
+        arrayOf("None", "Legitimize"),
+        "Legitimize"
+    ) { rotationsActive && generalApply() }
+
+    val isNekoNoise get() = randomizationModeValue.get() == "NekoNoise"
+    val isLegitimize get() = randomizationModeValue.get() == "Legitimize"
+
+    open val legitimizeFactor = floatRange("LegitFactor", 0.9f..1.1f, 0.0f..2f) { rotationsActive && generalApply() && isLegitimize }
     open val allowExcessiveRotation = boolean("AllowExcessiveRotation", false) {
-        rotationsActive && generalApply() && !legitimize
+        rotationsActive && generalApply() && !isLegitimize
     }
     open val excessiveRotationMaxAngle = float("ExcessiveRotation/MaxAngle", 45f, 5f..180f) {
-        allowExcessiveRotation.get() && rotationsActive && generalApply() && !legitimize
+        allowExcessiveRotation.get() && rotationsActive && generalApply() && !isLegitimize
     }
     open val excessiveRotationCorrectionSpeed = floatRange("ExcessiveRotation/OvershootFactor", 1.1f..1.3f, 1.0f..2.0f) {
-        allowExcessiveRotation.get() && rotationsActive && generalApply() && !legitimize
+        allowExcessiveRotation.get() && rotationsActive && generalApply() && !isLegitimize
     }
     open val horizontalAngleChangeValue =
         floatRange("HorizontalAngleChange", 360f..360f, 0f..360f) { rotationsActive && generalApply() }
@@ -548,7 +560,7 @@ open class RotationSettings(owner: Module, generalApply: () -> Boolean = { true 
     val strict by strictValue
     val keepRotation by keepRotationValue
     val resetTicks by resetTicksValue
-    val legitimize by legitimizeValue
+    val legitimize get() = isLegitimize
     val horizontalAngleChange by horizontalAngleChangeValue
     val verticalAngleChange by verticalAngleChangeValue
     val angleResetDifference by angleResetDifferenceValue
@@ -598,6 +610,4 @@ open class RotationSettings(owner: Module, generalApply: () -> Boolean = { true 
     init {
         owner.addValues(this.values)
     }
-
-    var noiseFunction: ((Rotation) -> Rotation)? = null
 }

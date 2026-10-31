@@ -463,6 +463,8 @@ object KillAura : Module("KillAura", Category.KILLAURA, Keyboard.KEY_R) {
 
         drawAimPointBox()
 
+        computeAimPointScreenPos()
+
         if (cancelRun) {
             target = null
             hittable = false
@@ -523,8 +525,39 @@ object KillAura : Module("KillAura", Category.KILLAURA, Keyboard.KEY_R) {
         drawAimPoint2D()
     }
 
+    private fun computeAimPointScreenPos() {
+        val worldPos = aimPointWorldPos
+        if (worldPos == null || !KillAuraRenderAimPointBox.renderPointBoxAim) {
+            aimPointScreenPos = null
+            return
+        }
+
+        val renderManager = mc.renderManager
+        val scaledRes = net.minecraft.client.gui.ScaledResolution(mc)
+        val scaleFactor = scaledRes.scaleFactor
+
+        val renderPos = worldPos - renderManager.renderPos
+        val screenPos = WorldToScreen.worldToScreen(
+            org.lwjgl.util.vector.Vector3f(
+                renderPos.xCoord.toFloat(),
+                renderPos.yCoord.toFloat(),
+                renderPos.zCoord.toFloat()
+            )
+        )
+
+        if (screenPos == null) {
+            aimPointScreenPos = null
+            return
+        }
+
+        val pointX = screenPos.x.toDouble() / scaleFactor
+        val pointY = (mc.displayHeight - screenPos.y).toDouble() / scaleFactor
+
+        aimPointScreenPos = Vec3(pointX, pointY, 0.0)
+    }
+
     private fun drawAimPoint2D() {
-        val worldPos = aimPointWorldPos ?: return
+        val screenPos = aimPointScreenPos ?: return
 
         if (!KillAuraRenderAimPointBox.renderPointBoxAim) return
 
@@ -532,39 +565,21 @@ object KillAura : Module("KillAura", Category.KILLAURA, Keyboard.KEY_R) {
         val shouldGlow = KillAuraRenderAimPointBox.aimPointGlow
         if (!shouldDrawLine && !shouldGlow) return
 
-        val renderManager = mc.renderManager
         val scaledRes = net.minecraft.client.gui.ScaledResolution(mc)
-        val scaleFactor = scaledRes.scaleFactor
-        val screenWidth = scaledRes.scaledWidth
-        val screenHeight = scaledRes.scaledHeight
-        val centerX = screenWidth / 2.0
-        val centerY = screenHeight / 2.0
+        val centerX = scaledRes.scaledWidth / 2.0
+        val centerY = scaledRes.scaledHeight / 2.0
 
-        val renderPos = worldPos - renderManager.renderPos
-
-        try {
-            mc.entityRenderer.setupCameraTransform(mc.timer.renderPartialTicks, 0)
-        } catch (e: Exception) {
-            return
-        }
-
-        val screenPos = WorldToScreen.worldToScreen(
-            org.lwjgl.util.vector.Vector3f(
-                renderPos.xCoord.toFloat(),
-                renderPos.yCoord.toFloat(),
-                renderPos.zCoord.toFloat()
-            )
-        ) ?: return
-
-        val pointX = screenPos.x.toDouble() / scaleFactor
-        val pointY = (mc.displayHeight - screenPos.y).toDouble() / scaleFactor
+        val pointX = screenPos.xCoord
+        val pointY = screenPos.yCoord
 
         val glowIntensity = KillAuraRenderAimPointBox.aimPointGlowIntensity
         val pointColor = KillAuraRenderAimPointBox.aimPointBoxColor
         val lineColor = KillAuraRenderAimPointBox.aimPointLineColor
         val lineWidth = KillAuraRenderAimPointBox.aimPointLineWidth
         val pointSize = KillAuraRenderAimPointBox.aimPointBoxSize * 30f
+        val style = KillAuraRenderAimPointBox.aimPointStyle
 
+        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS)
         GL11.glPushMatrix()
         GL11.glDisable(GL11.GL_TEXTURE_2D)
         GL11.glEnable(GL11.GL_BLEND)
@@ -580,7 +595,7 @@ object KillAura : Module("KillAura", Category.KILLAURA, Keyboard.KEY_R) {
                 val expand = i.toFloat() * 1.5f
 
                 GL11.glColor4f(pointColor.red / 255f, pointColor.green / 255f, pointColor.blue / 255f, alpha)
-                when (KillAuraRenderAimPointBox.aimPointStyle) {
+                when (style) {
                     "Circle", "Box" -> {
                         GL11.glBegin(GL11.GL_TRIANGLE_FAN)
                         GL11.glVertex2d(pointX, pointY)
@@ -606,9 +621,18 @@ object KillAura : Module("KillAura", Category.KILLAURA, Keyboard.KEY_R) {
         }
 
         GL11.glColor4f(pointColor.red / 255f, pointColor.green / 255f, pointColor.blue / 255f, pointColor.alpha / 255f)
-        when (KillAuraRenderAimPointBox.aimPointStyle) {
+        when (style) {
             "Circle", "Box" -> {
-                RenderUtils.drawFilledCircle(pointX.toFloat(), pointY.toFloat(), pointSize, pointColor)
+                GL11.glBegin(GL11.GL_TRIANGLE_FAN)
+                GL11.glVertex2d(pointX, pointY)
+                for (j in 0..360) {
+                    val rad = Math.toRadians(j.toDouble())
+                    GL11.glVertex2d(
+                        pointX + cos(rad) * pointSize,
+                        pointY + sin(rad) * pointSize
+                    )
+                }
+                GL11.glEnd()
             }
             "Square" -> {
                 GL11.glBegin(GL11.GL_QUADS)
@@ -638,12 +662,8 @@ object KillAura : Module("KillAura", Category.KILLAURA, Keyboard.KEY_R) {
             GL11.glEnd()
         }
 
-        GL11.glDepthMask(true)
-        GL11.glEnable(GL11.GL_DEPTH_TEST)
-        GL11.glDisable(GL11.GL_LINE_SMOOTH)
-        GL11.glEnable(GL11.GL_TEXTURE_2D)
-        GL11.glDisable(GL11.GL_BLEND)
         GL11.glPopMatrix()
+        GL11.glPopAttrib()
     }
 
     private fun runAttack(isFirstClick: Boolean, isLastClick: Boolean) {
@@ -1271,6 +1291,8 @@ object KillAura : Module("KillAura", Category.KILLAURA, Keyboard.KEY_R) {
 
     var aimPointWorldPos: Vec3? = null
         private set
+
+    private var aimPointScreenPos: Vec3? = null
 
     private fun drawAimPointBox() {
         val player = mc.thePlayer ?: return

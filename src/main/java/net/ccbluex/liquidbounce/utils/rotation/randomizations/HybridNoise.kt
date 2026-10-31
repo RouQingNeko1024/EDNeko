@@ -3,7 +3,7 @@ package net.ccbluex.liquidbounce.utils.rotation.randomizations
 import net.ccbluex.liquidbounce.utils.extensions.isMoving
 import net.ccbluex.liquidbounce.utils.extensions.random
 import net.ccbluex.liquidbounce.utils.kotlin.RandomUtils.nextFloat
-import kotlin.math.cos
+import net.ccbluex.liquidbounce.utils.math.FastMathUtil.cos
 import net.ccbluex.liquidbounce.utils.rotation.RandomizationSettings
 import net.minecraft.client.Minecraft
 import java.util.*

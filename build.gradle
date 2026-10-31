@@ -155,7 +155,7 @@ dependencies {
         exclude group: "com.github.TheAltening", module: "API-Java"
     }
 
-    implementation("org.knowm.xchart:xchart:3.8.8")
+    implementation("org.knowm.xchart:xchart:4.0.4")
 
     // HTTP Client
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.14") {
